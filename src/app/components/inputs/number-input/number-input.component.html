@@ -1,0 +1,4 @@
+<div [formGroup]="formGroup">
+    <ion-input [name]="formControlName" [formControlName]="formControlName" #dummyFacade type="text"
+        (keyup)="handleKeyUp($event)" (ionInput)="handleInput($event)" [value]="formattedAmount"></ion-input>
+</div>

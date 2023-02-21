@@ -1,0 +1,23 @@
+.passif {
+  border-radius: 8px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: 600;
+}
+
+.positif {
+  background-color: rgb(248, 161, 161);
+}
+
+.negatif {
+  background-color: rgb(166, 221, 203);
+}
+
+.delete-confirm {
+  --background: red;
+  .alert-title {
+    display: inline-block;
+    background-image: url(/assets/icon/warning.png);
+    color: blue;
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "accounttype": {
+    "actifs": "assets",
+    "passifs": "liabilities",
+    "depense": "expenses",
+    "income": "incomes"
+  },
+  "actions": {
+    "createOp": "Create Operation",
+    "createAcc": "Create Account",
+    "cancel": "Cancel"
+  },
+  "forms": {
+    "operation": {
+      "title": "New operation",
+      "cancel": "cancel",
+      "transferTo":"Transfet to",
+
+      "actif": {
+        "debit": "Deposite",
+        "credit": "withdrawal"
+      },
+
+      "passif": {
+        "debit": "payment",
+        "credit": "charge"
+      },
+
+      "income": {
+        "debit": "income",
+        "credit": "charge"
+      }
+    },
+    "account": {
+      "title": "New account",
+      "name": "Enter name of account",
+      "placeholder": "Account name"
+    }
+  },
+
+  "divers": "diverse",
+  "actifs": "assets",
+  "passifs": "liabilities",
+  "depense": "expenses",
+  "income": "incomes"
+}

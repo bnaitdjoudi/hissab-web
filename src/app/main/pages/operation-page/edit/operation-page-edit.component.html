@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+      <ion-back-button icon="chevron-back-outline">
+      </ion-back-button>
+    </ion-buttons>
+
+    <ion-title><ion-label class="capitelize">
+      </ion-label> Operation </ion-title>
+
+    <ion-buttons slot="end">
+
+      <ion-button fill="clear" (click)="onSubmitFired()">
+        <ion-icon name="save-outline"></ion-icon></ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="operation$ | async as op" class="ion-padding">
+
+
+  <operation-form #operationForm [operation]="op" [accountType]="op.accountType? op.accountType:''"
+    [leafsAccount]="leafAccounts "></operation-form>
+
+  <!--  <ion-list>
+    <ion-item>
+      <ion-label for="time" position="stacked">Date:</ion-label>
+      <div id="time" class="time-div">
+        <ion-text>{{op.time | date : 'dd/MM/yyyy, HH:mm' }}</ion-text>
+
+      </div>
+
+    </ion-item>
+    <ion-item>
+      <ion-label for="trans" position="stacked">numero transaction:</ion-label>
+      <ion-text id="trans">{{op.numTrans}}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="description" position="stacked">Description:</ion-label>
+
+      <div id="description" class="time-div">
+        <ion-text>{{op.description}}</ion-text>
+
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="path" position="stacked">Transfer to:</ion-label>
+
+      <div id="path" class="time-div">
+        <ion-text>{{op.transfer}}</ion-text>
+
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="debit" position="stacked">Debit:</ion-label>
+      <ion-text id="debit">{{op.debit | currency}}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="credit" position="stacked">Credit:</ion-label>
+      <ion-text id="credit">{{op.credit | currency }}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="balance" position="stacked">Balance:</ion-label>
+      <ion-text id="balance">{{op.balance | currency }}</ion-text>
+    </ion-item>
+  </ion-list> -->
+
+</ion-content>

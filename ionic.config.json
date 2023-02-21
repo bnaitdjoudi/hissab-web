@@ -1,7 +1,8 @@
 {
   "name": "hissab-web",
   "integrations": {
-    "capacitor": {}
+    "capacitor": {},
+    "cordova": {}
   },
   "type": "angular"
 }

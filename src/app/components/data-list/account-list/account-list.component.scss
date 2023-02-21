@@ -1,0 +1,123 @@
+ion-card {
+  --color: #444646;
+  width: 100%;
+  border-radius: 5px;
+  margin: 6px 2px;
+  box-shadow: rgb(255 255 255 / 12%) 0px 4px 16px;
+}
+
+ion-card-title {
+  --color: #444646;
+}
+
+ion-card-subtitle {
+  --color: #444646;
+}
+
+/* iOS places the subtitle above the title */
+ion-card-header {
+}
+ion-card-content {
+  padding-top: 15px;
+  display: contents;
+}
+
+ion-item {
+  --padding-start: 10px;
+  --inner-padding-end: 7px;
+}
+.line-op-main {
+  width: 100%;
+}
+
+.detail-line {
+  width: 50%;
+  float: left;
+}
+
+.total-line {
+  text-align: right;
+
+  .balance {
+    ion-label {
+      width: 50%;
+      float: left;
+      font-style: italic;
+    }
+    .balance-text {
+      text-align: right;
+      text-decoration: double;
+
+      color: #a9adad;
+    }
+  }
+}
+
+.left-line {
+  .title {
+    font-size: larger;
+    text-overflow: ellipsis;
+  }
+
+  .date-line {
+    color: #a9adad;
+    font-weight: bold;
+    font-size: small;
+  }
+}
+
+.number-line {
+  border-radius: 8px;
+  padding: 4px;
+  font-size: small;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.passif.positif {
+  border-radius: 8px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: 600;
+  background-color: rgb(166, 221, 203);
+}
+
+.passif.negatif {
+  border-radius: 8px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: 600;
+  background-color: rgb(248, 161, 161);
+}
+
+.actif.positif {
+  border-radius: 8px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: 600;
+  background-color: rgb(166, 221, 203);
+}
+
+.actif.negatif {
+  border-radius: 8px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: 600;
+  background-color: rgb(248, 161, 161);
+}
+
+.depense.positif {
+  border-radius: 8px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: 600;
+  background-color: rgb(166, 221, 203);
+}
+
+.depense.negatif {
+  border-radius: 8px;
+  padding: 5px;
+  font-size: medium;
+  font-weight: 600;
+  background-color: rgb(250, 186, 186);
+}

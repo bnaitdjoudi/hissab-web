@@ -1,0 +1,23 @@
+{
+  "accounttype": {
+    "actifs": "actifs",
+    "passifs": "passifs",
+    "despense": "depense",
+    "incone": "entrées"
+  },
+  "actions": {
+    "create": "Créer",
+    "cancel": "Annuler"
+  },
+
+  "forms": {
+    "operation": {
+      "title": "Ajouter operation",
+      "cancel": "Annuler",
+      "actifs": {
+        "debit": "Dépos",
+        "credit": "Retrait"
+      }
+    }
+  }
+}
