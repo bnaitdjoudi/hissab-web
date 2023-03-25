@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, forkJoin } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 import { Account } from '../../model/account.model';
 import { LeafAccount } from '../../model/leaf-account.model';
 import { Operation } from '../../model/operation.model';
@@ -11,11 +11,7 @@ import { OperationService } from '../../services/operation.service';
 import { RouteParamsStore } from '../../store/route.params.store';
 import { Store } from '../../store/store';
 import { excludedAccountTypeTransferTo } from '../../tools/configs';
-import {
-  functionMap,
-  localBalanceFunMap,
-} from '../../tools/counting.fun.tools';
-import { pathToAllParentUniquePath } from '../../tools/tools';
+import { localBalanceFunMap } from '../../tools/counting.fun.tools';
 import { AccountPageStoreModel } from './account-page.store.model';
 import random from 'random-string-alphanumeric-generator';
 
@@ -74,8 +70,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
   constructor(
     private readonly accountService: AccountsService,
     private readonly operationService: OperationService,
-    private readonly routeParamsStore: RouteParamsStore,
-    private readonly accountingService: AccountingService
+    private readonly routeParamsStore: RouteParamsStore
   ) {
     super({
       currentAccount: {
@@ -117,7 +112,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
         }
       }
 
-      if (acc.id !== undefined) {
+      if (acc.id !== undefined && acc.id > 0) {
         this.performUpdateOperationList({ page: 1, limit: 10 }, acc.id);
         this.performUpdateSubAccountList({ page: 1, limit: 10 }, acc.id);
       }
@@ -145,8 +140,6 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
           operation.id === 0
         ) {
           this.createNewOperation(operation);
-        } else {
-          this.updateOperation(operation);
         }
       }
     });
@@ -168,20 +161,16 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
     this._deleteOperationSubject.subscribe({
       next: (id: number) => {
         if (id !== null && id > 0) {
-          console.log('delete operation Id :' + id);
-
-          this.operationService
-            .deleteOperationDate(id)
-            .then(() => {
-              if (this.state.currentAccount.id !== undefined) {
-                this.accountService
-                  .getAccountById(this.state.currentAccount.id)
-                  .then((acc) => {
-                    this.setCurrentAccount(acc);
-                    this._currentPageOperation.next({ page: 1, limit: 10 });
-                  });
-              }
-            });
+          this.operationService.deleteOperationDate(id).then(() => {
+            if (this.state.currentAccount.id !== undefined) {
+              this.accountService
+                .getAccountById(this.state.currentAccount.id)
+                .then((acc) => {
+                  this.setCurrentAccount(acc);
+                  this._currentPageOperation.next({ page: 1, limit: 10 });
+                });
+            }
+          });
         }
       },
     });
@@ -206,7 +195,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
     this.setState({ ...this.state, subAccountData: data });
   }
 
-  setCurrentAccount(account: Account) {
+  async setCurrentAccount(account: Account) {
     this.setState({
       ...this.state,
       currentAccount: account,
@@ -234,130 +223,36 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
   }
 
   private performUpdateOperationList(paging: PagingRequest, id: number) {
-    this.operationService
-      .getOperationsByPagingAndAccountId(paging, id)
-      .then((val) => this.updateOperationsList(val))
-      .catch((err) => console.log(err));
+    if (id) {
+      this.operationService
+        .getOperationsByPagingAndAccountId(paging, id)
+        .then((val) => this.updateOperationsList(val))
+        .catch((err) => console.log(err));
+    }
   }
 
   private createNewOperation(operation: Operation) {
-    operation.idAccount = !!this.state.currentAccount.id
-      ? this.state.currentAccount.id
-      : 0;
+    operation.idAccount = this.state.currentAccount.id;
     operation.numTrans = random.randomAlphanumeric(16, 'uppercase');
     this.operationService
       .businessCreationOperationDate(operation)
       .then(() => {
-        this.accountService
-          .getAccountById(this.state.currentAccount.id)
-          .then((acc) => {
-            this.setCurrentAccount(acc);
-            this._currentPageOperation.next({ page: 1, limit: 10 });
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        this.reloadAccount();
       })
       .catch((err) => {
         console.error(err);
       });
-
-    /*operation.idAccount = !!this.state.currentAccount.id
-      ? this.state.currentAccount.id
-      : 0;
-    operation.numTrans = random.randomAlphanumeric(16, 'uppercase');
-    let acc = this.state.currentAccount;
-    let func = functionMap[acc.type];
-    let total = !!func
-      ? func(operation.debit, operation.credit, acc.totalAccount)
-      : acc.totalAccount;
-
-    operation.balance = total;
-    let diff = total - acc.totalAccount;
-
-    this.accountService
-      .findAccountByPath('%' + operation.transfer + '%')
-      .then((pathAccount) => {
-        if (!!pathAccount && pathAccount.id) {
-          let op: Operation =
-            this.accountingService.processTransferingOperation(
-              acc.type + '->' + pathAccount.type,
-              operation
-            );
-          op.idAccount = pathAccount.id;
-          op.transfer = acc.path;
-          let funcPath = functionMap[pathAccount.type];
-          let totalPath = !!funcPath
-            ? funcPath(op.debit, op.credit, pathAccount.totalAccount)
-            : pathAccount.totalAccount;
-
-          op.balance = totalPath;
-          let diff2 = totalPath - pathAccount.totalAccount;
-
-          this.operationService.createOperations([operation, op]).then((r) => {
-            Promise.all([
-              this.accountService.updateTotalByAccountPath(
-                [...pathToAllParentUniquePath(this.state.currentAccount.path)],
-                diff
-              ),
-              this.accountService.updateTotalByAccountPath(
-                [...pathToAllParentUniquePath(pathAccount.path)],
-                diff2
-              ),
-            ]).then(() => {
-              if (this.state.currentAccount.id !== undefined) {
-                this.accountService
-                  .getAccountById(this.state.currentAccount.id)
-                  .then((acc) => {
-                    this.setCurrentAccount(acc);
-                    this._currentPageOperation.next({ page: 1, limit: 10 });
-                  });
-              }
-            });
-          });
-        }
-      })
-      .catch((err) => console.error(err));*/
   }
 
-  private updateOperation(operation: Operation) {
-    this.operationService
-      .getOperationById(!!operation.id ? operation.id : 0)
-      .then((oldOperation) => {
-        if (!!oldOperation && !!operation.id) {
-          let calFun = localBalanceFunMap[this.state.currentAccount.type];
-          let diff =
-            calFun(operation.debit, operation.credit) -
-            calFun(oldOperation.debit, oldOperation.credit);
-          operation.balance = oldOperation.balance + diff;
-          let acc = this.state.currentAccount;
-          acc.totalAccount = acc.totalAccount + diff;
-          this.operationService
-            .updateOperation(operation, operation.id)
-            .then(() => {
-              if (!!acc && acc.id) {
-                this.accountService
-                  .updateAccount(acc, acc.id)
-                  .then((acc2) => {
-                    this.setCurrentAccount(acc2);
-
-                    if (operation.id && acc.id) {
-                      this.operationService
-                        .adjusteAfterOperation(operation.id, acc.id, diff)
-                        .then((res) => {
-                          this._currentPageOperation.next({
-                            page: 1,
-                            limit: 10,
-                          });
-                          console.log(JSON.stringify(res));
-                        })
-                        .catch((err) => console.error(err));
-                    }
-                  })
-                  .catch((err) => console.error(err));
-              }
-            });
-        }
+  async reloadAccount() {
+    this.accountService
+      .getAccountById(this.state.currentAccount.id)
+      .then((acc) => {
+        this.setCurrentAccount(acc);
+        this._currentPageOperation.next({ page: 1, limit: 10 });
+      })
+      .catch((err) => {
+        console.error(err);
       });
   }
 

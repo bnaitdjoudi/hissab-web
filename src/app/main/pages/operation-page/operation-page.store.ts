@@ -28,7 +28,7 @@ export class OperationPageStore extends Store<Operation | null> {
   }
   async deleteCurrentOperatoion(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (this.state) {
+      if (this.state != null) {
         this.deleteOperationById(this.state?.id)
           .then(() => {
             resolve();
@@ -52,12 +52,13 @@ export class OperationPageStore extends Store<Operation | null> {
     });
   }
 
-  async updateOperation(operation: Operation): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  async updateOperation(operation: Operation): Promise<Operation> {
+    return new Promise<Operation>((resolve, reject) => {
       this.operationService
         .businessUpdateOperationDate(operation)
-        .then(() => {
-          resolve();
+        .then((op) => {
+          this.setState(op);
+          resolve(op);
         })
         .catch((err) => {
           reject('erreur durant excecusion du service');

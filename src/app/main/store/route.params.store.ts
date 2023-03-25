@@ -24,14 +24,8 @@ export class RouteParamsStore extends Store<RouteParams> {
     (state: RouteParams) => state.operationParams.id
   );
 
-  constructor(
-    private readonly router: Router,
-    private readonly mainStore: MainStore
-  ) {
+  constructor( readonly router: Router, readonly mainStore: MainStore) {
     super(store);
-
-    
-
     this.router.events
       .pipe(
         filter((e) => e instanceof ActivationEnd),

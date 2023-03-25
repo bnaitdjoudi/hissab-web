@@ -1,7 +1,7 @@
 export const deleteConfirmation = (
   textHeader: string,
-  cancelCallBack: () => void,
-  confirmCallBack: () => void,
+  cancelCallBack: (() => void) | undefined,
+  confirmCallBack: (() => void) | undefined,
   cssClass: string
 ): any => {
   return {

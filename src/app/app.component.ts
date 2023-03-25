@@ -7,19 +7,10 @@ import { Subscription } from 'rxjs';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent implements OnInit, OnDestroy{
-
+export class AppComponent implements OnInit, OnDestroy {
   routeSuscription: Subscription | undefined;
 
-  constructor(private readonly activatedRoute:ActivatedRoute) {
-
-  }
-  ngOnDestroy(): void {
-    
-  }
-  ngOnInit(): void {
-    
-  }
-
-
+  constructor() {}
+  ngOnDestroy(): void {}
+  ngOnInit(): void {}
 }

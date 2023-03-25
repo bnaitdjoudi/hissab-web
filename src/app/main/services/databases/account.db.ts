@@ -4,92 +4,141 @@ import { Account } from '../../model/account.model';
 import { LeafAccount } from '../../model/leaf-account.model';
 import { PagingData } from '../../model/paging-data';
 import { PagingRequest } from '../../model/paging-request.model';
+import { printError } from '../../tools/errorTools';
 import { DataBaseService } from './database.service';
 import { GenericDataBase } from './generic.db';
+import { GenericDb } from './GenericDb';
 import { tables } from './tables';
 
 @Injectable()
-export class AccountDataBase implements GenericDataBase<Account, number> {
-  sqLiteObject: SQLiteObject;
-
-  constructor(private readonly dataBase: DataBaseService) {
-    this.sqLiteObject = this.dataBase.sqLiteObject;
-    if (this.sqLiteObject) {
-      this.dataBase
-        .openSQLObject()
-        .then((sqLiteObject) => {
-          this.sqLiteObject = sqLiteObject;
-          console.log('sqlObject pulled on AccountDataBase');
-        })
-        .catch((e) => console.error(JSON.stringify(e)));
-    }
+export class AccountDataBase
+  extends GenericDb
+  implements GenericDataBase<Account, number>
+{
+  override sqLiteObject: any;
+  constructor(override readonly dataBase: DataBaseService) {
+    super(dataBase);
   }
 
   async update(model: Account, id: number): Promise<Account> {
-    if (this.sqLiteObject) {
-      return this.privateUpdate(model, id);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateUpdate(model, id);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<Account>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateUpdate(model, id)
+          .then((account) => resolve(account))
+          .catch((err) =>
+            printError(
+              "erreur l'ors de l'execussion d ela requette",
+              reject,
+              err
+            )
+          );
+      }
+    });
   }
   private async privateUpdate(model: Account, id: number): Promise<Account> {
-    return this.sqLiteObject
-      .executeSql(
-        `UPDATE ${tables.account.name} SET ${tables.account.columns
-          .filter((el) => el.name !== 'ID')
-          .map((el) => el.name + ' = ?')} WHERE id = ?;`,
-        [model.acountName, model.totalAccount, model.isMain, model.type, id]
-      )
-      .then(() => this.findById(id))
-      .catch((err) => err);
-  }
-
-  //update ACCOUNT set type = 'actif' ,total_account = 0 where id =  1;
-
-  async findAll(): Promise<Account[]> {
-    return this.sqLiteObject
-      .executeSql(`SELECT * FROM ${tables.account.name};`)
-      .then((res) => res);
-  }
-  async findById(id: number): Promise<Account> {
-    return new Promise((resolve, reject) => {
+    await this.checkDataBaseOpened();
+    return new Promise<Account>((resolve, reject) => {
       this.sqLiteObject
         .executeSql(
-          `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[0].name} = ${id};`,
-          []
+          `UPDATE ${tables.account.name} SET ${tables.account.columns
+            .filter((el) => el.name !== 'ID')
+            .map((el) => el.name + ' = ?')} WHERE id = ?;`,
+          [
+            model.acountName,
+            model.totalAccount,
+            model.isMain ? 1 : 0,
+            model.type,
+            model.parentId,
+            model.path,
+            model.isLeaf ? 1 : 0,
+            id,
+          ]
         )
-        .then((data) => {
-          if (data.rows.length >= 1) {
-            resolve(this.performeAccountRowIndex(data, 0));
-          } else {
-            reject('NOT FOUND');
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          reject('erreur lors de linterogation de la bd');
-        });
+        .then(() =>
+          this.findById(id)
+            .then((account) => resolve(account))
+            .catch((err) =>
+              printError(
+                'erreur lors de la recuperation de la ligne',
+                reject,
+                err
+              )
+            )
+        )
+        .catch((err: any) =>
+          printError('erreur lors de la requette de mis a jour', reject, err)
+        );
+    });
+  }
+
+  async findAll(): Promise<Account[]> {
+    await this.checkDataBaseOpened();
+    return new Promise<Account[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.sqLiteObject
+          .executeSql(`SELECT * FROM ${tables.account.name};`)
+          .then((res: any) => resolve(this.constructAccountArray(res)))
+          .catch((err: any) =>
+            printError(
+              "error l'ors de la recuperation des accounts",
+              reject,
+              err
+            )
+          );
+      }
+    });
+  }
+  async findById(id: number): Promise<Account> {
+    await this.checkDataBaseOpened();
+    return new Promise((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.sqLiteObject
+          .executeSql(
+            `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[0].name} = ${id};`,
+            []
+          )
+          .then((data: any) => {
+            if (data.rows.length >= 1) {
+              resolve(this.performeAccountRowIndex(data, 0));
+            } else {
+              reject('NOT FOUND');
+            }
+          })
+          .catch((err: any) => {
+            printError('erreur lors de la requette', reject, err);
+          });
+      }
     });
   }
 
   async findByName(name: string): Promise<Account> {
-    return this.sqLiteObject
-      .executeSql(
-        `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[1].name} = ${name};`
-      )
-      .then((res) => res);
+    await this.checkDataBaseOpened();
+    return new Promise<Account>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[1].name} = ?;`,
+          [name]
+        )
+        .then((res: any) => {
+          if (res.rows.length > 0) {
+            resolve(this.performeAccountRowIndex(res, 0));
+          } else {
+            reject('NOT FOUND');
+          }
+        })
+        .catch((err: any) =>
+          printError('erreur lors de la requette', reject, err)
+        );
+    });
   }
 
   async create(model: Account): Promise<any> {
-    return this.sqLiteObject
-      .executeSql(
-        `INSERT INTO ${tables.account.name} (
+    await this.checkDataBaseOpened();
+    return new Promise((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `INSERT INTO ${tables.account.name} (
             ${tables.account.columns[1].name},
             ${tables.account.columns[2].name}, 
             ${tables.account.columns[3].name},
@@ -97,63 +146,70 @@ export class AccountDataBase implements GenericDataBase<Account, number> {
             ${tables.account.columns[5].name},
             ${tables.account.columns[6].name},
             ${tables.account.columns[7].name}) VALUES ( ?, ?, ?,?, ?, ?, ? );`,
-        [
-          model.acountName,
-          model.totalAccount,
-          model.isMain ? 1 : 0,
-          model.type,
-          model.parentId,
-          model.path,
-          model.isLeaf ? 1 : 0,
-        ]
-      )
-      .then((res) => res)
-      .catch((e) => {
-        if (e.code === 6) {
-          return 'account already exist';
-        }
-
-        return 'error on creating account:' + JSON.stringify(e);
-      });
-  }
-
-  async getAccountsByType(arg0: string): Promise<Account[]> {
-    return this.dataBase.openSQLObject().then((sqLiteObject) => {
-      this.sqLiteObject = sqLiteObject;
-
-      return this.sqLiteObject
-        .executeSql(
-          `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[4].name} = ?;`,
-          [arg0]
+          [
+            model.acountName,
+            model.totalAccount,
+            model.isMain ? 1 : 0,
+            model.type,
+            model.parentId,
+            model.path,
+            model.isLeaf ? 1 : 0,
+          ]
         )
-        .then((data) => {
-          console.log('data:::::' + JSON.stringify(data.rows.item));
-          if (data.rows.length >= 1) {
-            this.constructAccountArray(data);
+        .then(() => resolve('succes!'))
+        .catch((e: { code: number }) => {
+          if (e.code === 6) {
+            reject('account already exist');
+          } else {
+            printError('error on creating account:', reject, e);
           }
-
-          return [];
         });
     });
   }
 
-  async getMainAccounts(): Promise<Account[]> {
-    return this.dataBase.openSQLObject().then((sqLiteObject) => {
-      this.sqLiteObject = sqLiteObject;
+  async getAccountsByType(arg0: string): Promise<Account[]> {
+    await this.checkDataBaseOpened();
+    return new Promise<Account[]>((resolve, reject) => {
+      if (this.sqLiteObject !== undefined || this.sqLiteObject !== null) {
+        this.sqLiteObject
+          .executeSql(
+            `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[4].name} = ?;`,
+            [arg0]
+          )
+          .then((data: { rows: string | any[] }) => {
+            if (data.rows.length >= 1) {
+              resolve(this.constructAccountArray(data));
+            } else {
+              resolve([]);
+            }
+          })
+          .catch((e: any) =>
+            printError('error on runnin query account', reject, e)
+          );
+      } else {
+        reject('aucun ouverture a la bd');
+      }
+    });
+  }
 
-      return this.sqLiteObject
+  async getMainAccounts(): Promise<Account[]> {
+    await this.checkDataBaseOpened();
+    return new Promise<Account[]>((resolve, reject) => {
+      this.sqLiteObject
         .executeSql(
           `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[3].name} = ?;`,
           [1]
         )
-        .then((data) => {
-          console.log('data:::::' + JSON.stringify(data.rows.item));
+        .then((data: { rows: string | any[] }) => {
           if (data.rows.length >= 1) {
-            return this.constructAccountArray(data);
+            resolve(this.constructAccountArray(data));
+          } else {
+            resolve([]);
           }
-
-          return [];
-        });
+        })
+        .catch((err: any) =>
+          printError('error on running query account', reject, err)
+        );
     });
   }
 
@@ -161,33 +217,32 @@ export class AccountDataBase implements GenericDataBase<Account, number> {
     paging: PagingRequest,
     id: number
   ): Promise<PagingData<Account>> {
-    if (this.sqLiteObject) {
-      return this.privateFindByIdAccountAndPaging(paging, id);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateFindByIdAccountAndPaging(paging, id);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<PagingData<Account>>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateFindByIdAccountAndPaging(paging, id)
+          .then((paging) => resolve(paging))
+          .catch((err) =>
+            printError('erreur durant la construction des données', reject, err)
+          );
+      }
+    });
   }
   privateFindByIdAccountAndPaging(
     paging: PagingRequest,
     id: number
   ): Promise<PagingData<Account>> {
-    return this.sqLiteObject
-      .executeSql(
-        `SELECT COUNT (*) AS VAL FROM ${tables.account.name}  WHERE  ${tables.account.columns[5].name} = ?`,
-        [id]
-      )
-      .then((res: any) => {
-        let totalElements: number = res.rows.item(0).VAL;
-        let offset: number = (paging.page - 1) * paging.limit;
-        let totalPage: number = Math.ceil(totalElements / paging.limit);
-        console.log('ddd:' + JSON.stringify(paging));
-        return new Promise<PagingData<Account>>((resolve, reject) => {
+    return new Promise<PagingData<Account>>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT COUNT (*) AS VAL FROM ${tables.account.name}  WHERE  ${tables.account.columns[5].name} = ?`,
+          [id]
+        )
+        .then((res: any) => {
+          let totalElements: number = res.rows.item(0).VAL;
+          let offset: number = (paging.page - 1) * paging.limit;
+          let totalPage: number = Math.ceil(totalElements / paging.limit);
+
           this.sqLiteObject
             .executeSql(
               `SELECT  *  FROM ${tables.account.name}  WHERE ${tables.account.columns[5].name} = ? ORDER BY ${tables.transaction.columns[0].name} DESC LIMIT ?  OFFSET ?;`,
@@ -201,56 +256,58 @@ export class AccountDataBase implements GenericDataBase<Account, number> {
               });
             })
             .catch((err: any) => reject(err));
-        });
-      })
-      .catch((err: any) => err);
+        })
+        .catch((err: any) => reject(err));
+    });
   }
 
   async deleteById(ids: number[]): Promise<void> {}
 
   async ajusteDiffByPath(paths: string[], diff: number): Promise<any> {
-    if (this.sqLiteObject) {
-      return this.privateAjusteDiffByPath(paths, diff);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateAjusteDiffByPath(paths, diff);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<any>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateAjusteDiffByPath(paths, diff)
+          .then(() => resolve('succes!'))
+          .catch((err) => printError('error on running query', reject, err));
+      }
+    });
   }
 
-  async privateAjusteDiffByPath(paths: string[], diff: number): Promise<any> {
-    return this.sqLiteObject
-      .executeSql(
-        `UPDATE ${tables.account.name} SET ${
-          tables.account.columns[2].name
-        } = ${tables.account.columns[2].name} + ? WHERE ${
-          tables.account.columns[6].name
-        } IN (${paths.map((el) => "'" + el + "'").join(',')})`,
-        [diff]
-      )
-      .then((res) => res)
-      .catch((err) => err);
+  private async privateAjusteDiffByPath(
+    paths: string[],
+    diff: number
+  ): Promise<any> {
+    await this.checkDataBaseOpened();
+    return new Promise<any>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `UPDATE ${tables.account.name} SET ${
+            tables.account.columns[2].name
+          } = ${tables.account.columns[2].name} + ? WHERE ${
+            tables.account.columns[6].name
+          } IN (${paths.map((el) => "'" + el + "'").join(',')})`,
+          [diff]
+        )
+        .then((res: any) => resolve(res))
+        .catch((err: any) => reject(err));
+    });
   }
 
   async findAllLeafExeptType(types: string[]): Promise<LeafAccount[]> {
-    if (this.sqLiteObject) {
-      return this.privateFindAllLeafExeptType(types);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateFindAllLeafExeptType(types);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<LeafAccount[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateFindAllLeafExeptType(types)
+          .then((leafs) => resolve(leafs))
+          .catch((err) => printError('error on running query', reject, err));
+      }
+    });
   }
 
-  private privateFindAllLeafExeptType(types: string[]): Promise<LeafAccount[]> {
+  private async privateFindAllLeafExeptType(
+    types: string[]
+  ): Promise<LeafAccount[]> {
     return new Promise<LeafAccount[]>((resolve, reject) => {
       this.sqLiteObject
         .executeSql(
@@ -259,39 +316,49 @@ export class AccountDataBase implements GenericDataBase<Account, number> {
             .join(',')});`,
           []
         )
-        .then((data) => {
-          let leafAccounts: LeafAccount[] = [];
-          if (data.rows.length > 0) {
-            for (let i = 0; i < data.rows.length; i++) {
-              leafAccounts.push({
-                id: data.rows.item(i).ID,
-                acountName: data.rows.item(i).ACCOUNT_NAME,
-                path: data.rows.item(i).PATH,
-                isLeaf: data.rows.item(i).IS_LEAF > 0,
-              });
+        .then(
+          (data: {
+            rows: {
+              length: number;
+              item: (arg0: number) => {
+                (): any;
+                new (): any;
+                ID: any;
+                ACCOUNT_NAME: any;
+                PATH: any;
+                IS_LEAF: number;
+              };
+            };
+          }) => {
+            let leafAccounts: LeafAccount[] = [];
+            if (data.rows.length > 0) {
+              for (let i = 0; i < data.rows.length; i++) {
+                leafAccounts.push({
+                  id: data.rows.item(i).ID,
+                  acountName: data.rows.item(i).ACCOUNT_NAME,
+                  path: data.rows.item(i).PATH,
+                  isLeaf: data.rows.item(i).IS_LEAF > 0,
+                });
+              }
             }
+            resolve(leafAccounts);
           }
-          resolve(leafAccounts);
-        })
-        .catch((err) => {
-          reject("erreur dans l'appel a la base de données");
-          console.error(err);
+        )
+        .catch((err: any) => {
+          printError("erreur dans l'appel a la base de données", reject, err);
         });
     });
   }
 
   async findAllLeafExeptOneByIds(ids: number[]): Promise<LeafAccount[]> {
-    if (this.sqLiteObject) {
-      return this.privateFindAllLeafExeptOneByIds(ids);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateFindAllLeafExeptOneByIds(ids);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<LeafAccount[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateFindAllLeafExeptOneByIds(ids)
+          .then((leafs) => resolve(leafs))
+          .catch((err) => printError('error on running query', reject, err));
+      }
+    });
   }
 
   async privateFindAllLeafExeptOneByIds(ids: number[]): Promise<LeafAccount[]> {
@@ -303,21 +370,35 @@ export class AccountDataBase implements GenericDataBase<Account, number> {
             .join(',')});`,
           []
         )
-        .then((data) => {
-          let leafAccounts: LeafAccount[] = [];
-          if (data.rows.length > 0) {
-            for (let i = 0; i < data.rows.length; i++) {
-              leafAccounts.push({
-                id: data.rows.item(i).ID,
-                acountName: data.rows.item(i).ACCOUNT_NAME,
-                path: data.rows.item(i).PATH,
-                isLeaf: data.rows.item(i).IS_LEAF > 0,
-              });
+        .then(
+          (data: {
+            rows: {
+              length: number;
+              item: (arg0: number) => {
+                (): any;
+                new (): any;
+                ID: any;
+                ACCOUNT_NAME: any;
+                PATH: any;
+                IS_LEAF: number;
+              };
+            };
+          }) => {
+            let leafAccounts: LeafAccount[] = [];
+            if (data.rows.length > 0) {
+              for (let i = 0; i < data.rows.length; i++) {
+                leafAccounts.push({
+                  id: data.rows.item(i).ID,
+                  acountName: data.rows.item(i).ACCOUNT_NAME,
+                  path: data.rows.item(i).PATH,
+                  isLeaf: data.rows.item(i).IS_LEAF > 0,
+                });
+              }
             }
+            resolve(leafAccounts);
           }
-          resolve(leafAccounts);
-        })
-        .catch((err) => {
+        )
+        .catch((err: any) => {
           reject("erreur dans l'appel a la base de données");
           console.error(err);
         });
@@ -325,35 +406,31 @@ export class AccountDataBase implements GenericDataBase<Account, number> {
   }
 
   async finByPath(transfer: string): Promise<Account> {
-    if (this.sqLiteObject) {
-      return this.privateFinByPath(transfer);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateFinByPath(transfer);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<Account>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateFinByPath(transfer)
+          .then((acc) => resolve(acc))
+          .catch((err) => printError('error on running query', reject, err));
+      }
+    });
   }
-  private privateFinByPath(transfer: string): Promise<Account> {
+  private async privateFinByPath(transfer: string): Promise<Account> {
     return new Promise<Account>((resolve, reject) => {
       this.sqLiteObject
         .executeSql(
           `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[6].name} LIKE ?`,
           [transfer]
         )
-        .then((data) => {
+        .then((data: { rows: string | any[] }) => {
           if (data.rows.length > 0) {
             resolve(this.performeAccountRowIndex(data, 0));
           } else {
             reject('no record found!!!');
           }
         })
-        .catch((err) => {
-          reject('erreur en appelant la bd');
-          console.error(err);
+        .catch((err: any) => {
+          reject(err);
         });
     });
   }

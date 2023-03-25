@@ -23,10 +23,9 @@ export class AccountListComponent implements OnInit {
 
   onIonInfinite(ev: Event) {
     this.onIonInfiniteScroll.emit(ev as InfiniteScrollCustomEvent);
-    console.log('onIonInfinite');
   }
 
-  onSelectOperation(account: Account) {
+  onSelectAccount(account: Account) {
     this.onElementSelected.emit(account);
   }
 

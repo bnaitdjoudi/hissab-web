@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AlertController, LoadingController } from '@ionic/angular';
-import { isObservable, Observable, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Operation } from '../../../model/operation.model';
 import { deleteConfirmation } from '../../../tools/alert.contollers';
 import { OperationPageStore } from '../operation-page.store';
@@ -26,9 +26,9 @@ export class OperationPageEditComponent implements OnInit, OnDestroy {
 
   constructor(
     readonly operationStore: OperationPageStore,
-    private alertController: AlertController,
-    private _location: Location,
-    private loadingCtrl: LoadingController
+    readonly alertController: AlertController,
+    readonly _location: Location,
+    readonly loadingCtrl: LoadingController
   ) {}
   ngOnDestroy(): void {
     this.suscribtionLeafs?.unsubscribe();
@@ -42,11 +42,7 @@ export class OperationPageEditComponent implements OnInit, OnDestroy {
       });
   }
 
-  isOperationObservable(): boolean {
-    return this.operation$ ? isObservable(this.operation$) : false;
-  }
-
-  async showLoading(): Promise<HTMLIonLoadingElement> {
+  private async showLoading(): Promise<HTMLIonLoadingElement> {
     return this.loadingCtrl.create({
       message: 'updating operation',
     });
@@ -54,19 +50,32 @@ export class OperationPageEditComponent implements OnInit, OnDestroy {
 
   async onSubmitFired() {
     console.log('alert');
+
     const alert = await this.alertController.create(
       deleteConfirmation(
         'Voulez vous sauvegarder les changement?',
-        () => console.log('cancel'),
-        () => this.sumitOperationUpdate(),
+        undefined,
+        undefined,
         'custom-alert'
       )
     );
 
     await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    switch (role) {
+      case 'cancel': {
+        console.log('cancel alert');
+        break;
+      }
+      case 'confirm': {
+        await this.submitOperationUpdate();
+        break;
+      }
+    }
   }
 
-  private async sumitOperationUpdate() {
+  private async submitOperationUpdate() {
     this.loadingDelete = await this.showLoading();
     this.loadingDelete.present();
     if (this.operationFormComponent.isValidData()) {

@@ -65,6 +65,9 @@ export class NumberInputComponent implements OnInit, ControlValueAccessor {
     }
   }
 
+
+  
+
   handleInput(event: Event) {
     // check if digit
     if (

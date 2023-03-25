@@ -10,7 +10,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { OperationFormComponent } from 'src/app/components/forms/operation-form/operation-form.component';
 import { parseFloatTool } from '../../tools/tools';
 import { LeafAccount } from '../../model/leaf-account.model';
-import { deleteConfirmation } from '../../tools/alert.contollers';
 
 @Component({
   selector: 'app-account-page',
@@ -25,9 +24,9 @@ export class AccountPageComponent implements OnInit {
 
   leafAccounts: LeafAccount[] = [];
 
-  accountSuscription: Subscription | undefined;
-  dataListSubscription: Subscription | undefined;
-  leafAccountSuscription: Subscription | undefined;
+  accountSuscription: Subscription;
+  dataListSubscription: Subscription;
+  leafAccountSuscription: Subscription;
 
   currentAccount: Account = {
     id: 0,
@@ -51,7 +50,7 @@ export class AccountPageComponent implements OnInit {
     currentPage: 1,
     totalPage: 1,
   };
-  isAccountModalOpen: any;
+  isAccountModalOpen = false;
   nameAccount: string;
 
   @ViewChild(OperationFormComponent)
@@ -60,13 +59,13 @@ export class AccountPageComponent implements OnInit {
 
   constructor(
     readonly accountStore: AccountPageStore,
-    private actionSheetCtrl: ActionSheetController,
+    readonly actionSheetCtrl: ActionSheetController,
     private translateService: TranslateService
   ) {}
 
   ngOnDestroy(): void {
-    this.accountSuscription?.unsubscribe();
-    this.dataListSubscription?.unsubscribe();
+    this.accountSuscription.unsubscribe();
+    this.dataListSubscription.unsubscribe();
   }
   ngOnInit(): void {
     this.accountSuscription = this.accountStore.currentAccount$
@@ -78,7 +77,6 @@ export class AccountPageComponent implements OnInit {
     this.dataListSubscription = this.accountStore.listDataCombined$.subscribe(
       (data) => {
         [this.accountsData, this.operations] = data;
-        console.log(JSON.stringify(this.accountsData));
       }
     );
 
@@ -91,9 +89,8 @@ export class AccountPageComponent implements OnInit {
     );
   }
 
-  addOperationOrAccount(row: Operation | Account) {
-    console.log('dinnnnnnnnnnnnnnnnnnnnnn');
-    this.accountStore.setNewOrUpdateOperation(row as Operation);
+  addOperation(row: Operation) {
+    this.accountStore.setNewOrUpdateOperation(row);
     this.isCreateOpModalOpen = false;
   }
 
@@ -134,7 +131,6 @@ export class AccountPageComponent implements OnInit {
     actionSheet.onDidDismiss().then((result) => {
       switch (result.role) {
         case 'createOp': {
-          console.log('ddddddddddddddddddddddddddddddddddddddddd');
           this.createOperation();
           break;
         }
@@ -147,9 +143,8 @@ export class AccountPageComponent implements OnInit {
     });
   }
 
-  private createOperation() {
+  createOperation() {
     this.isCreateOpModalOpen = true;
-    console.log('fffff::' + this.isCreateOpModalOpen);
   }
 
   modalAccount() {
@@ -180,7 +175,7 @@ export class AccountPageComponent implements OnInit {
         credit: parseFloatTool(this.operationFormComponent.operation.credit),
       };
 
-      this.addOperationOrAccount(operation);
+      this.addOperation(operation);
     }
   }
 
@@ -189,6 +184,4 @@ export class AccountPageComponent implements OnInit {
 
     this.isCreateOpModalOpen = false;
   }
-
-  
 }

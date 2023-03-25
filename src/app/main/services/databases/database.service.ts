@@ -9,12 +9,17 @@ import {
   INSERT_INITIAL_ACCOUNT_DATA,
 } from './tables';
 import { SQLitePorter } from '@awesome-cordova-plugins/sqlite-porter/ngx';
+import { InjectDbTestService } from './injectDbTest.service';
 
 declare var window: any;
 
 @Injectable()
 export class DataBaseService {
   sqLiteObject: any;
+
+  DATABASE: string = 'data5.db';
+  DATABASE_V: string = '1.1';
+  DDD: string = 'yes';
 
   constructor(
     private readonly sqlite: SQLite,
@@ -33,7 +38,8 @@ export class DataBaseService {
   }
 
   private createDataBaseWebSql(init: boolean) {
-    let db = window.openDatabase('data4.db', '1.0', 'DEV', -1);
+    console.info('CREATE WEBSQL DATABASE');
+    let db = window.openDatabase(this.DATABASE, this.DATABASE_V, 'DEV', -1);
     this.sqLiteObject = browserDBInstance(db);
     if (init) {
       this.createAccountTables();
@@ -45,9 +51,10 @@ export class DataBaseService {
    * create Data base
    */
   private createDataBaseSqlite() {
+    console.info('CREATE SQLITE DATABASE');
     this.sqlite
       .create({
-        name: 'data4.db',
+        name: this.DATABASE,
         location: 'default',
       })
       .then((db: SQLiteObject) => {
@@ -136,9 +143,11 @@ export class DataBaseService {
         resolve(this.sqLiteObject);
       });
     }
+    console.info('OPEN SQLITE DATABASEfdgsdffg');
+    if (this.platform.is('capacitor')) {
+      console.info('OPEN SQLITE DATABASE');
 
-    if (this.platform.is('android')) {
-      return this.sqlite.create({ name: 'data4.db', location: 'default' });
+      return this.sqlite.create({ name: this.DATABASE, location: 'default' });
     } else {
       return new Promise<any>((resolve, reject) => {
         this.createDataBaseWebSql(false);

@@ -1,202 +1,239 @@
 import { Injectable } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
 import { rejects } from 'assert';
-import { KeyObject } from 'crypto';
 import parseISO from 'date-fns/parseISO';
+import { resolve } from 'dns';
 import { Operation } from '../../model/operation.model';
 import { PagingData } from '../../model/paging-data';
 import { PagingRequest } from '../../model/paging-request.model';
 import { printError } from '../../tools/errorTools';
 import { DataBaseService } from './database.service';
 import { GenericDataBase } from './generic.db';
+import { GenericDb } from './GenericDb';
 import { tables } from './tables';
 
 @Injectable()
-export class OperationDataBase implements GenericDataBase<Operation, number> {
-  sqLiteObject: any;
-
-  constructor(private readonly dataBase: DataBaseService) {
-    this.sqLiteObject = this.dataBase.sqLiteObject;
-    if (this.sqLiteObject) {
-      this.dataBase
-        .openSQLObject()
-        .then((sqLiteObject) => {
-          this.sqLiteObject = sqLiteObject;
-          console.log('sqlObject pulled on AccountDataBase');
-        })
-        .catch((e) => console.error(JSON.stringify(e)));
-    }
+export class OperationDataBase
+  extends GenericDb
+  implements GenericDataBase<Operation, number>
+{
+  constructor(override readonly dataBase: DataBaseService) {
+    super(dataBase);
   }
 
   async create(model: Operation): Promise<any> {
-    if (this.sqLiteObject) {
-      return this.privateCreate(model);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateCreate(model);
-      })
-      .catch((err) => {
-        return err;
-      });
+    await this.checkDataBaseOpened();
+    return new Promise<any>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateCreate(model)
+          .then((res) => {
+            resolve('loperation est bien créée');
+          })
+          .catch((err) =>
+            printError(
+              'erreur a excecution de la requete insertion',
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
   }
   private async privateCreate(model: Operation): Promise<any> {
-    return this.sqLiteObject
-      .executeSql(
-        `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
-          .filter((el) => el.name !== 'ID')
-          .map((el) => el.name)}) 
-        VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?);`,
-        [
-          model.numTrans,
-          model.time,
-          model.description,
-          model.statut,
-          model.credit,
-          model.debit,
-          model.balance,
-          model.idAccount,
-          model.transfer,
-        ]
-      )
-      .then((res: any) => res)
-      .catch((e: any) => {
-        if (e.code === 6) {
-          return 'operation already exist';
-        }
+    return new Promise<any>((resolve, reject) =>
+      this.sqLiteObject
+        .executeSql(
+          `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
+            .filter((el) => el.name !== 'ID')
+            .map((el) => el.name)}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?);`,
+          [
+            model.numTrans,
+            model.time,
+            model.description,
+            model.statut,
+            model.credit,
+            model.debit,
+            model.balance,
+            model.idAccount,
+            model.transfer,
+          ]
+        )
+        .then((res: any) => resolve(res))
+        .catch((e: any) => {
+          if (e.code === 6) {
+            reject('operation already exist');
+          }
 
-        return e;
-      });
+          reject(e);
+        })
+    );
   }
   async update(operation: Operation, id: number): Promise<Operation> {
-    if (this.sqLiteObject) {
-      return this.privateUpdate(operation, id);
-    }
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateUpdate(operation, id);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateUpdate(operation, id)
+          .then((res) => resolve(operation))
+          .catch((err) =>
+            printError('error dans le update doperation', reject, err)
+          );
+      } else {
+        printError(
+          'aucun instance de connexion a bd',
+          reject,
+          'aucun instance de connexion a bd'
+        );
+      }
+    });
   }
   private async privateUpdate(
     operation: Operation,
     id: number
   ): Promise<Operation> {
-    return this.sqLiteObject
-      .executeSql(
-        `UPDATE  ${tables.transaction.name} SET ${tables.transaction.columns
-          .filter((el) => el.name !== 'ID')
-          .map((el) => el.name + ' = ?')} WHERE ID = ? `,
-        [
-          operation.numTrans,
-          operation.time,
-          operation.description,
-          operation.statut,
-          operation.credit,
-          operation.debit,
-          operation.balance,
-          operation.idAccount,
-          operation.transfer,
-          id,
-        ]
-      )
-      .then(() => this.findById(id))
-      .catch((err: any) => err);
+    return new Promise<Operation>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `UPDATE  ${tables.transaction.name} SET ${tables.transaction.columns
+            .filter((el) => el.name !== 'ID')
+            .map((el) => el.name + ' = ?')} WHERE ID = ? `,
+          [
+            operation.numTrans,
+            operation.time,
+            operation.description,
+            operation.statut,
+            operation.credit,
+            operation.debit,
+            operation.balance,
+            operation.idAccount,
+            operation.transfer,
+            id,
+          ]
+        )
+        .then(() =>
+          this.findById(id)
+            .then((op) => resolve(op))
+            .catch((err) =>
+              printError('fail to get updated operation', reject, err)
+            )
+        )
+        .catch((err: any) =>
+          printError('fail to update operation', reject, err)
+        );
+    });
   }
 
   async findById(id: number): Promise<Operation> {
-    if (this.sqLiteObject) {
-      return this.privateFindById(id);
-    }
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateFindById(id);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<Operation>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateFindById(id)
+          .then((operation) => resolve(operation))
+          .catch((err) =>
+            printError('erreur pour retrouver une operation', reject, err)
+          );
+      } else {
+        printError(
+          'aucun instance de connexion a bd',
+          reject,
+          'aucun instance de connexion a bd'
+        );
+      }
+    });
   }
 
   private async privateFindById(id: number): Promise<Operation> {
-    return this.sqLiteObject
-      .executeSql(
-        `SELECT * FROM ${tables.transaction.name} WHERE ${tables.transaction.columns[0].name} = ${id};`,
-        []
-      )
-      .then((data: any) => {
-        if (data.rows.length >= 1) {
-          return {
-            id: data.rows.item(0).ID,
-            numTrans: data.rows.item(0).NUM_TRANS,
-            time: parseISO(data.rows.item(0).TIME),
-            balance: data.rows.item(0).BALANCE,
-            description: data.rows.item(0).DESCRIPTION,
-            statut: data.rows.item(0).STATUT,
-            credit: data.rows.item(0).CREDIT,
-            debit: data.rows.item(0).DEBIT,
-            idAccount: data.rows.item(0).ID_ACCOUNT,
-            transfer: data.rows.item(0).TRANSFER,
-          } as Operation;
-        }
-
-        return {
-          description: '',
-          debit: 0,
-        } as Operation;
-      })
-      .catch((err: any) => err);
+    return new Promise<Operation>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT * FROM ${tables.transaction.name} WHERE ${tables.transaction.columns[0].name} = ${id};`,
+          []
+        )
+        .then((data: any) => {
+          if (data.rows.length >= 1) {
+            resolve(this.performOperationsRowIndex(data, 0));
+          } else {
+            reject('no operation found');
+          }
+        })
+        .catch((err: any) =>
+          printError('error en excecutant la requete', reject, err)
+        );
+    });
   }
 
   async findByIdAccount(id: number): Promise<Operation[]> {
-    if (this.sqLiteObject) {
-      return this.privateFindByIdAccount(id);
-    }
+    await this.checkDataBaseOpened();
+    return new Promise<Operation[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateFindByIdAccount(id)
+          .then((ops) => resolve(ops))
+          .catch((err) =>
+            printError(
+              'erreur lors trouver des operastions avec idcount',
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
+  }
 
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateFindByIdAccount(id);
-      })
-      .catch((err) => err);
+  private async privateFindByIdAccount(id: number): Promise<Operation[]> {
+    return new Promise<Operation[]>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT * FROM ${tables.transaction.name} WHERE ${tables.transaction.columns[8].name} = ? ORDER BY ${tables.transaction.columns[2].name} DESC;`,
+          [id]
+        )
+        .then((data: any) => {
+          resolve(this.constructOperationArray(data));
+        })
+        .catch((err: any) =>
+          printError('erreur a lexcecution de la requette ', reject, err)
+        );
+    });
   }
 
   async findByIdAccountAndPaging(
     paging: PagingRequest,
     id: number
   ): Promise<PagingData<Operation>> {
-    if (this.sqLiteObject) {
-      return this.privateFindByIdAccountAndPaging(paging, id);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateFindByIdAccountAndPaging(paging, id);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<PagingData<Operation>>((resolve, rejects) => {
+      if (this.sqLiteObject) {
+        this.privateFindByIdAccountAndPaging(paging, id)
+          .then((data) => resolve(data))
+          .catch((err) =>
+            printError(
+              'erreur lors de la recuperation des données',
+              rejects,
+              err
+            )
+          );
+      } else {
+        rejects('aucun instance de connexion a bd');
+      }
+    });
   }
+
   privateFindByIdAccountAndPaging(
     paging: PagingRequest,
     id: number
   ): Promise<PagingData<Operation>> {
-    return this.sqLiteObject
-      .executeSql(
-        `SELECT COUNT (*) AS VAL FROM ${tables.transaction.name}  WHERE  ${tables.transaction.columns[8].name} = ?`,
-        [id]
-      )
-      .then((res: any) => {
-        let totalElements: number = res.rows.item(0).VAL;
-        let offset: number = (paging.page - 1) * paging.limit;
-        let totalPage: number = Math.ceil(totalElements / paging.limit);
-        console.log('ddd:' + JSON.stringify(paging));
-        return new Promise<PagingData<Operation>>((resolve, reject) => {
+    return new Promise<PagingData<Operation>>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT COUNT (*) AS VAL FROM ${tables.transaction.name}  WHERE  ${tables.transaction.columns[8].name} = ?`,
+          [id]
+        )
+        .then((res: any) => {
+          let totalElements: number = res.rows.item(0).VAL;
+          let offset: number = (paging.page - 1) * paging.limit;
+          let totalPage: number = Math.ceil(totalElements / paging.limit);
+
           this.sqLiteObject
             .executeSql(
               `SELECT  *  FROM ${tables.transaction.name}  WHERE ${tables.transaction.columns[8].name} = ? ORDER BY ${tables.transaction.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
@@ -209,25 +246,17 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
                 totalPage: totalPage,
               });
             })
-            .catch((err: any) => reject(err));
-        });
-      })
-      .catch((err: any) => err);
+            .catch((err: any) =>
+              printError('error lors davoir la liste', reject, err)
+            );
+        })
+        .catch((err: any) =>
+          printError('erreur lors davoir count', reject, err)
+        );
+    });
   }
 
-  private async privateFindByIdAccount(id: number): Promise<Operation[]> {
-    return this.sqLiteObject
-      .executeSql(
-        `SELECT * FROM ${tables.transaction.name} WHERE ${tables.transaction.columns[8].name} = ? ORDER BY ${tables.transaction.columns[2].name} DESC;`,
-        [id]
-      )
-      .then((data: any) => {
-        return this.constructOperationArray(data);
-      })
-      .catch((err: any) => console.error(err));
-  }
-
-  findAll(): Promise<Operation[]> {
+  async findAll(): Promise<Operation[]> {
     throw new Error('Method not implemented.');
   }
 
@@ -236,30 +265,38 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
     countId: number,
     diff: number
   ): Promise<any> {
-    if (this.sqLiteObject) {
-      return this.privateAdjusteAfterOperation(id, countId, diff);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateAdjusteAfterOperation(id, countId, diff);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateAdjusteAfterOperation(id, countId, diff)
+          .then(() => resolve({}))
+          .catch((err) =>
+            printError('erreur lors de lajustement', reject, err)
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
   }
   private async privateAdjusteAfterOperation(
     id: number,
     countId: number,
     diff: number
   ): Promise<any> {
-    return this.sqLiteObject
-      .executeSql(
-        `UPDATE  ${tables.transaction.name} SET ${tables.transaction.columns[7].name} = ${tables.transaction.columns[7].name} + ? WHERE id > ? and ${tables.transaction.columns[8].name} = ?`,
-        [diff, id, countId]
-      )
-      .then((res: any) => res)
-      .catch((err: any) => err);
+    return new Promise((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `UPDATE  ${tables.transaction.name} SET ${tables.transaction.columns[7].name} = ${tables.transaction.columns[7].name} + ? WHERE id > ? and ${tables.transaction.columns[8].name} = ?`,
+          [diff, id, countId]
+        )
+        .then((res: any) => {
+          resolve('succes!!');
+          console.info(res);
+        })
+        .catch((err: any) =>
+          printError('erreur lors de lexcecusion de la requete', reject, err)
+        );
+    });
   }
 
   private constructOperationArray(data: any): Operation[] {
@@ -284,87 +321,112 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
   }
 
   async deleteById(ids: number[]): Promise<void> {
-    if (this.sqLiteObject) {
-      return this.privateDeleteById(ids);
-    }
-
-    return this.dataBase
-      .openSQLObject()
-      .catch((err) => err)
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateDeleteById(ids);
-      });
+    await this.checkDataBaseOpened();
+    return new Promise((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateDeleteById(ids)
+          .then(() => resolve())
+          .catch((err) =>
+            printError('erreur lors de la suppression', reject, err)
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
   }
 
   private async privateDeleteById(ids: number[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.sqLiteObject
         .executeSql(
-          `DELETE FROM  ${tables.transaction.name} WHERE  ${
+          `DELETE FROM ${tables.transaction.name} WHERE  ${
             tables.transaction.columns[0].name
           } IN (${ids.join(',')})`
         )
-        .then(() => {
-          console.log('operation ids :' + ids.join(',') + ' deleted!');
+        .then((res: any) => {
+          console.log(
+            'operation ids :' +
+              ids.join(',') +
+              ' deleted!:::' +
+              JSON.stringify(res)
+          );
           resolve();
         })
-        .catch((err: any) => reject(err));
+        .catch((err: any) => {
+          if (err.rows.length === 0 && err.rowsAffected >= 0) {
+            resolve();
+          } else {
+            printError("erreur dans l'excecusion de le requete", reject, err);
+          }
+        });
     });
   }
 
-  async createList(operations: Operation[]): Promise<any> {
-    if (this.sqLiteObject) {
-      return this.privatecreateList(operations);
-    }
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privatecreateList(operations);
-      })
-      .catch((err) => err);
+  async createList(operations: Operation[], withoutId: boolean): Promise<any> {
+    await this.checkDataBaseOpened();
+    return new Promise<any>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privatecreateList(operations, withoutId)
+          .then(() => resolve({}))
+          .catch((err) =>
+            printError("error dans l'excecusion de la requete", reject, err)
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
   }
 
-  private async privatecreateList(operations: Operation[]): Promise<any> {
-    return this.sqLiteObject
-      .executeSql(
-        `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
-          .filter((el) => el.name !== 'ID')
-          .map((el) => el.name)}) 
+  private async privatecreateList(
+    operations: Operation[],
+    withId: boolean
+  ): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
+            .filter((el) => {
+              if (withId) {
+                return true;
+              }
+              return el.name !== 'ID';
+            })
+            .map((el) => el.name)}) 
         VALUES ${operations
           .map(
             (model) =>
-              `( '${model.numTrans}', '${model.time}', '${model.description}', '${model.statut}' ,${model.credit}, ${model.debit}, ${model.balance}, ${model.idAccount}, '${model.transfer}')`
+              `( ${!withId ? '' : model.id + ','} '${model.numTrans}', '${
+                model.time
+              }', '${model.description}', '${model.statut}' ,${model.credit}, ${
+                model.debit
+              }, ${model.balance}, ${model.idAccount}, '${model.transfer}')`
           )
           .join(',')};`,
-        []
-      )
-      .then((res: any) => res)
-      .catch((e: any) => {
-        if (e.code === 6) {
-          return 'operation already exist';
-        }
+          []
+        )
+        .then((res: any) => resolve(res))
+        .catch((e: any) => {
+          if (e.code === 6) {
+            printError('operation already exist', reject, e);
+          }
 
-        return e;
-      });
+          printError("erreur dans l'excecusion de la requete", reject, e);
+        });
+    });
   }
 
   async selectOperationByNumTrans(numTrans: string): Promise<Operation[]> {
-    if (this.sqLiteObject) {
-      return this.privateSelectOperationByNumTrans(numTrans);
-    }
-    return new Promise<Operation[]>((_resolve, reject) => {
-      this.dataBase
-        .openSQLObject()
-        .then((sqLiteObject) => {
-          this.sqLiteObject = sqLiteObject;
-          return this.privateSelectOperationByNumTrans(numTrans);
-        })
-        .catch((err) => {
-          reject('erreur lors de la creation de la connexion a DB');
-          console.error(err);
-        });
+    await this.checkDataBaseOpened();
+    return new Promise<Operation[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateSelectOperationByNumTrans(numTrans)
+          .then((operations) => resolve(operations))
+          .catch((err) =>
+            printError("error dans l'excecusion de la requette", reject, err)
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
     });
   }
 
@@ -381,8 +443,7 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
           resolve(this.constructOperationArray(result));
         })
         .catch((err: any) => {
-          reject('erreur lors d excecusion de la requette');
-          console.error(err);
+          printError("erreur lors de l'excecusion de la requette", reject, err);
         });
     });
   }
@@ -390,89 +451,106 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
   async selectOperationJoinAccountByNumTrans(
     numTrans: string
   ): Promise<Operation[]> {
-    if (this.sqLiteObject) {
-      return this.privateSelectOperationJoinAccountByNumTrans(numTrans);
-    }
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateSelectOperationJoinAccountByNumTrans(numTrans);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<Operation[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateSelectOperationJoinAccountByNumTrans(numTrans)
+          .then((opers) => resolve(opers))
+          .catch((err) =>
+            printError(
+              "erreur lors de l'excecusion de la requette",
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
   }
 
   private async privateSelectOperationJoinAccountByNumTrans(
     numTrans: string
   ): Promise<Operation[]> {
-    return this.sqLiteObject
-      .executeSql(
-        `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[1].name} = ?;`,
-        [numTrans]
-      )
-      .then((data: any) => {
-        let operations: Operation[] = [];
-        if (data.rows.length >= 1) {
-          operations = this.constructAccountArray(data);
-        }
-        return operations;
-      })
-      .catch((err: any) => err);
+    return new Promise<Operation[]>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[1].name} = ?;`,
+          [numTrans]
+        )
+        .then((data: any) => {
+          let operations: Operation[] = [];
+          if (data.rows.length >= 1) {
+            operations = this.constructAccountArray(data);
+          }
+          resolve(operations);
+        })
+        .catch((err: any) =>
+          printError("erreur lors de l'excecusion de la requette", reject, err)
+        );
+    });
   }
 
   async selectOperationJoinAccountById(id: number): Promise<Operation> {
-    if (this.sqLiteObject) {
-      return this.privateSelectOperationJoinAccountById(id);
-    }
-    return this.dataBase
-      .openSQLObject()
-      .then((sqLiteObject) => {
-        this.sqLiteObject = sqLiteObject;
-        return this.privateSelectOperationJoinAccountById(id);
-      })
-      .catch((err) => err);
+    await this.checkDataBaseOpened();
+    return new Promise<Operation>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateSelectOperationJoinAccountById(id)
+          .then((op) => resolve(op))
+          .catch((err) =>
+            printError(
+              "erreur lors de l'excecusion de la requette",
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
   }
 
   private async privateSelectOperationJoinAccountById(
     id: number
   ): Promise<Operation> {
-    return this.sqLiteObject
-      .executeSql(
-        `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[0].name} = ?;`,
-        [id]
-      )
-      .then((data: any) => {
-        if (data.rows.length >= 1) {
-          return this.performOperationsRowIndex(data, 0);
-        } else {
-          return null;
-        }
-      })
-      .catch((err: any) => err);
+    return new Promise<Operation>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[0].name} = ?;`,
+          [id]
+        )
+        .then((data: any) => {
+          if (data.rows.length >= 1) {
+            resolve(this.performOperationsRowIndex(data, 0));
+          } else {
+            resolve({} as Operation);
+          }
+        })
+        .catch((err: any) =>
+          printError("erreur lors de l'excecusion de la requette", reject, err)
+        );
+    });
   }
 
   async findOperationTransferTo(
     numTrans: string,
     countId: number
   ): Promise<Operation> {
-    if (this.sqLiteObject) {
-      return this.privateFincOperatonTransferTo(numTrans, countId);
-    }
+    await this.checkDataBaseOpened();
     return new Promise<Operation>((resolve, reject) => {
-      this.dataBase
-        .openSQLObject()
-        .then((sqLiteObject) => {
-          this.sqLiteObject = sqLiteObject;
-          this.privateFincOperatonTransferTo(numTrans, countId)
-            .then((operation) => {
-              resolve(operation);
-            })
-            .catch((err) => reject(err));
-        })
-        .catch((err) => {
-          reject('problem de connexion a la base de données');
-          console.error(err);
-        });
+      if (this.sqLiteObject) {
+        this.privateFincOperatonTransferTo(numTrans, countId)
+          .then((op) => resolve(op))
+          .catch((err) =>
+            printError(
+              "erreur lors de l'excecusion de la requette",
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
     });
   }
   privateFincOperatonTransferTo(
@@ -482,8 +560,7 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
     return new Promise<Operation>((resolve, reject) => {
       this.sqLiteObject
         .executeSql(
-          `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id 
-        WHERE op.${tables.transaction.columns[1].name} = ? and  op.${tables.transaction.columns[8].name} <> ?`,
+          `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[1].name} = ? and op.${tables.transaction.columns[8].name} <> ?`,
           [numTrans, countId]
         )
         .then((res: any) => {
@@ -494,32 +571,78 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
           }
         })
         .catch((err: any) => {
-          reject('erreur dans lexcecision de la requete');
-          console.error(err);
+          printError("erreur lors de l'excecusion de la requette", reject, err);
+        });
+    });
+  }
+
+  async findOperationByTransAndCountId(
+    numTrans: string,
+    countId: number
+  ): Promise<Operation> {
+    await this.checkDataBaseOpened();
+    return new Promise<Operation>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateFindOperationByTransAndCountId(numTrans, countId)
+          .then((op) => resolve(op))
+          .catch((err) =>
+            printError(
+              "erreur lors de l'excecusion de la requette",
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
+    });
+  }
+
+  private async privateFindOperationByTransAndCountId(
+    numTrans: string,
+    countId: number
+  ): Promise<Operation> {
+    return new Promise<Operation>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[1].name} = ? and op.${tables.transaction.columns[8].name} = ?`,
+          [numTrans, countId]
+        )
+        .then((res: any) => {
+          if (res.rows.length > 0) {
+            resolve(this.performOperationsRowIndex(res, 0));
+          } else {
+            reject(404);
+          }
+        })
+        .catch((err: any) => {
+          printError("erreur lors de l'excecusion de la requette", reject, err);
         });
     });
   }
 
   async getBalanceBeforeDate(date: Date, accountId: number): Promise<number> {
-    if (this.sqLiteObject) {
-      return this.privateGetBalanceBeforeDate(date, accountId);
-    }
-
-    return new Promise<number>(async (resolve, rejects) => {
-      try {
-        this.sqLiteObject = await this.dataBase.openSQLObject();
-        try {
-          let balance = await this.privateGetBalanceBeforeDate(date, accountId);
-          resolve(balance);
-        } catch (error) {
-          printError('erreur en recuperant la balance', rejects, error);
-        }
-      } catch (error) {
-        printError('erreur en recuperant la sqlObject', rejects, error);
+    await this.checkDataBaseOpened();
+    return new Promise<number>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateGetBalanceBeforeDate(date, accountId)
+          .then((balance) => resolve(balance))
+          .catch((err) =>
+            printError(
+              "erreur lors de l'excecusion de la requette",
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
       }
     });
   }
-  privateGetBalanceBeforeDate(date: Date, accountId: number): Promise<number> {
+  private async privateGetBalanceBeforeDate(
+    date: Date,
+    accountId: number
+  ): Promise<number> {
     return new Promise<number>((resolve, rejects) => {
       this.sqLiteObject
         .executeSql(
@@ -540,33 +663,29 @@ export class OperationDataBase implements GenericDataBase<Operation, number> {
     });
   }
 
-  adjusteAfterOperationByDate(
+  async adjusteAfterOperationByDate(
     date: Date | string,
     countId: number,
     diff: number
   ): Promise<void> {
-    if (this.sqLiteObject) {
-      return this.privateAdjusteAfterOperationByDate(date, countId, diff);
-    }
-
-    return new Promise<void>((resolve, rejects) => {
-      this.dataBase
-        .openSQLObject()
-        .then(async (sqLiteObject) => {
-          this.sqLiteObject = sqLiteObject;
-          try {
-            await this.privateAdjusteAfterOperationByDate(date, countId, diff);
-            resolve();
-          } catch (err) {
-            printError('erreur lors de lappel du private', rejects, err);
-          }
-        })
-        .catch((err) => {
-          printError('error on open database', rejects, err);
-        });
+    await this.checkDataBaseOpened();
+    return new Promise<void>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.privateAdjusteAfterOperationByDate(date, countId, diff)
+          .then(() => resolve())
+          .catch((err) =>
+            printError(
+              "erreur lors de l'excecusion de la requette",
+              reject,
+              err
+            )
+          );
+      } else {
+        reject('aucun instance de connexion a bd');
+      }
     });
   }
-  privateAdjusteAfterOperationByDate(
+  private async privateAdjusteAfterOperationByDate(
     date: Date | string,
     countId: number,
     diff: number

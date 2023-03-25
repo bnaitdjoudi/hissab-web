@@ -7,7 +7,9 @@ import { AccountDataBase } from './databases/account.db';
 
 @Injectable()
 export class AccountsService {
-  constructor(private readonly accountDb: AccountDataBase) {}
+  constructor(private readonly accountDb: AccountDataBase) {
+
+  }
 
   async getAllAccounts(): Promise<Account[]> {
     return this.accountDb.findAll();
@@ -64,6 +66,7 @@ export class AccountsService {
 
   async getAccountByType(type: string): Promise<Account[]> {
     return new Promise<Account[]>((resolve, reject) => {
+      
       this.accountDb
         .getAccountsByType(type)
         .then((accounts) => resolve(accounts))

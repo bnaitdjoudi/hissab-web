@@ -35,9 +35,10 @@
       <ion-label for="transferToDiv" position="stacked">Transfer to: </ion-label>
       <div id="transferToDiv">
 
-        <ion-input class="transInput" type="text" readonly [value]="defaultTransferTo?.acountName" slot="start">
+        <ion-input class="transInput" type="text" readonly
+          [value]="!edit ? defaultTransferTo?.acountName: operation.transfer" slot="start">
         </ion-input>
-        <ion-button fill="clear" slot="end">
+        <ion-button fill="clear" slot="end" *ngIf="!edit">
           <ion-icon slot="end" name="list-outline"></ion-icon>
         </ion-button>
       </div>
@@ -77,7 +78,8 @@
   </ion-modal>
 
 
-  <ion-modal #modal trigger="open-leaf" [initialBreakpoint]="0.75" [breakpoints]="[ 0.75]" [backdropBreakpoint]="0.75">
+  <ion-modal #modal trigger="open-leaf" *ngIf="!edit" [initialBreakpoint]="0.75" [breakpoints]="[ 0.75]"
+    [backdropBreakpoint]="0.75">
     <ng-template>
 
       <ion-content class="ion-padding">

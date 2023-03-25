@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivationEnd, Router } from '@angular/router';
-import { filter, map, Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Account } from './model/account.model';
 import { MainStore } from './store/main.store';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'main-page',
@@ -10,8 +10,7 @@ import { MainStore } from './store/main.store';
   styleUrls: ['main.page.scss'],
 })
 export class MainPage implements OnInit, OnDestroy {
-  routeSuscription: Subscription | undefined;
-  balanceSuscription: Subscription | undefined;
+  balanceSuscription: Subscription;
 
   isModalOpenActif = false;
 
@@ -23,41 +22,17 @@ export class MainPage implements OnInit, OnDestroy {
     private readonly router: Router
   ) {}
 
-  onActifConfirmValue(mantant: number) {
-    console.log('ccccc:' + mantant);
-  }
-
-  onOpenActifAjuste() {
-    this.isModalOpenActif = true;
-  }
-
-  onWillDismissEvent(montant: number) {}
-
   ngOnDestroy(): void {
-    this.routeSuscription?.unsubscribe();
-    console.log('MainPage::ngOnDestroy');
+    this.balanceSuscription.unsubscribe();
   }
   async ngOnInit(): Promise<void> {
-    console.log('MainPage::ngOnInit::');
-
-    this.routeSuscription = this.router.events
-      .pipe(
-        filter(
-          (e) =>
-            e instanceof ActivationEnd &&
-            Object.keys(e.snapshot.params).length > 0
-        ),
-        map((e) => (e instanceof ActivationEnd ? e.snapshot.params : {}))
-      )
-      .subscribe((params) => {
-        // Do whatever you want here!!!!
-      });
-
-    this.mainStore.balanceAccount$.subscribe((account: Account | undefined) => {
-      if (account) {
-        this.balanceAccount = account;
+    this.balanceSuscription = this.mainStore.balanceAccount$.subscribe(
+      (account: Account | undefined) => {
+        if (account) {
+          this.balanceAccount = account;
+        }
       }
-    });
+    );
   }
 
   accountClass(currentAccount: Account): string {
@@ -70,5 +45,8 @@ export class MainPage implements OnInit, OnDestroy {
 
   multiplyFor(type: string): number {
     return type === 'actif' || type === 'income' ? 1 : -1;
+  }
+  routeToAccount(id: number): void {
+    this.router.navigate(['account/' + id]);
   }
 }

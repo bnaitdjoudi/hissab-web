@@ -9,8 +9,8 @@ describe('CardMainAccountComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CardMainAccountComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [CardMainAccountComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CardMainAccountComponent);
@@ -20,5 +20,12 @@ describe('CardMainAccountComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('onAjuste should run ajusteAccount.emit', () => {
+    spyOn(component.ajusteAccount, 'emit');
+
+    component.onAjuste({} as Event);
+    expect(component.ajusteAccount.emit).toHaveBeenCalled();
   });
 });

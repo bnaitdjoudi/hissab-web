@@ -1,15 +1,9 @@
 import { Injectable } from '@angular/core';
-import { rejects } from 'assert';
 import { format } from 'date-fns';
-import { resolve } from 'dns';
 import { Operation } from '../model/operation.model';
 import { PagingData } from '../model/paging-data';
 import { PagingRequest } from '../model/paging-request.model';
-import {
-  deleteOpBalanceFunMap,
-  functionMap,
-  localBalanceFunMap,
-} from '../tools/counting.fun.tools';
+import { deleteOpBalanceFunMap } from '../tools/counting.fun.tools';
 import { printError } from '../tools/errorTools';
 import { pathToAllParentUniquePath } from '../tools/tools';
 import { AccountingService } from './accounting.service';
@@ -29,7 +23,7 @@ export class OperationService {
   }
 
   async createOperations(operations: Operation[]): Promise<any> {
-    return this.operationDb.createList(operations);
+    return this.operationDb.createList(operations, true);
   }
 
   async getOperationsByAccountId(id: number): Promise<Operation[]> {
@@ -168,7 +162,7 @@ export class OperationService {
                   balanceS + operationS.debit - operationS.credit;
                 let operations = [operationD, operationS];
                 this.operationDb
-                  .createList(operations)
+                  .createList(operations, false)
                   .then(() => {
                     Promise.all(
                       operations.map((op) =>
@@ -231,8 +225,18 @@ export class OperationService {
                     )
                       .then(() => resolve())
                       .catch((err) => reject(err));
-                  });
-              });
+                  })
+                  .catch((err) =>
+                    printError('erreur dans la suppression', reject, err)
+                  );
+              })
+              .catch((err) =>
+                printError(
+                  'erreur pour retrouver par numero de transaction',
+                  reject,
+                  err
+                )
+              );
           } else {
             reject('operation non retrouvée');
           }
@@ -241,22 +245,31 @@ export class OperationService {
     });
   }
 
-  async businessUpdateOperationDate(operationM: Operation): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      this.deleteOperationDate(operationM.id).then(() => {
-        this.businessCreationOperationDate(operationM)
-          .then(() => {
-            resolve();
-          })
-          .catch((err) => {
-            reject('erreur lors de la creation de l operation');
-            console.error(err);
-          })
-          .catch((err) => {
-            reject('erreur lors de la suppression de l operation');
-            console.error(err);
-          });
-      });
+  async businessUpdateOperationDate(operationM: Operation): Promise<Operation> {
+    return new Promise<Operation>(async (resolve, reject) => {
+      this.deleteOperationDate(operationM.id)
+        .then(() => {
+          this.businessCreationOperationDate(operationM)
+            .then((op) => {
+              this.operationDb
+                .findOperationByTransAndCountId(op.numTrans, op.idAccount)
+                .then((rop) => {
+                  resolve(rop);
+                })
+                .catch((err) => {
+                  reject('erreur quand on veut recuperer la operaton');
+                  console.error(err);
+                });
+            })
+            .catch((err) => {
+              reject('erreur lors de la creation de l operation');
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          reject('erreur lors de la suppression de l operation');
+          console.error(err);
+        });
     });
   }
 }

@@ -23,9 +23,10 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   @Input() accountType: string = 'actifs';
   @Input() operation: Operation;
   @Input() leafsAccount: LeafAccount[] = [];
+  @Input() edit: boolean = false;
   defaultTransferTo: LeafAccount | undefined;
 
-  @ViewChild('debit') debitElement: IonInput;
+  @ViewChild('modal') modalLeaf: IonModal;
 
   required_message = 'ce champs ne peut pas etre null!';
 
@@ -66,11 +67,13 @@ export class OperationFormComponent implements OnInit, OnDestroy {
     this.initReactionForm();
     this.operation.transfer = this.defaultTransferTo
       ? this.defaultTransferTo.path
-      : '';
+      : this.operation.transfer;
   }
 
   ngOnDestroy(): void {
     this.operationFormSuscribtion?.unsubscribe();
+    console.log('OperationFormComponent::: destroyed');
+    this.modalLeaf.dismiss();
   }
 
   iniOperationForm() {

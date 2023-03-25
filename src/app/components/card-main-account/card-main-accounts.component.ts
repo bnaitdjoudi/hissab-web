@@ -1,5 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 @Component({
   selector: 'card-main-account',
@@ -7,34 +13,21 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
   styleUrls: ['./card-main-accounts.component.scss'],
 })
 export class CardMainAccountComponent implements OnInit, OnDestroy {
-
-
-  @Input() total:number | null = 0;
-  @Input() title:string = '';
+  @Input() total: number | null = 0;
+  @Input() title: string = '';
 
   @Output() ajusteAccount = new EventEmitter<void>();
- 
 
-
-
-
-  constructor() { 
-    
-  }
+  constructor() {}
 
   ngOnDestroy(): void {
-    
     console.log('CardMainAccountComponent::ngOnDestroy');
-   
   }
   ngOnInit(): void {
     console.log('CardMainAccountComponent::ngOnInit');
-    
-   
   }
 
-  onAjuste(event:Event):void {
-    console.log('fjl;sdjf;l');
+  onAjuste(event: Event): void {
     this.ajusteAccount.emit();
   }
 }

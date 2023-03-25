@@ -16,7 +16,6 @@ export const browserDBInstance = (db: any) => {
               resolve(rs);
             },
             (rx: any, error: any) => {
-              console.error(error);
               reject(error);
             }
           );

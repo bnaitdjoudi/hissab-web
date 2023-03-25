@@ -6,6 +6,7 @@ import { deleteConfirmation } from '../../../tools/alert.contollers';
 import { OperationPageStore } from '../operation-page.store';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-operation-page',
@@ -17,11 +18,11 @@ export class OperationPageViewComponent implements OnInit {
 
   loadingDelete: HTMLIonLoadingElement;
   constructor(
-    private readonly operationStore: OperationPageStore,
+    readonly operationStore: OperationPageStore,
     private alertController: AlertController,
     private _location: Location,
     private loadingCtrl: LoadingController,
-    private router: Router
+    readonly router: Router
   ) {}
 
   ngOnInit() {
@@ -31,31 +32,46 @@ export class OperationPageViewComponent implements OnInit {
     });
   }
 
-  isOperationObservable(): boolean {
-    return this.operation ? isObservable(this.operation) : false;
-  }
-
   async onDeleteFired() {
     console.log('alert');
     const alert = await this.alertController.create(
       deleteConfirmation(
         'Alert Operation suppression!',
-        () => console.log('cancel'),
-        () => this.processOperationDelete(),
+        undefined,
+        undefined,
         'custom-alert'
       )
     );
 
     await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    switch (role) {
+      case 'cancel': {
+        console.info('cancel');
+        break;
+      }
+
+      case 'confirm': {
+        this.processOperationDelete();
+      }
+    }
   }
 
   private async processOperationDelete() {
     this.loadingDelete = await this.showLoading();
     this.loadingDelete.present();
-    this.operationStore.deleteCurrentOperatoion().then(() => {
-      this.loadingDelete.dismiss();
-      this._location.back();
-    });
+
+    this.operationStore
+      .deleteCurrentOperatoion()
+      .then(() => {
+        this.loadingDelete.dismiss();
+        this._location.back();
+      })
+      .catch((err) => {
+        console.error(err);
+        this.loadingDelete.dismiss();
+      });
   }
 
   async showLoading(): Promise<HTMLIonLoadingElement> {

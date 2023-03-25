@@ -25,9 +25,7 @@ export class MainStore extends Store<MainStoreData> {
     this.initMainAccounts();
   }
 
-  get totalAssetAccount(): number {
-    return this.totalAssetAccount;
-  }
+ 
 
    initMainAccounts() {
     this.accountsService.getMainAccounts().then((data) => {

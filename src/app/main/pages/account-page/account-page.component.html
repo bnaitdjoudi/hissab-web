@@ -17,9 +17,8 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  <actif-view class="fill-height" (addOperationEmitter)="addOperationOrAccount($event)" [account]="currentAccount"
-    [operations]="operations" [accountData]="accountsData" [page]="accountStore._currentPageOperation"
-    [deleteOperationSubject]="accountStore._deleteOperationSubject"
+  <actif-view class="fill-height" [account]="currentAccount" [operations]="operations" [accountData]="accountsData"
+    [page]="accountStore._currentPageOperation" [deleteOperationSubject]="accountStore._deleteOperationSubject"
     [isCreateOpModalOpen]="isCreateOpModalOpen && operations.data.length > 0"></actif-view>
 
 

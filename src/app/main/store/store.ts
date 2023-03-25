@@ -32,9 +32,13 @@ export class Store<T> {
   }
 
   setState(newState: Partial<T>) {
-    this._state.next({
-      ...this.state,
-      ...newState,
-    });
+    if (newState == null) {
+      this._state.next(newState);
+    } else {
+      this._state.next({
+        ...this.state,
+        ...newState,
+      });
+    }
   }
 }
