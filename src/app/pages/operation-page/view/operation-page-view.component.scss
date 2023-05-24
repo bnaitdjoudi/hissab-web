@@ -1,0 +1,27 @@
+.time-div {
+  width: 100%;
+
+  text-align: left;
+  ion-button {
+    float: right;
+  }
+}
+
+.operation-details {
+  border: none;
+  background: inherit;
+
+  ion-text {
+    color: rgb(214, 213, 212);
+    padding-bottom: 12px;
+  }
+
+  ion-label {
+    text-transform: capitalize;
+    font-size: 12pt;
+    font-weight: 600;
+  }
+  ion-item {
+    --padding-bottom: 12px;
+  }
+}

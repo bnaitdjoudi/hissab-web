@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { InfiniteScrollCustomEvent, IonicModule } from '@ionic/angular';
-import { Account } from 'src/app/main/model/account.model';
+import { Account } from 'src/app/model/account.model';
 
 import { AccountListComponent } from './account-list.component';
 
@@ -39,6 +39,7 @@ describe('AccountListComponent', () => {
       parentId: 0,
       path: 'accountTest',
       isLeaf: false,
+      resume: { debit: 0, credit: 0, sons: 0 },
     };
 
     spyOn(component.onElementSelected, 'emit');
@@ -69,6 +70,7 @@ describe('AccountListComponent', () => {
       parentId: 0,
       path: 'accountTest',
       isLeaf: false,
+      resume: { debit: 0, credit: 0, sons: 0 },
     };
 
     expect(component.accountClass(givenAccount)).toEqual('actif positif');
@@ -84,6 +86,7 @@ describe('AccountListComponent', () => {
       parentId: 0,
       path: 'accountTest',
       isLeaf: false,
+      resume: { debit: 0, credit: 0, sons: 0 },
     };
 
     expect(component.accountClass(givenAccount)).toEqual('actif negatif');

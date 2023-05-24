@@ -1,4 +1,21 @@
 {
+  "period": {
+    "global": "global"
+  },
+  "month": {
+    "January": "January",
+    "February": "February",
+    "March": "March",
+    "April": "April",
+    "May": "May",
+    "June": "June",
+    "July": "July",
+    "August": "August",
+    "September": "September",
+    "October": "October",
+    "November": "November",
+    "December": "December"
+  },
   "accounttype": {
     "actifs": "assets",
     "passifs": "liabilities",
@@ -8,13 +25,16 @@
   "actions": {
     "createOp": "Create Operation",
     "createAcc": "Create Account",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "period": "Period"
   },
   "forms": {
     "operation": {
       "title": "New operation",
       "cancel": "cancel",
-      "transferTo":"Transfet to",
+      "transferTo": "Transfer to",
+      "description": "description",
+      "numTrans": "transaction number",
 
       "actif": {
         "debit": "Deposite",
@@ -29,6 +49,11 @@
       "income": {
         "debit": "income",
         "credit": "charge"
+      },
+
+      "depense": {
+        "debit": "bonus",
+        "credit": "charge"
       }
     },
     "account": {
@@ -42,5 +67,14 @@
   "actifs": "assets",
   "passifs": "liabilities",
   "depense": "expenses",
-  "income": "incomes"
+  "income": "incomes",
+  "transferTo": "transfer to",
+  "pages": {
+    "main": {
+      "balance": {
+        "balance": "balance",
+        "global": "global"
+      }
+    }
+  }
 }

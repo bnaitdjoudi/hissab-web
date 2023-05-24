@@ -1,21 +1,11 @@
-<ion-content [fullscreen]="true">
-
-    <ion-item>
-        <ion-label>Total</ion-label>
-        <ion-label ngClass=" {{account.type}} {{account.totalAccount > 0 ? 'positif':'negatif'}}" slot="end">{{(account? calculMultiplication(account.totalAccount, account.type):0) | currency
-            :'CAD':'symbol-narrow':'1.2-2'
-            }}</ion-label>
-    </ion-item>
-
-    <operation-list *ngIf="operations.data.length > 0" [operations]="operations.data"
-        (onElementSelected)="onOperationSelected($event)" (onIonInfiniteScroll)="onIonInfiniteScroll($event)"
+<ion-content>
+    <operation-list *ngIf="accountVal.resume.sons > 0 " [operations]="operations.data"
+        (onElementSelected)="onOperationSelected($event)" (onIonInfiniteScroll)="onIonInfiniteScrollOperation($event)"
         [isMoreData]="operations.currentPage < operations.totalPage" (onDelete)="presentDeleteAlert($event)"
-        [currBalFun]="currBalfun"></operation-list>
-
-    <account-list *ngIf="accountData.data.length > 0" [accounts]="accountData.data"
-        (onIonInfiniteScroll)="onIonInfiniteScroll($event)" [isMoreData]="operations.currentPage < operations.totalPage"
-        (onDelete)="presentDeleteAlert($event)" [currBalFun]="currBalfun"></account-list>
-
-
-
+        [currBalFun]="currBalfun" [account]="accountVal" [periodLabel]="periodLabel"></operation-list>
+    <account-list *ngIf="accountVal.resume.sons === 0 " [accountData]="currentAccountData"
+        (onElementSelected)="onAccountSelected($event)" (onIonInfiniteScroll)="onIonInfiniteScrollAccount($event)"
+        [isMoreData]="currentAccountData.currentPage < currentAccountData.totalPage"
+        (onDelete)="presentDeleteAlert($event)" [currBalFun]="currBalfun" [account]="accountVal"
+        [periodLabel]="periodLabel"></account-list>
 </ion-content>

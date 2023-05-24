@@ -1,17 +1,24 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
-import { Account } from 'src/app/main/model/account.model';
-import { Operation } from 'src/app/main/model/operation.model';
+import { Account } from 'src/app/model/account.model';
+import { PagingData } from 'src/app/model/paging-data';
 
 @Component({
   selector: 'account-list',
   templateUrl: './account-list.component.html',
-  styleUrls: ['./account-list.component.scss'],
+  styleUrls: ['./account-list.component.scss', './../data-list-header.scss'],
 })
 export class AccountListComponent implements OnInit {
-  @Input() accounts: Account[] = [];
+  currentAccountData: Account[] = [];
+
+  @Input() set accountData(data: PagingData<Account>) {
+    this.currentAccountData = data.data;
+    this.currentAccountData = [...this.currentAccountData];
+  }
   @Input() isMoreData: boolean = true;
   @Input() currBalFun: (debit: number, credit: number) => any[];
+  @Input() account: Account;
+  @Input() periodLabel: string;
 
   @Output() onElementSelected = new EventEmitter<Account>();
   @Output() onIonInfiniteScroll = new EventEmitter<InfiniteScrollCustomEvent>();
@@ -22,6 +29,7 @@ export class AccountListComponent implements OnInit {
   ngOnInit() {}
 
   onIonInfinite(ev: Event) {
+    console.log('infinitie');
     this.onIonInfiniteScroll.emit(ev as InfiniteScrollCustomEvent);
   }
 
@@ -36,14 +44,18 @@ export class AccountListComponent implements OnInit {
   }
 
   accountClass(currentAccount: Account): string {
-    return (
-      currentAccount.type +
-      ' ' +
-      (currentAccount.totalAccount > 0 ? 'positif' : 'negatif')
-    );
+    return 'balance';
   }
 
   multiply(type: string): number {
+    return type === 'actif' || type === 'income' ? 1 : -1;
+  }
+
+  trackItem(index: number, item: Account) {
+    return item.id + this.currentAccountData?.length;
+  }
+
+  multiplyFor(type: string): number {
     return type === 'actif' || type === 'income' ? 1 : -1;
   }
 }

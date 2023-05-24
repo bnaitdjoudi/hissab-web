@@ -75,25 +75,31 @@ ion-item {
 }
 
 .actif.positif {
-  background-color: rgb(195, 247, 229);
+  background-color: #33804b;
 }
 
 .actif.negatif {
-  background-color: rgb(245, 187, 187);
+  background-color: #9c0b0b;
 }
 
 .passif.positif {
-  background-color: rgb(195, 247, 229);
+  background-color: #33804b;
 }
 
 .passif.negatif {
-  background-color: rgb(245, 187, 187);
+  background-color: #9c0b0b;
 }
 
 .depense.positif {
-  background-color: rgb(195, 247, 229);
+  background-color: #33804b;
 }
 
 .depense.negatif {
-  background-color: rgb(245, 187, 187);
+  background-color: #9c0b0b;
+}
+
+ion-card {
+  background-color: #4a4a4f;
+  margin: 8px 6px;
+  box-shadow: none;
 }

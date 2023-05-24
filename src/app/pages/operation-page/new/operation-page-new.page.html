@@ -1,0 +1,38 @@
+<ion-content>
+  <ion-header class="header-fixed ">
+    <ion-toolbar>
+
+      <ion-buttons slot="start">
+        <ion-back-button icon="chevron-back-outline">
+        </ion-back-button>
+      </ion-buttons>
+
+      <ion-title><ion-label class="capitelize">
+        </ion-label> New Operation </ion-title>
+
+
+    </ion-toolbar>
+  </ion-header>
+  <operation-form #operationForm [leafsAccount]="this.operationStore.accountStore.leafAccounts$"
+    [accountType]="accountType" [operation]="currentOperation" [currentAccount]="currentAccount"
+    (onLoadLeafAccount)="onLoadLeafAccount($event)" (onSubmit)="submit()"></operation-form>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+
+      <ion-button fill="clear" slot="start" (click)="goToHome()" id="menu-button">
+
+        <fa-icon icon="house"></fa-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" slot="end" id="menu-button">
+        <fa-icon icon="ellipsis-vertical"></fa-icon></ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-footer>

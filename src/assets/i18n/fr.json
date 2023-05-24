@@ -7,7 +7,8 @@
   },
   "actions": {
     "create": "Créer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "period": "Periode"
   },
 
   "forms": {
@@ -17,6 +18,23 @@
       "actifs": {
         "debit": "Dépos",
         "credit": "Retrait"
+      },
+      "depense": {
+        "debit": "bonus",
+        "credit": "charge"
+      }
+    }
+  },
+  "divers": "diverse",
+  "actifs": "assets",
+  "passifs": "liabilities",
+  "depense": "expenses",
+  "income": "incomes",
+  "transferTo": "transfer to",
+  "pages": {
+    "main": {
+      "balance": {
+        "global": "global"
       }
     }
   }

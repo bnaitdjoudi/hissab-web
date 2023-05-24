@@ -10,13 +10,13 @@ import {
 import { Router } from '@angular/router';
 import { AlertController, InfiniteScrollCustomEvent } from '@ionic/angular';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { Account } from 'src/app/main/model/account.model';
-import { LeafAccount } from 'src/app/main/model/leaf-account.model';
-import { Operation } from 'src/app/main/model/operation.model';
-import { PagingData } from 'src/app/main/model/paging-data';
-import { PagingRequest } from 'src/app/main/model/paging-request.model';
-import { deleteConfirmation } from 'src/app/main/tools/alert.contollers';
-import { parseFloatTool } from 'src/app/main/tools/tools';
+import { Account } from 'src/app/model/account.model';
+import { LeafAccount } from 'src/app/model/leaf-account.model';
+import { Operation } from 'src/app/model/operation.model';
+import { PagingData } from 'src/app/model/paging-data';
+import { PagingRequest } from 'src/app/model/paging-request.model';
+import { deleteConfirmation } from 'src/app/tools/alert.contollers';
+import { parseFloatTool } from 'src/app/tools/tools';
 import { OperationFormComponent } from '../../forms/operation-form/operation-form.component';
 
 @Component({
@@ -32,7 +32,6 @@ export class ActifViewComponent implements OnInit, OnDestroy {
   @Input() title: string = '';
   @Input() leafAccounts: LeafAccount[] | null = [];
   @Input() set account(val: Account) {
-    console.log('typpppppppppppppppppe:' + val.type);
     if (val) {
       this.accountVal = val;
       this.currBalfun = (debit: number, credit: number) => [
@@ -41,6 +40,8 @@ export class ActifViewComponent implements OnInit, OnDestroy {
       ];
     }
   }
+
+  @Input() periodLabel: string;
 
   get account(): Account {
     if (this.accountVal) return this.accountVal;
@@ -56,13 +57,23 @@ export class ActifViewComponent implements OnInit, OnDestroy {
     totalPage: 0,
   };
 
-  @Input() accountData: PagingData<Account> = {
+  currentAccountData: PagingData<Account> = {
     data: [],
-    currentPage: 0,
     totalPage: 0,
+    currentPage: 0,
   };
 
+  @Input() set accountData(data: PagingData<Account>) {
+    console.log(JSON.stringify(data));
+    if (data) this.currentAccountData = data;
+  }
+
   @Input() page: PagingRequest | BehaviorSubject<PagingRequest> = {
+    page: 0,
+    limit: 0,
+  };
+
+  @Input() accountPage: PagingRequest | BehaviorSubject<PagingRequest> = {
     page: 0,
     limit: 0,
   };
@@ -88,12 +99,8 @@ export class ActifViewComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
-  ngOnDestroy(): void {
-    //console.log('CardMainAccountComponent::ngOnDestroy');
-  }
-  ngOnInit(): void {
-    //console.log('CardMainAccountComponent::ngOnInit');
-  }
+  ngOnDestroy(): void {}
+  ngOnInit(): void {}
 
   setOpen(open: boolean) {
     this.isCreateOpModalOpen = open;
@@ -135,8 +142,11 @@ export class ActifViewComponent implements OnInit, OnDestroy {
     this.router.navigate(['/operation/' + operation.id], {});
   }
 
-  onIonInfiniteScroll(ev: InfiniteScrollCustomEvent) {
-    console.log('onIonInfiniteScroll');
+  onAccountSelected(account: Account) {
+    this.router.navigate(['/account/' + account.id], {});
+  }
+
+  onIonInfiniteScrollOperation(ev: InfiniteScrollCustomEvent) {
     if (this.page instanceof PagingRequest) {
       this.page.page++;
     } else {
@@ -144,6 +154,21 @@ export class ActifViewComponent implements OnInit, OnDestroy {
         this.page.next({
           page: this.page.getValue().page + 1,
           limit: this.page.getValue().limit,
+        });
+      }
+    }
+
+    ev.target.complete();
+  }
+
+  onIonInfiniteScrollAccount(ev: InfiniteScrollCustomEvent) {
+    if (this.accountPage instanceof PagingRequest) {
+      this.accountPage.page++;
+    } else {
+      if (this.accountPage) {
+        this.accountPage.next({
+          page: this.accountPage.getValue().page + 1,
+          limit: this.accountPage.getValue().limit,
         });
       }
     }

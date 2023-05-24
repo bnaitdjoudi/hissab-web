@@ -1,0 +1,69 @@
+.mlist {
+  background-color: #4a4a4f;
+}
+
+ion-header {
+  background-color: #4a4a4f;
+  color: #fdf7dd;
+  font-weight: bold;
+  border-bottom-color: #595959;
+  border-bottom-style: solid;
+  border-bottom-width: thin;
+  padding: 0.2em;
+  display: inline-grid;
+
+  div.header-div {
+    height: 100%;
+    padding: 0.2em;
+
+    border: none;
+
+    h1 {
+      text-align: center;
+      font-family: "Open Sans", sans-serif;
+      font-weight: bold;
+    }
+
+    h5 {
+      text-align: center;
+      color: #b6c2b2;
+      text-transform: capitalize;
+      line-height: 1.2em;
+      font-style: italic;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .mcat {
+      width: 100%;
+      padding: 0em;
+
+      div {
+        width: 50%;
+        float: left;
+        padding: 0.1em;
+        font-weight: 100;
+      }
+
+      .labeltrans {
+        color: #b6c2b2;
+        text-transform: capitalize;
+        line-height: 1.5em;
+        font-style: italic;
+      }
+
+      .numberd {
+        font-family: "Open Sans", sans-serif;
+        font-weight: bold;
+      }
+
+      div:nth-child(2) {
+        text-align: right;
+      }
+
+      ion-label {
+        display: block;
+      }
+    }
+  }
+}

@@ -1,4 +1,7 @@
-<div [formGroup]="formGroup">
-    <ion-input [name]="formControlName" [formControlName]="formControlName" #dummyFacade type="text"
-        (keyup)="handleKeyUp($event)" (ionInput)="handleInput($event)" [value]="formattedAmount"></ion-input>
+<div [formGroup]="formGroup" style="width:100%">
+    <mat-form-field style="width:100%">
+        <input matInput type="number" [name]="formControlName" [formControlName]="formControlName" placeholder="0"
+            step="0.01" (change)="valueChange($event)">
+        <span class="prefix-currency" matTextPrefix>$&nbsp;</span>
+    </mat-form-field>
 </div>

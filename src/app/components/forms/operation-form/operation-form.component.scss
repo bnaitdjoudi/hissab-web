@@ -1,11 +1,52 @@
-#transferToDiv {
+#leafBuutton {
   width: 100%;
+
   .transInput {
     width: 80%;
     float: left;
   }
+
   #open-leaf {
     float: right;
     width: 15%;
   }
+}
+
+ion-input {
+  color: #ffffffde;
+}
+
+.operation-details {
+  border: none;
+  background: inherit;
+}
+
+p {
+  font-family: Lato;
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+mat-horizontal-stepper {
+  width: 100%;
+  height: calc(100% - 60px);
+}
+
+.c-padding-top {
+  --padding-top: 60px;
+}
+
+.form-tool {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+
 }

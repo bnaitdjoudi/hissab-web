@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { PipeModule } from '../pipes/pipes.moule';
 import { CardMainAccountComponent } from './card-main-account/card-main-accounts.component';
@@ -16,6 +17,12 @@ import { NumberInputComponent } from './inputs/number-input/number-input.compone
 import { NgxTranslateModule } from '../translate/translate.module';
 import { AccountListComponent } from './data-list/account-list/account-list.component';
 import { RouterModule } from '@angular/router';
+import { MaterialModule } from '../material.module';
+import { MainMenuComponent } from './shared/main-menu/main-menu.component';
+import { HeaderComponent } from './shared/header/header.component';
+import { HeaderSimpleComponent } from './shared/header-simple/header-simple.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TransferAccountsComponent } from './forms/transfer-accounts/transfer-accounts.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -28,6 +35,8 @@ registerLocaleData(localeFr, 'fr-FR');
     PipeModule,
     NgxTranslateModule,
     RouterModule,
+    MaterialModule,
+    FontAwesomeModule,
   ],
   exports: [
     CardMainAccountComponent,
@@ -38,6 +47,9 @@ registerLocaleData(localeFr, 'fr-FR');
     ErrorMessageComponent,
     OperationListComponent,
     AccountListComponent,
+    MainMenuComponent,
+    HeaderComponent,
+    HeaderSimpleComponent,
   ],
   declarations: [
     CardMainAccountComponent,
@@ -49,7 +61,12 @@ registerLocaleData(localeFr, 'fr-FR');
     OperationListComponent,
     NumberInputComponent,
     AccountListComponent,
+    MainMenuComponent,
+    HeaderComponent,
+    HeaderSimpleComponent,
+    TransferAccountsComponent,
   ],
   providers: [],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ComponentsModule {}

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { InfiniteScrollCustomEvent, IonicModule } from '@ionic/angular';
-import { Operation } from 'src/app/main/model/operation.model';
+import { Operation } from 'src/app/model/operation.model';
 
 import { OperationListComponent } from './operation-list.component';
 

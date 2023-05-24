@@ -9,12 +9,12 @@ import {
 } from '@angular/core';
 import { AlertController, InfiniteScrollCustomEvent } from '@ionic/angular';
 import { BehaviorSubject } from 'rxjs';
-import { Account } from 'src/app/main/model/account.model';
-import { Operation } from 'src/app/main/model/operation.model';
-import { PagingData } from 'src/app/main/model/paging-data';
-import { PagingRequest } from 'src/app/main/model/paging-request.model';
-import { deleteConfirmation } from 'src/app/main/tools/alert.contollers';
-import { parseFloatTool } from 'src/app/main/tools/tools';
+import { Account } from 'src/app/model/account.model';
+import { Operation } from 'src/app/model/operation.model';
+import { PagingData } from 'src/app/model/paging-data';
+import { PagingRequest } from 'src/app/model/paging-request.model';
+import { deleteConfirmation } from 'src/app/tools/alert.contollers';
+import { parseFloatTool } from 'src/app/tools/tools';
 import { OperationFormComponent } from '../../forms/operation-form/operation-form.component';
 
 @Component({

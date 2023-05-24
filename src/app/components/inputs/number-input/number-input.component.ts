@@ -41,7 +41,7 @@ export class NumberInputComponent implements OnInit, ControlValueAccessor {
 
   @Input() precision: number;
 
-  @Input() amount: string;
+  @Input() amount: number;
 
   @Output() amountEntered = new EventEmitter<number>();
 
@@ -51,75 +51,12 @@ export class NumberInputComponent implements OnInit, ControlValueAccessor {
 
   constructor(private currencyPipe: CurrencyPipe) {}
 
-  ngOnInit() {
-    if (this.amount && this.amount.trim() !== '') {
-      this.amountEntered.emit(+this.amount);
-    }
-  }
+  ngOnInit() {}
 
-  handleKeyUp(event: KeyboardEvent) {
+  valueChange(event: any) {
     // this handles keyboard input for backspace
-
-    if (event.key === NumberInputComponent.BACKSPACE_KEY) {
-      this.delDigit();
-    }
-  }
-
-
-  
-
-  handleInput(event: Event) {
-    // check if digit
-    if (
-      this.isCustomEvent(event) &&
-      event.detail.data &&
-      !isNaN(event.detail.data)
-    ) {
-      this.addDigit(event.detail.data);
-    } else if (
-      this.isCustomEvent(event) &&
-      event.detail.inputType === NumberInputComponent.BACKSPACE_INPUT_TYPE
-    ) {
-      // this handles numpad input for delete/backspace
-      this.delDigit();
-    }
-  }
-
-  private addDigit(key: string) {
-    this.amount = this.amount + key;
-    this.amountEntered.emit(+this.amount / Math.pow(10, this.precision));
-    this.onChange(this.amount);
-    this.onTouch(this.amount);
-  }
-
-  private delDigit() {
-    this.amount = new String(this.amount).substring(0, this.amount.length - 1);
-    this.amountEntered.emit(+this.amount / Math.pow(10, this.precision));
-    this.onChange(this.amount);
-    this.onTouch(this.amount);
-  }
-
-  private clearInput() {
-    this.dummyFacade.value = CONSTANTS.EMPTY; // ensures work for mobile devices
-    // ensures work for browser
-    this.dummyFacade.getInputElement().then((native: HTMLInputElement) => {
-      native.value = CONSTANTS.EMPTY;
-    });
-  }
-
-  get formattedAmount(): string | null {
-    this.val = this.currencyPipe.transform(
-      +this.amount / Math.pow(10, this.precision)
-    );
-    return this.val;
-  }
-
-  openInput() {
-    this.dummyFacade.setFocus();
-  }
-
-  isCustomEvent(event: Event): event is CustomEvent {
-    return 'detail' in event;
+    console.log(event.target.value);
+    this.amountEntered.emit(event.target.value);
   }
 
   registerOnChange(fn: any): void {

@@ -1,0 +1,30 @@
+.capitelize {
+  text-transform: capitalize;
+  font-size: medium;
+  font-weight: 600;
+}
+
+ion-card {
+  --background: #4a4a4f;
+  --color: #eff6f1;
+  margin-inline: 12px;
+  border: 1px solid #fa4c7a71;
+  box-shadow: rgba(243, 58, 107, 0.199) 0px 4px 10px;
+}
+
+ion-card-title {
+  --color: #eff6f1;
+  text-transform: capitalize;
+}
+
+ion-card-subtitle {
+  --color: #eff6f1;
+}
+
+ion-list {
+  --inner-border-width: 0px;
+}
+
+ion-select {
+  color: #eff6f1;
+}

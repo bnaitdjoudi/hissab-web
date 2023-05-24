@@ -33,7 +33,8 @@
             ],
             "styles": [
               "src/theme/variables.scss",
-              "src/global.scss"
+              "src/global.scss",
+              "node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css"
             ],
             "scripts": []
           },
@@ -115,10 +116,7 @@
                 "output": "./svg"
               }
             ],
-            "styles": [
-              "src/theme/variables.scss",
-              "src/global.scss"
-            ],
+            "styles": ["src/theme/variables.scss", "src/global.scss"],
             "scripts": []
           },
           "configurations": {
@@ -131,10 +129,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         },
         "cypress-run": {

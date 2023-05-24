@@ -10,20 +10,20 @@
  */
 
 /* Core CSS required for Ionic components to work properly */
-@import "~@ionic/angular/css/core.css";
+@import '@ionic/angular/css/core.css';
 
 /* Basic CSS for apps built with Ionic */
-@import "~@ionic/angular/css/normalize.css";
-@import "~@ionic/angular/css/structure.css";
-@import "~@ionic/angular/css/typography.css";
-@import "~@ionic/angular/css/display.css";
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
 
 /* Optional CSS utils that can be commented out */
-@import "~@ionic/angular/css/padding.css";
-@import "~@ionic/angular/css/float-elements.css";
-@import "~@ionic/angular/css/text-alignment.css";
-@import "~@ionic/angular/css/text-transformation.css";
-@import "~@ionic/angular/css/flex-utils.css";
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
+@import '@ionic/angular/css/display.css';
 
 ion-alert.custom-alert {
   .alert-head {
@@ -32,6 +32,27 @@ ion-alert.custom-alert {
     background-size: 36px;
     background-repeat: no-repeat;
   }
+}
+
+:host {
+  --color: #fcfcfc;
+
+
+}
+
+ion-header::after {
+  display: none;
+}
+
+ion-label {
+  color: #fcfcfc;
+}
+
+button {
+  span {
+    text-transform: capitalize;
+  }
+
 }
 
 /*
@@ -68,6 +89,154 @@ button.alert-button.alert-button-confirm {
 }
 
 ion-modal ion-toolbar {
-  --background: rgb(14 116 144);
+  --background: #33804b;
   --color: white;
+}
+
+ion-searchbar {
+  color: white !important;
+
+  input {
+    --color: white;
+  }
+}
+
+
+
+ion-header {
+  --background: #424242;
+  ;
+
+  ion-toolbar {
+    --background: #424242;
+    ;
+    --border-style: none;
+    border: 0px !important;
+    border-bottom-color: transparent !important;
+    background-image: none !important;
+    border-bottom: none !important;
+    --border-style:
+      none !important;
+    --ion-color-base: transparent !important;
+    --opacity-scale: 1;
+
+    opacity: 1;
+
+    ion-title {
+      color: #fcfcfc;
+    }
+
+    ion-back-button {
+      color: #fdf7dd;
+    }
+
+    ion-button {
+      margin-right: 10px;
+
+      fa-icon {
+        color: #fdf7dd;
+        font-size: 18pt;
+      }
+    }
+  }
+
+  &.header-md:after {
+    background: none;
+  }
+}
+
+
+
+ion-footer {
+  --background: #00874E;
+
+  ion-toolbar {
+    --background: #00874E;
+    --border-style: none;
+    border: 0px !important;
+    border-bottom-color: transparent !important;
+    background-image: none !important;
+    border-bottom: none !important;
+    --border-style:
+      none !important;
+    --ion-color-base: transparent !important;
+    --opacity-scale: 1;
+
+    opacity: 1;
+
+    ion-title {
+      color: #fcfcfc;
+    }
+
+    ion-back-button {
+      color: #fdf7dd;
+    }
+
+    ion-button {
+      margin-right: 10px;
+
+      fa-icon {
+        color: #fdf7dd;
+        font-size: 18pt;
+      }
+    }
+  }
+
+  &.header-md:after {
+    background: none;
+  }
+}
+
+
+ion-content {
+  --background: #424242;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+ion-content.content {
+  //display: contents;
+  height: fit-content;
+}
+
+ion-item {
+  --background: #424242;
+  ;
+  --padding-start: 7px;
+  --padding-end: 7px;
+  --border-color: #616161;
+  --inner-padding-end: 0px;
+  --padding-bottom: 1px;
+
+  ion-label {
+    color: #eff6f1 !important;
+  }
+
+  fa-icon {
+    color: #fdf7dd;
+    font-size: 18pt;
+  }
+
+  ion-icon {
+    color: #fdf7dd;
+    font-size: 18pt;
+  }
+}
+
+.list-md {
+  background-color: #4a4a4f;
+}
+
+.balance {
+  border-radius: 3px;
+  padding: 8px;
+  font-size: medium;
+  font-weight: 600;
+  background-color: #46464bfa;
+}
+
+.uppercase-text {
+  text-transform: capitalize;
 }

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { Operation } from 'src/app/main/model/operation.model';
+import { Operation } from 'src/app/model/operation.model';
 import { NgxTranslateModule } from 'src/app/translate/translate.module';
 
 import { OperationFormComponent } from './operation-form.component';

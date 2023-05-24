@@ -1,0 +1,85 @@
+<ion-header class="header-color">
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+
+    </ion-buttons>
+
+    <ion-title><ion-label class="capitelize">
+      </ion-label> Operation </ion-title>
+
+
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="operation as op" class="ion-padding">
+
+  <ion-list class="operation-details">
+
+    <ion-item (click)="goToAccountParent()">
+      <ion-label for="time" position="stacked">Account:</ion-label>
+      <ion-text id="time">{{account.acountName }}</ion-text>
+      <ion-icon name="open-outline" size="large" slot="end"></ion-icon>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="time" position="stacked">Date:</ion-label>
+      <ion-text id="time">{{op.time | date : 'dd/MM/yyyy, HH:mm' }}</ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label for="trans" position="stacked">{{ 'forms.operation.numTrans' | translate }}:</ion-label>
+      <ion-text id="trans">{{op.numTrans}}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="description" position="stacked">{{ 'forms.operation.description' | translate }}:</ion-label>
+      <ion-text id="description">{{op.description}}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="path" position="stacked">{{ 'transferTo' | translate }}:</ion-label>
+      <ion-text id="path">{{op.transfer}}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="debit"
+        position="stacked">{{ 'forms.operation.'+operation.accountType+'.debit' | translate }}:</ion-label>
+      <ion-text id="debit">{{op.debit | currency}}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="credit"
+        position="stacked">{{ 'forms.operation.'+operation.accountType+'.credit' | translate }}:</ion-label>
+      <ion-text id="credit">{{op.credit | currency }}</ion-text>
+    </ion-item>
+
+    <ion-item>
+      <ion-label for="balance" position="stacked">Balance:</ion-label>
+      <ion-text id="balance">{{op.balance | currency }}</ion-text>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+
+      <ion-button fill="clear" slot="start" (click)="goToHome()" id="menu-button">
+
+        <fa-icon icon="house"></fa-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="onDeleteFired()">
+        <fa-icon icon="trash-can"></fa-icon></ion-button>
+      <ion-button fill="clear" (click)="goToEditPage()">
+        <fa-icon icon="edit"></fa-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-footer>
