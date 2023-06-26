@@ -2,6 +2,7 @@
   width: 100%;
 
   text-align: left;
+
   ion-button {
     float: right;
   }
@@ -18,9 +19,11 @@
 
   ion-label {
     text-transform: capitalize;
-    font-size: 12pt;
+    font-size: larger;
     font-weight: 600;
+    padding-bottom: 22px;
   }
+
   ion-item {
     --padding-bottom: 12px;
   }

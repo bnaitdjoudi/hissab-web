@@ -12,7 +12,6 @@ import { PipeModule } from 'src/app/pipes/pipes.moule';
 import { MaterialModule } from 'src/app/material.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterModule, Routes } from '@angular/router';
-import { AccountPageComponent } from '../account-page/account-page.component';
 
 const routes: Routes = [
   {

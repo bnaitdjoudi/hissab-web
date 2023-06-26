@@ -5,6 +5,7 @@ import { MainStore } from './../../store/main.store';
 import { Router } from '@angular/router';
 import { Period } from '../../model/balance.model';
 import { getLabelPeriode } from './../../tools/period.label';
+import { RouteParamsStore } from 'src/app/store/route.params.store';
 
 @Component({
   selector: 'main-page',
@@ -13,6 +14,7 @@ import { getLabelPeriode } from './../../tools/period.label';
 })
 export class MainPage implements OnInit, OnDestroy {
   balanceSuscription: Subscription;
+  flagSuscription: Subscription;
   isModalOpenActif = false;
 
   mainAccounts$ = this.mainStore.mainAccounts$;
@@ -22,7 +24,8 @@ export class MainPage implements OnInit, OnDestroy {
 
   constructor(
     private readonly mainStore: MainStore,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly routeParamStore: RouteParamsStore
   ) {}
 
   ngOnDestroy(): void {}
@@ -35,6 +38,7 @@ export class MainPage implements OnInit, OnDestroy {
     );
 
     this.mainStore.setPeriod('month');
+    this.routeParamStore.goto
   }
 
   accountClass(currentAccount: Account): string {

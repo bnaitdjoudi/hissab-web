@@ -1,0 +1,21 @@
+<ion-header>
+</ion-header>
+<ion-content center text-center >
+  <form [formGroup]="authForm">
+    <mat-form-field class="example-full-width">
+      <mat-label>Email</mat-label>
+      <input matInput placeholder="Email" formControlName="emailFormCtrl">
+      <mat-hint>example@domain!</mat-hint>
+      <mat-error>Email is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width">
+      <mat-label>Password</mat-label>
+      <input type="password" matInput placeholder="Password" formControlName="passwordFormCtrl">
+      <mat-error>Email is required</mat-error>
+    </mat-form-field>
+    <div class="ion-padding form-tool">
+      <button mat-raised-button color="primary" style="float: right;" (click)="submit()">SUBMIT</button>
+    </div>
+  </form>
+</ion-content>

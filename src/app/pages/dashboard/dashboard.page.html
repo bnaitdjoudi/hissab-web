@@ -5,7 +5,7 @@
     </ion-toolbar>
   </ion-header>
   <ion-content>
-    <main-menu [selectedRoute]='menuRoute$ | async'>
+    <main-menu [selectedRoute]='menuRoute$ | async' >
     </main-menu>
   </ion-content>
 </ion-menu>
@@ -15,7 +15,7 @@
 
     <ion-list>
       <ion-item>
-        <ion-label>Period</ion-label>
+        <ion-label class="period-label">Period</ion-label>
         <ion-select label-placement="fixed" [value]="period$ | async " (ionChange)="onPeriodChange($event)">
           <ion-select-option value="month">Current month</ion-select-option>
           <ion-select-option value="cyear">Current year</ion-select-option>
@@ -34,7 +34,7 @@
       </ion-card-header>
       <ion-card-content>
         <ion-label class="uppercase-text" slot="start">{{getMonth() | translate}}</ion-label>
-        <ion-label slot="end" style="float: right;">{{globalBalance| currency
+        <ion-label slot="end" style="float: right;" class="uppercase-text">{{globalBalance| currency
       :'CAD':'symbol-narrow':'1.2-2'}}</ion-label>
       </ion-card-content>
     </ion-card>

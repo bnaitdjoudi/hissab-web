@@ -1,0 +1,10 @@
+ion-searchbar.custom {
+    --background: #e4e1e1;
+    caret-color: var(--mdc-theme-primary, #c2185b);
+    --color: #333131;
+    --placeholder-color: #2b0101;
+
+    input {
+        color: #333131
+    }
+}

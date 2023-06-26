@@ -1,0 +1,53 @@
+ion-card {
+    background: #33804b;
+    color: azure;
+
+    ion-card-title {
+        --color: aliceblue;
+        text-transform: capitalize;
+        font-size: 16px;
+    }
+
+    ion-content {
+        --color: aliceblue;
+        text-transform: capitalize;
+
+    }
+
+    .uppercase-text {
+
+        font-size: 22px;
+    }
+}
+
+
+ion-select {
+    --placeholder-color: azure;
+    --placeholder-opacity: 1;
+    width: 100%;
+    justify-content: center;
+}
+
+ion-select::part(placeholder),
+ion-select::part(text) {
+    flex: 0 0 auto;
+}
+
+ion-select::part(placeholder)::first-letter {
+    font-size: 32px;
+    font-weight: 500;
+}
+
+ion-select::part(text) {
+    color: azure;
+    font-size: 18px;
+}
+
+ion-select::part(icon) {
+    color: azure;
+    opacity: 1;
+}
+
+.period-label {
+    font-size: 18px;
+}

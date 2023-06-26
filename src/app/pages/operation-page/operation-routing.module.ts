@@ -10,10 +10,7 @@ const routes: Routes = [
     path: 'new',
     component: OperationPageNewPage,
   },
-  {
-    path: 'new/:id',
-    component: OperationPageNewPage,
-  },
+
   {
     path: 'search',
     component: OperationSearchPage,

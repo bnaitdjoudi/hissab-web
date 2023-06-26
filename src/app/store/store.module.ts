@@ -5,6 +5,7 @@ import { AssetsStore } from './assets.store';
 import { MainStore } from './main.store';
 import { RouteParamsStore } from './route.params.store';
 import { OperationPageStore } from '../pages/operation-page/operation-page.store';
+import { SignUpPageStore } from '../pages/signup-page/signup-page.store';
 
 @NgModule({
   imports: [ServicesModule],
@@ -14,6 +15,7 @@ import { OperationPageStore } from '../pages/operation-page/operation-page.store
     RouteParamsStore,
     AccountPageStore,
     OperationPageStore,
+    SignUpPageStore,
   ],
 })
 export class StoreModule {}

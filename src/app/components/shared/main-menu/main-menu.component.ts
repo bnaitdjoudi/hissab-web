@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 })
 export class MainMenuComponent implements OnInit {
   @Input() selectedRoute: 'dash' | 'operation' | 'account';
+  @Output() onMenuSelected: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(readonly router: Router) {}
 
@@ -20,6 +21,7 @@ export class MainMenuComponent implements OnInit {
   }
 
   goto(url: string) {
+    this.onMenuSelected.emit();
     this.router.navigate([url]);
   }
 }

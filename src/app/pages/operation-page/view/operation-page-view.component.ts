@@ -34,6 +34,8 @@ export class OperationPageViewComponent implements OnInit, OnDestroy {
     this.suscribtionOperation = this.operationStore.operation$.subscribe(
       (op) => {
         if (op && op.id) this.operation = op;
+
+      
       }
     );
 
@@ -107,5 +109,15 @@ export class OperationPageViewComponent implements OnInit, OnDestroy {
 
   goToAccountParent() {
     if (this.account) this.router.navigate(['/account/' + this.account.id], {});
+  }
+  goToAccountTransfer() {
+    this.operationStore
+      .getAccountIdByPath(this.operation.transfer)
+      .then((id: number) => {
+        this.router.navigate(['/account/' + id], {});
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 }

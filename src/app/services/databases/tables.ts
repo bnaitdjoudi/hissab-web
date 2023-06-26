@@ -38,6 +38,26 @@ export const tables = {
       { name: 'IS_FLAG_SETTED', type: 'INTEGER(1)' },
     ],
   },
+
+  profiles: {
+    name: 'PROFIL',
+    columns: [
+      { name: 'mail', type: 'VARCHAR(35) PRIMARY KEY' },
+      { name: 'FIRST_NAME', type: 'VARCHAR(25)' },
+      { name: 'LAST_NAME', type: 'VARCHAR(25)' },
+      { name: 'PHONE', type: 'VARCHAR(25)' },
+      { name: 'IS_ADMIN', type: 'INTEGER(1)' },
+    ],
+  },
+
+  authentication: {
+    name: 'AUTH',
+    columns: [
+      { name: 'mail', type: 'VARCHAR(35)' },
+      { name: 'password', type: 'VARCHAR(56)' },
+      { name: 'DATE', type: 'VARCHAR(21)' },
+    ],
+  },
 };
 
 export const views = {
@@ -129,3 +149,11 @@ export const INSERT_FLAGS = `INSERT INTO ${
   .join(',')}) VALUES ${INITIAL_FLAGS_DATA.map(
   (el) => `('${el.flagName}', ${el.isFlagSetted})`
 ).join(',')} `;
+
+export const CREATE_PROFILES_TABLE = `CREATE TABLE  IF NOT EXISTS ${
+  tables.profiles.name
+} (${tables.profiles.columns.map((el) => el.name + ' ' + el.type)});`;
+
+export const CREATE_AUTH_TABLE = `CREATE TABLE  IF NOT EXISTS ${
+  tables.authentication.name
+} (${tables.authentication.columns.map((el) => el.name + ' ' + el.type)});`;

@@ -1,9 +1,141 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>search</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content>
-  Search page
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Search Operation </ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-grid>
+    <ion-row>
+
+      <ion-col><ion-searchbar placeholder="Description" [value]="description"
+          (ionInput)="handleInput($event)"></ion-searchbar></ion-col>
+      <ion-col size="auto"><button id="open-filter" mat-mini-fab matSuffix aria-label="End Date">
+          <mat-icon color="primary">tune</mat-icon>
+        </button></ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+  <ion-list>
+
+
+    <ion-item *ngFor="let item of currentAccounts; let index" (click)="goToSelected(item.id)">
+
+
+      <ion-card>
+        <ion-card-content>
+          <div class="line-op-main">
+            <div class="detail-line left-line">
+              <ion-label class="title">{{ item.description }}</ion-label>
+              <ion-label class="date-line">{{ item.time | dateOperation }}</ion-label>
+            </div>
+            <div class="detail-line total-line">
+              <ion-label><span class="number-line ">{{
+                        (item.debit -item.credit )  |
+                        currency:'CAD':'symbol-narrow':'1.2-2'
+                        }}</span></ion-label>
+              <ion-label><span class="number-line ">{{item.accountName}}</span></ion-label>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-modal #modal trigger="open-filter">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>filter</ion-title>
+          <ion-buttons slot="end">
+
+            <button mat-icon-button color="warn" (click)="modal.dismiss()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          <ion-item>
+            <mat-form-field class="example-full-width">
+              <mat-label> Account</mat-label>
+              <textarea matInput placeholder="From account" readonly [value]="selectedAccount.acountName"></textarea>
+
+              <button id="open-leaf" mat-mini-fab matSuffix aria-label="Search" (click)="openAccountSearch()">
+                <mat-icon color="primary">search</mat-icon>
+              </button>
+
+            </mat-form-field>
+          </ion-item>
+
+          <ion-item>
+            <mat-form-field class="example-full-width">
+              <mat-label> Start Date</mat-label>
+
+              <input type="datetime" matInput placeholder="Start date" readonly [matDatepicker]="picker"
+                (dateChange)="changeDate('start', $event)" [value]="startDate">
+
+              <button id="open-before-date" mat-mini-fab matSuffix aria-label="Search" (click)="picker.open()">
+                <mat-icon color="primary">calendar_month</mat-icon>
+              </button>
+
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </ion-item>
+
+          <ion-item>
+            <mat-form-field class="example-full-width">
+              <mat-label> End Date</mat-label>
+
+              <input type="datetime" matInput placeholder="End Date" readonly [min]="startDate" [value]="endDate"
+                [matDatepicker]="endPicker" (dateChange)="changeDate('end', $event)">
+
+              <button id="open-before-date" mat-mini-fab matSuffix aria-label="End Date" (click)="endPicker.open()">
+                <mat-icon color="primary">calendar_month</mat-icon>
+              </button>
+
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+          </ion-item>
+        </ion-list>
+
+      </ion-content>
+      <div class="ion-padding form-tool">
+        <button mat-raised-button style="float: left;" (click)="clearFilter()">CLEAR</button>
+        <button mat-raised-button color="primary" style="float: right;"
+          (click)="validate();  modal.dismiss(); ">VALID</button>
+      </div>
+    </ng-template>
+  </ion-modal>
+  <ion-modal #modal2 [isOpen]="accoutModal" [initialBreakpoint]="0.25" [breakpoints]="[0, 0.25, 0.5, 0.75]"
+    (didDismiss)="model2Dismiss()">
+    <ng-template>
+      <search-account (onSearchInputClick)="modal2.setCurrentBreakpoint(0.75)"
+        (onSearchInputText)="onAccontSearchChange($event)"
+        [accountData]="operationStore.accountStore.searchAccountResult$ | async"
+        (onAccountSelected)="onAccountSelected($event)"></search-account>
+    </ng-template>
+  </ion-modal>
 </ion-content>
+<ion-footer>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+
+      <button mat-mini-fab matSuffix aria-label="End Date" (click)="goHome()">
+        <mat-icon color="primary">home</mat-icon>
+      </button>
+
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <button mat-mini-fab matSuffix aria-label="reate" (click)="add()">
+        <mat-icon color="primary">add</mat-icon>
+      </button>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-footer>

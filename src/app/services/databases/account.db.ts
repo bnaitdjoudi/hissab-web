@@ -25,11 +25,11 @@ export class AccountDataBase
     endDate: Date
   ): Promise<Account> {
     return new Promise<Account>(async (resolve, reject) => {
-      if(!this.sqLiteObject){
+      if (!this.sqLiteObject) {
         try {
           this.sqLiteObject = await this.dataBase.openSQLObject();
         } catch (error) {
-          console.error(error)
+          console.error(error);
           reject(error);
         }
       }
@@ -192,7 +192,7 @@ export class AccountDataBase
     });
   }
 
-  async create(model: Account): Promise<any> {
+  async create(model: Account): Promise<Account> {
     await this.checkDataBaseOpened();
     return new Promise((resolve, reject) => {
       this.sqLiteObject
@@ -215,7 +215,9 @@ export class AccountDataBase
             model.isLeaf ? 1 : 0,
           ]
         )
-        .then(() => resolve('succes!'))
+        .then(() => {
+          this.finByPath(model.path).then((acc) => resolve(acc));
+        })
         .catch((e: { code: number }) => {
           if (e.code === 6) {
             reject('account already exist');
@@ -557,6 +559,73 @@ export class AccountDataBase
         .catch((err: any) =>
           printError('erreur durant excecusion de la requete', reject, err)
         );
+    });
+  }
+
+  findAccountByTextSerach(text: string, withoutOp: boolean) {
+    return new Promise<Account[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.sqLiteObject
+          .executeSql(
+            `select acc.*, count(op.id)  from ${
+              tables.account.name
+            } acc left join operation op on op.id_account = acc.id  where  UPPER(${
+              tables.account.columns[1].name
+            }) like ? or  UPPER(${
+              tables.account.columns[6].name
+            }) like ? group by acc.id ${
+              withoutOp ? ' having count(op.id) = 0' : ''
+            }`,
+            [text, text]
+          )
+          .then((res: any) => {
+            if (res.rows.length > 0) {
+              resolve(this.constructAccountArray(res));
+            } else {
+              resolve([]);
+            }
+          })
+          .catch((err: any) => {
+            reject('coucou');
+            console.error(err);
+          });
+      } else {
+        reject('pas de connection a l abd');
+      }
+    });
+  }
+
+  async finAccountOnSearchingText(
+    val: string,
+    paging: PagingRequest
+  ): Promise<PagingData<Account>> {
+    return new Promise<PagingData<Account>>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(
+          `SELECT COUNT (*) AS VAL FROM ${tables.account.name}  WHERE  ${tables.account.columns[1].name} like ? or ${tables.account.columns[6].name} like ?`,
+          [`%${val}%`, `%${val}%`]
+        )
+        .then((res: any) => {
+          let totalElements: number = res.rows.item(0).VAL;
+          let offset: number = (paging.page - 1) * paging.limit;
+          let totalPage: number = Math.ceil(totalElements / paging.limit);
+
+          this.sqLiteObject
+            .executeSql(
+              `SELECT *  FROM ${tables.account.name}  WHERE  ${tables.account.columns[1].name} like ? or ${tables.account.columns[6].name} like ? 
+              ORDER BY ${tables.account.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
+              [`%${val}%`, `%${val}%`, paging.limit, offset]
+            )
+            .then((res: any) => {
+              resolve({
+                data: this.constructAccountArray(res),
+                currentPage: paging.page,
+                totalPage: totalPage,
+              });
+            })
+            .catch((err: any) => reject(err));
+        })
+        .catch((err: any) => reject(err));
     });
   }
 

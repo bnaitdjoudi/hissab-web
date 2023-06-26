@@ -19,8 +19,8 @@
 
     <ion-item (click)="goToAccountParent()">
       <ion-label for="time" position="stacked">Account:</ion-label>
-      <ion-text id="time">{{account.acountName }}</ion-text>
-      <ion-icon name="open-outline" size="large" slot="end"></ion-icon>
+      <ion-text >{{account.acountName }}</ion-text>
+      <ion-icon name="open-outline" slot="end"></ion-icon>
     </ion-item>
 
     <ion-item>
@@ -38,8 +38,10 @@
     </ion-item>
 
     <ion-item>
-      <ion-label for="path" position="stacked">{{ 'transferTo' | translate }}:</ion-label>
+      <ion-label for="path" (click)="goToAccountTransfer()"
+        position="stacked">{{ 'transferTo' | translate }}:</ion-label>
       <ion-text id="path">{{op.transfer}}</ion-text>
+      <ion-icon name="open-outline" slot="end"></ion-icon>
     </ion-item>
 
     <ion-item>

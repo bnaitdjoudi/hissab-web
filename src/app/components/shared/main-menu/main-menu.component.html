@@ -1,7 +1,8 @@
 <ion-content>
     <ion-list>
         <ion-item [class]="'first no-border ' + getSelectedClass('dash')">
-            <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon" fontIcon="home"></mat-icon>
+            <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                fontIcon="dashboard"></mat-icon>
             <ion-label>
                 DashBorad
             </ion-label>
@@ -9,36 +10,85 @@
         <ion-item-divider>
             <ion-label> Account </ion-label>
         </ion-item-divider>
-        <ion-item class="no-border" (click)="goto('/account/new')">
-            <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
-                fontIcon="create_new_folder"></mat-icon>
-            <ion-label>
-                New Account
-            </ion-label>
+        <ion-menu-toggle>
+            <ion-item class="no-border" (click)="goto('/account/new')">
+
+                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                    fontIcon="create_new_folder"></mat-icon>
+                <ion-label>
+                    New Account
+                </ion-label>
+
+
+            </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+            <ion-item [class]="'no-border '" (click)="goto('/account/search')">
+                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                    fontIcon="search"></mat-icon>
+                <ion-label>
+                    Search Accounts
+                </ion-label>
+            </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+            <ion-item-divider>
+                <ion-label> Operations </ion-label>
+            </ion-item-divider>
+            <ion-item class="no-border" (click)="goto('/operation/new')">
+                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                    fontIcon="create_new_folder"></mat-icon>
+                <ion-label>
+                    New Operation
+                </ion-label>
+            </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+            <ion-item class="no-border" (click)="goto('/operation/search')">
+                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                    fontIcon="search"></mat-icon>
+                <ion-label>
+                    Search Operations
+                </ion-label>
+            </ion-item>
+
+        </ion-menu-toggle>
+
+        <ion-item>
+            <mat-icon class="icon-size" aria-hidden="false">bar_chart</mat-icon>
+            <ion-label> Reports </ion-label>
         </ion-item>
 
-        <ion-item [class]="'no-border '" (click)="goto('/account/search')">
-            <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon" fontIcon="search"></mat-icon>
-            <ion-label>
-                Search Accounts
-            </ion-label>
-        </ion-item>
         <ion-item-divider>
-            <ion-label> Operations </ion-label>
+            <ion-label> Admin </ion-label>
         </ion-item-divider>
-        <ion-item class="no-border" (click)="goto('/operation/new')">
-            <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
-                fontIcon="create_new_folder"></mat-icon>
-            <ion-label>
-                New Operation
-            </ion-label>
-        </ion-item>
+        <ion-menu-toggle>
+            <ion-item class="no-border" (click)="goto('/operation/new')">
+                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                    fontIcon="people"></mat-icon>
+                <ion-label>
+                    Profiles
+                </ion-label>
+            </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+            <ion-item class="no-border" (click)="goto('/operation/search')">
+                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                    fontIcon="card_membership"></mat-icon>
+                <ion-label>
+                    Abonnement
+                </ion-label>
+            </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+            <ion-item class="no-border" (click)="goto('/operation/new')">
+                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                    fontIcon="translate"></mat-icon>
+                <ion-label>
+                    Langues
+                </ion-label>
+            </ion-item>
+        </ion-menu-toggle>
 
-        <ion-item class="no-border" (click)="goto('/operation/search')">
-            <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon" fontIcon="search"></mat-icon>
-            <ion-label>
-                Search Operations
-            </ion-label>
-        </ion-item>
     </ion-list>
 </ion-content>

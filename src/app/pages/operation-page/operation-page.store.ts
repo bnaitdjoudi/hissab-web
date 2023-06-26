@@ -6,9 +6,13 @@ import { Store } from '../../store/store';
 import { AccountPageStore } from '../account-page/account-page.store';
 import { Location } from '@angular/common';
 import random from 'random-string-alphanumeric-generator';
-import { OperationPageStoreModel } from '../../model/operation-page.store.model';
+import {
+  OperationPageStoreModel,
+  OperationSearchData,
+} from '../../model/operation-page.store.model';
 import { Observable } from 'rxjs';
 import { Account } from '../../model/account.model';
+import { PagingData } from 'src/app/model/paging-data';
 
 let initialStore: OperationPageStoreModel = {};
 
@@ -22,11 +26,20 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
     (state) => state.currentAccount
   );
 
+  operationSerachData$: Observable<OperationSearchData | undefined> =
+    this.select<OperationSearchData | undefined>(
+      (state) => state.operationSerachData
+    );
+
+  operationSearchResult$: Observable<PagingData<Operation> | undefined> =
+    this.select<PagingData<Operation> | undefined>(
+      (state) => state.operationSearchResult
+    );
+
   constructor(
     private readonly operationService: OperationService,
     private readonly routeParamsStore: RouteParamsStore,
-    readonly accountStore: AccountPageStore,
-    private location: Location
+    readonly accountStore: AccountPageStore
   ) {
     super(initialStore);
 
@@ -63,7 +76,31 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
     this.accountStore.currentAccount$.subscribe((acc) => {
       this.setAccount(acc);
     });
+
+    this.operationSerachData$.subscribe((operationSerachData) => {
+      this.operationService
+        .operationSearch(operationSerachData)
+        .then((operationSearchResult: PagingData<Operation> | undefined) => {
+          this.setOperationSearchResult(operationSearchResult);
+        });
+    });
   }
+  setOperationSearchResult(
+    operationSearchResult: PagingData<Operation> | undefined
+  ) {
+    this.setState({
+      ...this.state,
+      operationSearchResult: operationSearchResult,
+    });
+  }
+
+  setOperationSerachData(operationSerachData: OperationSearchData | undefined) {
+    this.setState({
+      ...this.state,
+      operationSerachData: operationSerachData,
+    });
+  }
+
   setAccount(currentAccount: Account) {
     this.setState({ ...this.state, currentAccount: currentAccount });
   }
@@ -136,5 +173,19 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
 
   onLoadLeafAccount(exeptId: number | undefined) {
     this.accountStore.loadLeadAccounts(exeptId);
+  }
+
+  async getAccountIdByPath(transfer: string): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      this.accountStore
+        .getAccountByPath(transfer)
+        .then((acc) => {
+          resolve(acc.id);
+        })
+        .catch((err) => {
+          console.error(err);
+          reject('error dans le service');
+        });
+    });
   }
 }

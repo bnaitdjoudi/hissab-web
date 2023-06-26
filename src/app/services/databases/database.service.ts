@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
+
 import { Platform } from '@ionic/angular';
 import { browserDBInstance } from './browser';
 import {
   CREATE_ACCOUNT_TABLE,
+  CREATE_AUTH_TABLE,
   CREATE_FLAGS,
+  CREATE_PROFILES_TABLE,
   CREATE_TRANSACTION_TABLE,
   CREATE_TRANSACTION_VIEW,
   INITIAL_ACCOUNT_DATA,
-  INSERT_FLAGS,
   INSERT_INITIAL_ACCOUNT_DATA,
-  tables,
 } from './tables';
 import { SQLitePorter } from '@awesome-cordova-plugins/sqlite-porter/ngx';
 import { InjectDbTestService } from './injectDbTest.service';
@@ -65,9 +66,23 @@ export class DataBaseService {
         await this.createAccountTables();
         await this.createTransactionTables();
         await this.createTransactionView();
+        await this.initProfilesTable();
+        await this.initAuthTable();
         await this.initInitFlag();
       }
       this.initService.initialisationSubject.next(true);
+    });
+  }
+  initAuthTable() {
+    console.info('CREATE PROFILES TABLE');
+    this.sqLiteObject.executeSql(CREATE_AUTH_TABLE, []).then((res: any) => {
+      console.info('AUTH TABLE CREATED');
+    });
+  }
+  initProfilesTable() {
+    console.info('CREATE PROFILES TABLE');
+    this.sqLiteObject.executeSql(CREATE_PROFILES_TABLE, []).then((res: any) => {
+      console.info('PROFILES TABLE CREATED');
     });
   }
 
@@ -125,7 +140,7 @@ export class DataBaseService {
 
         this.initAll();
       })
-      .catch((e) => console.error(e));
+      .catch((e: any) => console.error(e));
   }
 
   private async createAccountTables(): Promise<void> {

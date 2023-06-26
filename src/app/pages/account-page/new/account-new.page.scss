@@ -1,0 +1,31 @@
+.container {
+    padding: 8px;
+    --padding-top: 16px;
+    --padding-bottom: 0px;
+    --padding-start: 18px;
+    --padding-end: 18px;
+}
+
+.example-form {
+
+    width: 100%;
+
+    .example-full-width {
+        width: 100%;
+    }
+}
+
+.form-tool {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+
+    button {
+        margin-right: 10px;
+    }
+
+}
+
+.no-scroll .scroll-content {
+    overflow: hidden;
+}

@@ -12,4 +12,5 @@ export interface Operation {
   transfer: string;
   accountType?: string;
   random?: string;
+  accountName?: string;
 }

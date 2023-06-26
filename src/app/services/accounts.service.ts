@@ -50,7 +50,7 @@ export class AccountsService {
     });
   }
 
-  async createAccount(account: Account): Promise<any> {
+  async createAccount(account: Account): Promise<Account> {
     return new Promise<any>((resolve, reject) => {
       this.accountDb
         .create(account)
@@ -149,6 +149,18 @@ export class AccountsService {
     });
   }
 
+  async finAccountOnSearching(
+    text: string,
+    withoutOp: boolean
+  ): Promise<Account[]> {
+    return new Promise<Account[]>((resolve, reject) => {
+      this.accountDb
+        .findAccountByTextSerach(text, withoutOp)
+        .then((accounts: Account[]) => {
+          resolve(accounts);
+        });
+    });
+  }
   async getSubAccountsStateByPagingAndAccountId(
     val: PagingRequest,
     id: number,
@@ -166,6 +178,25 @@ export class AccountsService {
             reject
           )
         );
+    });
+  }
+
+  finAccountOnSearchingText(
+    val: string | undefined,
+    paging: PagingRequest
+  ): Promise<PagingData<Account>> {
+    return new Promise<PagingData<Account>>((resolve, reject) => {
+      if (val || val === '') {
+        this.accountDb
+          .finAccountOnSearchingText(val, paging)
+          .then((data: PagingData<Account>) => resolve(data))
+          .catch((error: any) => {
+            console.error(error);
+            reject('error on searching on DB');
+          });
+      } else {
+        resolve({ currentPage: 0, data: [], totalPage: 0 });
+      }
     });
   }
 }

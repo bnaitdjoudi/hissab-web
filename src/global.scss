@@ -93,13 +93,6 @@ ion-modal ion-toolbar {
   --color: white;
 }
 
-ion-searchbar {
-  color: white !important;
-
-  input {
-    --color: white;
-  }
-}
 
 
 
@@ -148,10 +141,11 @@ ion-header {
 
 
 ion-footer {
-  --background: #00874E;
+  --background: #424242;
+  ;
 
   ion-toolbar {
-    --background: #00874E;
+    --background: #424242;
     --border-style: none;
     border: 0px !important;
     border-bottom-color: transparent !important;
@@ -226,7 +220,7 @@ ion-item {
 }
 
 .list-md {
-  background-color: #4a4a4f;
+  background-color: #424242;
 }
 
 .balance {

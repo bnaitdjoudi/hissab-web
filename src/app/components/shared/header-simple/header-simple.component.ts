@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { Location } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
 @Component({
   selector: 'header-simple',
   templateUrl: './header-simple.component.html',
@@ -7,9 +7,10 @@ import { Location } from '@angular/common';
 })
 export class HeaderSimpleComponent {
   @Input() title: string;
+  @Output() onReturnClick: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(private location: Location) {}
+  constructor() {}
   back(): void {
-    this.location.back();
+    this.onReturnClick.emit();
   }
 }

@@ -13,8 +13,8 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" *ngIf="operation as op" class="ion-padding">
-  <operation-form #operationForm [operation]="op" [accountType]="op.accountType? op.accountType:''"
-    [edit]="true"></operation-form>
+  <operation-form #operationForm [operation]="op" [accountType]="op.accountType? op.accountType:''" [edit]="true"
+    [currentAccount]="operationStore.account$ | async" (onSubmit)="onSubmitFired()"></operation-form>
   <!--  <ion-list>
     <ion-item>
       <ion-label for="time" position="stacked">Date:</ion-label>

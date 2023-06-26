@@ -12,4 +12,9 @@ export interface AccountPageStoreModel {
   operationsPagingRequest: PagingRequest;
   accountsPagingRequest: PagingRequest;
   leafAccounts: LeafAccount[];
+  listAccount: Account[];
+  editing: boolean;
+  newAccount: Account | undefined;
+  searchTextAccount?: string;
+  searchAccountResult: PagingData<Account>;
 }

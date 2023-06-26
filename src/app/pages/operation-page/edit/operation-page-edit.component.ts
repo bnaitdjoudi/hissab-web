@@ -55,8 +55,6 @@ export class OperationPageEditComponent implements OnInit, OnDestroy {
   }
 
   async onSubmitFired() {
-    console.log('alert');
-
     const alert = await this.alertController.create(
       deleteConfirmation(
         'Voulez vous sauvegarder les changement?',

@@ -14,7 +14,9 @@ const store: RouteParams = {
     id: 0,
   },
 };
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class RouteParamsStore extends Store<RouteParams> {
   idAccount$ = this.select<number>(
     (state: RouteParams) => state.accountParams.id
@@ -31,8 +33,8 @@ export class RouteParamsStore extends Store<RouteParams> {
     this.reee = new Date().toUTCString();
     this.router.events
       .pipe(
-        filter((e) => e instanceof ActivationEnd),
-        map((e) =>
+        filter((e: any) => e instanceof ActivationEnd),
+        map((e: any) =>
           e instanceof ActivationEnd
             ? { params: e.snapshot.params, url: e.snapshot.url }
             : { params: [], url: '' }
@@ -41,13 +43,14 @@ export class RouteParamsStore extends Store<RouteParams> {
       .subscribe((event: any) => {
         console.log('current url: ' + this.router.url);
 
-        if (this.router.url === '/') {
+        if (this.router.url === '/dashboard') {
           this.mainStore.synchronusData();
         }
         if (this.router.url.includes('account/')) {
           this.setIdCount(event.params['id']);
         } else {
           this.setIdCount(0);
+          this.mainStore._currentAccountId.next(0);
         }
 
         if (this.router.url.includes('operation/')) {
@@ -62,6 +65,13 @@ export class RouteParamsStore extends Store<RouteParams> {
           this.setIdOperation(0);
         }
       });
+
+    this.mainStore.flags$.subscribe((mapFlags) => {
+      console.log('ROOOOOOOOOOOOOOOOOO' + JSON.stringify(mapFlags));
+      if (mapFlags.size > 0 && !mapFlags.has('PROFIL_SIGNEDUP')) {
+        this.router.navigate(['sginns']);
+      }
+    });
   }
 
   setIdCount(id: number) {

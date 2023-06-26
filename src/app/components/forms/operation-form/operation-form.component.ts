@@ -12,15 +12,11 @@ import {
 import { Operation } from 'src/app/model/operation.model';
 import { format, parseISO } from 'date-fns';
 import { CurrencyPipe } from '@angular/common';
-import { register } from 'swiper/element/bundle';
+
 import {
   AbstractControl,
   FormBuilder,
-  FormControl,
   FormGroup,
-  FormGroupDirective,
-  NgForm,
-  ValidationErrors,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
@@ -30,18 +26,6 @@ import { parseFloatTool } from 'src/app/tools/tools';
 import { LeafAccount } from 'src/app/model/leaf-account.model';
 import { Account } from 'src/app/model/account.model';
 import { MatStepper } from '@angular/material/stepper';
-import { ErrorStateMatcher } from '@angular/material/core';
-
-register();
-
-export class CustomErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(
-    control: FormControl | null,
-    form: FormGroupDirective | NgForm | null
-  ) {
-    return (control?.invalid && control.dirty) ?? false;
-  }
-}
 
 @Component({
   selector: 'operation-form',
@@ -50,29 +34,29 @@ export class CustomErrorStateMatcher implements ErrorStateMatcher {
   providers: [CurrencyPipe],
 })
 export class OperationFormComponent implements OnInit, OnDestroy {
-  @Input() accountType: string = 'actifs';
+  @Input() accountType: string = 'actif';
   @Input() set operation(operation: Operation) {
-    this.swiperRef?.previous();
-    this.swiperRef?.previous();
-    this.transferForm?.reset();
-    this.operationForm?.reset();
-    this.operationForm?.markAsTouched();
-    this.transferForm?.markAsTouched();
+    this.swiperRef?.reset();
+
     this.setOperation(operation);
+    this.initTransferForm();
+    this.iniOperationForm();
+    this.initReactionForm();
+
+    this.accountType = operation.accountType ? operation.accountType : 'actif';
   }
 
   @Input() leafsAccount: Observable<LeafAccount[]>;
 
   @Input() edit: boolean = false;
 
-  @Input() set currentAccount(currentAccount: Account | undefined) {
-    console.log('ddd::::' + currentAccount?.acountName);
+  @Input() set currentAccount(currentAccount: Account | undefined | null) {
     this.account = currentAccount;
-    if (currentAccount) {
+
+    if (currentAccount && currentAccount.id) {
       this.defaultTransferFrom = { ...currentAccount };
-    } else {
-      this.defaultTransferFrom = {} as LeafAccount;
     }
+    console.log('ddfdfd::::ghghg' + JSON.stringify(this.defaultTransferFrom));
   }
 
   @Output()
@@ -83,7 +67,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   @Output()
   onSubmit: EventEmitter<void> = new EventEmitter<void>();
 
-  account: Account | undefined;
+  account: Account | undefined | null;
   defaultTransferFrom: LeafAccount | undefined;
   defaultTransferTo: LeafAccount | undefined;
   leafsAccountFiltred: LeafAccount[] = [];
@@ -146,7 +130,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
       ? this.defaultTransferTo.path
       : this.currentOperation.transfer;
 
-    this.buildSlides();
+    //this.buildSlides();
   }
 
   buildSlides() {
@@ -236,7 +220,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   }
 
   initReactionForm() {
-    this.operationForm.valueChanges.subscribe((val) => {
+    this.operationForm?.valueChanges.subscribe((val) => {
       Object.keys(val)
         .filter((k) => k !== 'debit' && k !== 'credit' && k !== 'time')
         .forEach((key) => {
@@ -383,6 +367,12 @@ export class OperationFormComponent implements OnInit, OnDestroy {
         this.currentOperation.transfer = this.defaultTransferTo
           ? this.defaultTransferTo.path
           : '';
+        this.currentOperation.idAccount = this.defaultTransferFrom
+          ? this.defaultTransferFrom.id
+          : 0;
+        this.transferForm
+          .get('idAccount')
+          ?.setValue(this.currentOperation.idAccount);
 
         this.transferForm
           .get('transfer')
@@ -441,6 +431,8 @@ export class OperationFormComponent implements OnInit, OnDestroy {
         if (this.operationForm.hasError('noMatch')) {
           this.presentAlert();
         }
+        this.currentOperation.description =
+          this.operationForm.get('description')?.value;
         break;
       case 2: {
         this.onSubmit.emit();
@@ -481,6 +473,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   }
   private loadDataLeaf() {
     this.progressShown = true;
+
     this.onLoadLeafAccount.emit(
       this.modalTitle === 'Transfer to'
         ? this.defaultTransferFrom?.id

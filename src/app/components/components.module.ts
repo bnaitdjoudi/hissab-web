@@ -23,6 +23,7 @@ import { HeaderComponent } from './shared/header/header.component';
 import { HeaderSimpleComponent } from './shared/header-simple/header-simple.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TransferAccountsComponent } from './forms/transfer-accounts/transfer-accounts.component';
+import { SearchAccountComponent } from './search/search-account/search-account.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -50,6 +51,7 @@ registerLocaleData(localeFr, 'fr-FR');
     MainMenuComponent,
     HeaderComponent,
     HeaderSimpleComponent,
+    SearchAccountComponent,
   ],
   declarations: [
     CardMainAccountComponent,
@@ -65,6 +67,7 @@ registerLocaleData(localeFr, 'fr-FR');
     HeaderComponent,
     HeaderSimpleComponent,
     TransferAccountsComponent,
+    SearchAccountComponent,
   ],
   providers: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

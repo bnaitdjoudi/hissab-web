@@ -7,6 +7,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { BordService } from '../services/bord.service';
 import { BalanceResult, Period } from '../model/balance.model';
 import { InitService } from '../services/init.service';
+import { Flag } from '../model/flags.model';
+import { FlagsService } from '../services/flags.service';
 
 const store: MainStoreData = {
   globalBalance: 0,
@@ -14,6 +16,8 @@ const store: MainStoreData = {
   period: '',
   init: false,
   menuRoute: 'dash',
+  flags: new Map<string, Flag>(),
+  iSignedin: false,
 };
 
 @Injectable({
@@ -40,12 +44,18 @@ export class MainStore extends Store<MainStoreData> {
 
   _periodSubject: BehaviorSubject<any> = new BehaviorSubject<any>('');
 
+  _currentAccountId: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+
   menuRoute$ = this.select<any>((state) => state.menuRoute);
+
+  flags$ = this.select<Map<string, Flag>>((state) => state.flags);
+  iSignedin$ = this.select<boolean>((state) => state.iSignedin);
 
   constructor(
     private readonly accountsService: AccountsService,
     private readonly bordService: BordService,
-    private readonly initService: InitService
+    private readonly initService: InitService,
+    private readonly flagService: FlagsService
   ) {
     super(store);
     console.log('construct main store');
@@ -61,6 +71,13 @@ export class MainStore extends Store<MainStoreData> {
         this.period$.subscribe(async (val) => {
           console.log(val);
           await this.synchronusData();
+        });
+
+        this.flagService.findAllFlags().then((flags) => {
+          this.setState({
+            ...this.state,
+            flags: new Map<string, Flag>(flags.map((el) => [el.flagName, el])),
+          });
         });
       }
     });
@@ -122,5 +139,28 @@ export class MainStore extends Store<MainStoreData> {
 
   updateMenuRoute(menuRoute: 'dash' | 'account' | 'operation') {
     this.setState({ ...this.state, menuRoute: menuRoute });
+  }
+
+  async setSignedUpFlag() {
+    console.log('walou');
+    try {
+      await this.flagService.createFlag({
+        flagName: 'PROFIL_SIGNED_UP',
+        flagSetted: true,
+      });
+
+      this.setState({
+        ...this.state,
+        flags: new Map<string, Flag>(
+          (await this.flagService.findAllFlags()).map((el) => [el.flagName, el])
+        ),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  setSignedIn(val: boolean) {
+    this.setState({ ...this.state, iSignedin: val });
   }
 }

@@ -50,3 +50,19 @@ mat-horizontal-stepper {
   width: 100%;
 
 }
+
+.resume-label {
+
+  font-size: larger;
+  font-weight: 700;
+  color: #cfb6b6 !important;
+}
+
+ion-textarea {
+  color: #fff
+}
+
+mat-label,
+ion-label {
+  text-transform: capitalize;
+}

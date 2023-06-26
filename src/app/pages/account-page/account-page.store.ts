@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { Account } from '../../model/account.model';
 import { LeafAccount } from '../../model/leaf-account.model';
 import { Operation } from '../../model/operation.model';
@@ -9,13 +9,13 @@ import { AccountsService } from '../../services/accounts.service';
 import { OperationService } from '../../services/operation.service';
 import { RouteParamsStore } from '../../store/route.params.store';
 import { Store } from '../../store/store';
-import { excludedAccountTypeTransferTo } from '../../tools/configs';
 import { AccountPageStoreModel } from './account-page.store.model';
 import random from 'random-string-alphanumeric-generator';
 import { printError } from '../../tools/errorTools';
 import { MainStore } from '../../store/main.store';
 import { getDatesByPeriodValue } from '../../tools/date.tools';
-import { OperationPageStore } from '../operation-page/operation-page.store';
+import { error } from 'console';
+import { resolve } from 'cypress/types/bluebird';
 
 @Injectable({
   providedIn: 'root',
@@ -23,9 +23,11 @@ import { OperationPageStore } from '../operation-page/operation-page.store';
 export class AccountPageStore extends Store<AccountPageStoreModel> {
   //observables
   currentAccount$ = this.select<Account>((state) => state.currentAccount);
+
   newOperation$ = this.select<Operation | null | undefined>(
     (state) => state.newOperation
   );
+
   operationsData$ = this.select<PagingData<Operation>>(
     (state) => state.operationsData
   );
@@ -42,10 +44,21 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
     (state) => state.accountsPagingRequest
   );
 
+  listAccounts$ = this.select<Account[]>((state) => state.listAccount);
+
   leafAccounts$ = this.select<LeafAccount[]>((state) => state.leafAccounts);
 
   listDataCombined$ = combineLatest([this.accountsData$, this.operationsData$]);
 
+  newAccount$ = this.select<Account | undefined>((state) => state.newAccount);
+
+  searchTextAccount$: Observable<string | undefined> = this.select<
+    string | undefined
+  >((state) => state.searchTextAccount);
+
+  searchAccountResult$: Observable<PagingData<Account>> = this.select<
+    PagingData<Account>
+  >((state) => state.searchAccountResult);
   reee: string;
   //Subjects
   _currentPageOperation: BehaviorSubject<PagingRequest> =
@@ -72,6 +85,8 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
 
   _newAccountSubject: BehaviorSubject<Account | null>;
 
+  _searchAccount: BehaviorSubject<string>;
+
   constructor(
     private readonly accountService: AccountsService,
     private readonly operationService: OperationService,
@@ -95,11 +110,17 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
       accountsPagingRequest: { page: 1, limit: 15 },
       operationsPagingRequest: { page: 1, limit: 15 },
       leafAccounts: [],
+      listAccount: [],
+      editing: false,
+      newAccount: undefined,
+      searchAccountResult: { currentPage: 1, data: [], totalPage: 0 },
     });
     this._deleteOperationSubject = new BehaviorSubject<number>(0);
     this._newAccountSubject = new BehaviorSubject<Account | null>(null);
+    this._searchAccount = new BehaviorSubject<string>('');
     this.initSuscription();
     this.reee = new Date().toUTCString();
+    this.mainStore._currentAccountId.subscribe((id) => this.reloadAccount(id));
   }
 
   private initSuscription() {
@@ -173,10 +194,35 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
     this.mainStore.period$.subscribe(() => {
       this.loadAccount(this.state.currentAccount.id);
     });
+
+    //search
+    this._searchAccount.subscribe((text) => {
+      this.accountService
+        .finAccountOnSearching(text, this.state.editing)
+        .then((accounts: Account[]) => this.setListAccounts(accounts))
+        .catch();
+    });
+
+    this.searchTextAccount$.subscribe((val) => {
+      this.accountService
+        .finAccountOnSearchingText(val, { limit: 15, page: 1 })
+        .then((data: PagingData<Account>) => {
+          this.setState({ ...this.state, searchAccountResult: data });
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setState({
+            ...this.state,
+            searchAccountResult: { currentPage: 0, data: [], totalPage: 0 },
+          });
+        });
+    });
+  }
+  setListAccounts(accounts: Account[]) {
+    this.setState({ ...this.state, listAccount: accounts });
   }
 
   private loadAccount(id: number) {
-    console.log('loooooddddd:::' + this.mainStore.state.period);
     const [startDate, endDate] = getDatesByPeriodValue(
       this.mainStore.state.period
     );
@@ -188,10 +234,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
           .getResumeOfAccountById(acc.id)
           .then((res) => {
             acc.resume = res;
-            console.log(
-              'gggggggggggggggggggggggggggggg:::::::::::::::::' +
-                JSON.stringify(acc)
-            );
+
             this.setCurrentAccount(acc);
             this._currentPageSubAccount.next({ page: 1, limit: 15 });
             this._currentPageOperation.next({ page: 1, limit: 15 });
@@ -293,61 +336,52 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
             printError('erreur durant lappel au service db', reject, err);
           });
       } else {
-        this.setCurrentAccount({
-          id: 0,
-          acountName: '',
-          totalAccount: 0,
-          isMain: false,
-          type: '',
-          parentId: 0,
-          path: '',
-          isLeaf: false,
-          resume: { sons: 0 },
-        });
+        this.setCurrentAccount({ resume: {} } as Account);
       }
     });
   }
 
-  private createNewAccount(account: Account) {
-    account = {
-      ...account,
-      parentId: this.state.currentAccount.id ? this.state.currentAccount.id : 0,
-      type: this.state.currentAccount.type,
-      path: this.state.currentAccount.path + '/' + account.acountName,
-      isLeaf: true,
-    };
-    this.accountService
-      .createAccount(account)
-      .then((res) => {
-        console.log(
-          'message de creation de Account:' + account.acountName + '-> ' + res
-        );
+  private async createNewAccount(account: Account): Promise<Account> {
+    return new Promise<Account>((resolve, reject) => {
+      account = {
+        ...account,
+        parentId: this.state.currentAccount.id
+          ? this.state.currentAccount.id
+          : 0,
+        type: this.state.currentAccount.type,
+        path: this.state.currentAccount.path + '/' + account.acountName,
+        isLeaf: true,
+      };
+      this.accountService
+        .createAccount(account)
+        .then((res) => {
+          resolve(res);
+          this._currentPageOperation.next({ page: 1, limit: 15 });
+          this._currentPageSubAccount.next({ page: 1, limit: 15 });
 
-        this._currentPageOperation.next({ page: 1, limit: 15 });
-        this._currentPageSubAccount.next({ page: 1, limit: 15 });
-
-        if (
-          this.state.currentAccount.isLeaf &&
-          this.state.currentAccount.id !== undefined
-        ) {
-          this.accountService
-            .updateAccount(
-              {
-                ...this.state.currentAccount,
-                isLeaf: false,
-              } as Account,
-              this.state.currentAccount.id
-            )
-            .then(() => {
-              this.setCurrentAccount({
-                ...this.state.currentAccount,
-                isLeaf: false,
-              });
-            })
-            .catch((err) => console.error(err));
-        }
-      })
-      .catch((err) => console.error(err));
+          if (
+            this.state.currentAccount.isLeaf &&
+            this.state.currentAccount.id !== undefined
+          ) {
+            this.accountService
+              .updateAccount(
+                {
+                  ...this.state.currentAccount,
+                  isLeaf: false,
+                } as Account,
+                this.state.currentAccount.id
+              )
+              .then(() => {
+                this.setCurrentAccount({
+                  ...this.state.currentAccount,
+                  isLeaf: false,
+                });
+              })
+              .catch((err) => console.error(err));
+          }
+        })
+        .catch((err) => console.error(err));
+    });
   }
 
   getCurrentPeriod() {
@@ -387,5 +421,55 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
   }
   setLeafAccounts(leafs: LeafAccount[]) {
     this.setState({ ...this.state, leafAccounts: leafs });
+  }
+
+  async getAccountByPath(transfer: string): Promise<Account> {
+    return new Promise<Account>((resolve, reject) => {
+      this.accountService
+        .findAccountByPath(transfer)
+        .then((acc) => {
+          resolve(acc);
+        })
+        .catch((err) => console.error(err));
+    });
+  }
+
+  async searchAccount(text: string) {
+    this._searchAccount.next(text);
+  }
+
+  cancelEdition() {
+    this.setState({ ...this.state, editing: false, newAccount: undefined });
+  }
+
+  startEdition() {
+    this.setState({ ...this.state, editing: true, newAccount: {} as Account });
+  }
+
+  editNewAccount(name: string, idAccount: number) {
+    this.setState({
+      ...this.state,
+      newAccount: { parentId: idAccount, acountName: name } as Account,
+    });
+  }
+
+  setTextSearch(val: string | undefined) {
+    this.setState({ ...this.state, searchTextAccount: val });
+  }
+
+  async submit(): Promise<number> {
+    return new Promise<number>(async (resolve, reject) => {
+      const acc: Account = {
+        acountName: this.state.newAccount?.acountName,
+      } as Account;
+
+      try {
+        const account = await this.createNewAccount(acc);
+        resolve(account.id);
+      } catch (error) {
+        console.error(error);
+        reject('erreur durant la creation');
+      }
+    });
   }
 }

@@ -8,6 +8,7 @@ import { DataBaseService } from './database.service';
 import { GenericDataBase } from './generic.db';
 import { GenericDb } from './GenericDb';
 import { tables } from './tables';
+import { OperationSearchData } from 'src/app/model/operation-page.store.model';
 
 @Injectable()
 export class OperationDataBase
@@ -929,6 +930,68 @@ export class OperationDataBase
     });
   }
 
+  operationSearch(
+    operationSearchData: OperationSearchData
+  ): Promise<PagingData<Operation> | undefined> {
+    return new Promise<PagingData<Operation> | undefined>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        const clauseDescription = `${tables.transaction.columns[3].name} like '%${operationSearchData.description}%'`;
+        const clauseStartDate = operationSearchData.startDate
+          ? `${tables.transaction.columns[2].name} >   '${format(
+              operationSearchData.startDate,
+              'yyyy-MM-dd HH:mm:ss'
+            )}' `
+          : ' 1 = 1';
+        const clauseEndDate = operationSearchData.endDate
+          ? `${tables.transaction.columns[2].name} <  '${format(
+              operationSearchData.endDate,
+              'yyyy-MM-dd HH:mm:ss'
+            )}' `
+          : ' 1 = 1';
+        const clauseAccountId = operationSearchData.accountId
+          ? `${tables.transaction.columns[8].name} =  ${operationSearchData.accountId} `
+          : ' 1 = 1';
+        const clause = `${clauseDescription} and ${clauseStartDate} and  ${clauseEndDate} and ${clauseAccountId}`;
+        this.sqLiteObject
+          .executeSql(
+            `SELECT COUNT (*) AS VAL FROM ${tables.transaction.name} WHERE ${clause};`,
+            []
+          )
+          .then((res: any) => {
+            let totalElements: number = res.rows.item(0).VAL;
+            let offset: number =
+              (operationSearchData.page - 1) * operationSearchData.limit;
+            let totalPage: number = Math.ceil(
+              totalElements / operationSearchData.limit
+            );
+
+            this.sqLiteObject
+              .executeSql(
+                `SELECT op.*, acc.${tables.account.columns[1].name} FROM ${tables.transaction.name} op left join ${tables.account.name} acc on acc.${tables.account.columns[0].name} = ${tables.transaction.columns[8].name}   WHERE ${clause} ORDER BY ${tables.transaction.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
+                [operationSearchData.limit, offset]
+              )
+              .then((res: any) => {
+                resolve({
+                  data: this.constructAccountArray(res),
+                  currentPage: operationSearchData.page,
+                  totalPage: totalPage,
+                });
+              })
+              .catch((error: any) => {
+                reject('erreur dans la requette des operations');
+                console.error(error);
+              });
+          })
+          .catch((error: any) => {
+            reject('erreur dans la requette count operation');
+            console.error(error);
+          });
+      } else {
+        reject(' no db connexion');
+      }
+    });
+  }
+
   private constructAccountArray(data: any): Operation[] {
     let operations: Operation[] = [];
 
@@ -952,6 +1015,7 @@ export class OperationDataBase
       idAccount: data.rows.item(i).ID_ACCOUNT,
       accountType: data.rows.item(i).TYPE,
       transfer: data.rows.item(i).TRANSFER,
+      accountName: data.rows.item(i).ACCOUNT_NAME,
     };
   }
 }

@@ -3,18 +3,18 @@ import { IonicModule } from '@ionic/angular';
 import { combineLatest, from } from 'rxjs';
 import { OperationFormComponent } from 'src/app/components/forms/operation-form/operation-form.component';
 import { NgxTranslateModule } from 'src/app/translate/translate.module';
-import { Account } from '../../model/account.model';
-import { LeafAccount } from '../../model/leaf-account.model';
-import { Operation } from '../../model/operation.model';
-import { PagingData } from '../../model/paging-data';
+import { Account } from '../../../model/account.model';
+import { LeafAccount } from '../../../model/leaf-account.model';
+import { Operation } from '../../../model/operation.model';
+import { PagingData } from '../../../model/paging-data';
 
-import { AccountPageComponent } from './account-page.component';
-import { AccountPageStore } from './account-page.store';
+import { AccountPageViewComponent } from './account-page.component';
+import { AccountPageStore } from './../account-page.store';
 
 describe('AccountPageComponent ', () => {
   const presentActionSheet = async (
     returnSheet: any,
-    component: AccountPageComponent
+    component: AccountPageViewComponent
   ) => {
     const htmlAction: HTMLIonActionSheetElement = {
       present: (): Promise<void> => {
@@ -39,8 +39,8 @@ describe('AccountPageComponent ', () => {
 
   const presentActionSheetChooseAction = async (
     role: any,
-    component: AccountPageComponent,
-    spyMethod: keyof AccountPageComponent
+    component: AccountPageViewComponent,
+    spyMethod: keyof AccountPageViewComponent
   ) => {
     const htmlAction: HTMLIonActionSheetElement = {
       present: (): Promise<void> => {
@@ -66,8 +66,8 @@ describe('AccountPageComponent ', () => {
   };
 
   describe('AccountPageComponent mode account', () => {
-    let component: AccountPageComponent;
-    let fixture: ComponentFixture<AccountPageComponent>;
+    let component: AccountPageViewComponent;
+    let fixture: ComponentFixture<AccountPageViewComponent>;
 
     const currentAccount: Account = {
       id: 2,
@@ -141,14 +141,14 @@ describe('AccountPageComponent ', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [AccountPageComponent],
+        declarations: [AccountPageViewComponent],
         imports: [IonicModule.forRoot(), NgxTranslateModule],
         providers: [
           { provide: AccountPageStore, useValue: accountPageStoreMock },
         ],
       }).compileComponents();
 
-      fixture = TestBed.createComponent(AccountPageComponent);
+      fixture = TestBed.createComponent(AccountPageViewComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
     }));
@@ -301,19 +301,19 @@ describe('AccountPageComponent ', () => {
       },
     };
 
-    let component: AccountPageComponent;
-    let fixture: ComponentFixture<AccountPageComponent>;
+    let component: AccountPageViewComponent;
+    let fixture: ComponentFixture<AccountPageViewComponent>;
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [AccountPageComponent],
+        declarations: [AccountPageViewComponent],
         imports: [IonicModule.forRoot(), NgxTranslateModule],
         providers: [
           { provide: AccountPageStore, useValue: accountPageStoreMock },
         ],
       }).compileComponents();
 
-      fixture = TestBed.createComponent(AccountPageComponent);
+      fixture = TestBed.createComponent(AccountPageViewComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
     }));
@@ -491,19 +491,19 @@ describe('AccountPageComponent ', () => {
       },
     };
 
-    let component: AccountPageComponent;
-    let fixture: ComponentFixture<AccountPageComponent>;
+    let component: AccountPageViewComponent;
+    let fixture: ComponentFixture<AccountPageViewComponent>;
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [AccountPageComponent],
+        declarations: [AccountPageViewComponent],
         imports: [IonicModule.forRoot(), NgxTranslateModule],
         providers: [
           { provide: AccountPageStore, useValue: accountPageStoreMock },
         ],
       }).compileComponents();
 
-      fixture = TestBed.createComponent(AccountPageComponent);
+      fixture = TestBed.createComponent(AccountPageViewComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
     }));

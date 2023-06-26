@@ -1,6 +1,5 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { AccountPageComponent } from './../account-page/account-page.component';
+import { NgModule, inject } from '@angular/core';
+import { Route, RouterModule, Routes, UrlSegment } from '@angular/router';
 
 const routes: Routes = [
   {
@@ -9,8 +8,11 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'account/:id',
-    component: AccountPageComponent,
+    path: 'account',
+    loadChildren: () =>
+      import('./../account-page/account.module').then(
+        (m) => m.AccountPageModule
+      ),
   },
   {
     path: 'operation',

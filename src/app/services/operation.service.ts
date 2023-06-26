@@ -11,6 +11,7 @@ import { AccountsService } from './accounts.service';
 import { OperationDataBase } from './databases/operation.db';
 import { Period } from '../model/balance.model';
 import { getDatesByPeriodValue } from '../tools/date.tools';
+import { OperationSearchData } from '../model/operation-page.store.model';
 
 @Injectable()
 export class OperationService {
@@ -356,5 +357,26 @@ export class OperationService {
           console.error(err);
         });
     });
+  }
+
+  async operationSearch(
+    operationSerachData: OperationSearchData | undefined
+  ): Promise<PagingData<Operation> | undefined> {
+    return new Promise<PagingData<Operation> | undefined>(
+      async (resolve, reject) => {
+        if (operationSerachData) {
+          try {
+            resolve(
+              await this.operationDb.operationSearch(operationSerachData)
+            );
+          } catch (error) {
+            reject("erreur dans l'apelle  a bd");
+            console.error(error);
+          }
+        } else {
+          resolve(undefined);
+        }
+      }
+    );
   }
 }

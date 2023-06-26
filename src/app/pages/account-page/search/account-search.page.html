@@ -1,0 +1,17 @@
+<ion-content>
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Serach account</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar [debounce]="1000" (ionInput)="handleInput($event)" class="custom"></ion-searchbar>
+    </ion-toolbar>
+  </ion-header>
+  <ion-list>
+    <ion-item *ngFor="let result of results" (click)="goToAccountOrResult(result.id)">
+      <ion-label>{{ result.acountName }}</ion-label>
+      <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

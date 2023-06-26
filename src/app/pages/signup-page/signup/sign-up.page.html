@@ -1,0 +1,63 @@
+<ion-header>
+
+</ion-header>
+
+<ion-content center text-center>
+  <form [formGroup]="profilForm">
+    <mat-stepper formArrayName="formArray" #stepper linear>
+      <mat-step formGroupName="0" [stepControl]="formArray?.get([0])!">
+        <ng-template matStepLabel>Profile & login</ng-template>
+        <mat-form-field class="example-full-width">
+          <mat-label>First name</mat-label>
+          <input matInput placeholder="First name" formControlName="firstNameFormCtrl">
+          <mat-error>First name is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Last name</mat-label>
+          <input matInput placeholder="Last name" formControlName="lastNameFormCtrl">
+          <mat-error>Last name is required</mat-error>
+        </mat-form-field>
+
+
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Phone</mat-label>
+          <input matInput placeholder="Last name" type="tel" formControlName="telFormCtrl">
+          <mat-error>Phone is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Email</mat-label>
+          <input matInput placeholder="Email" formControlName="emailFormCtrl">
+          <mat-hint>example@domain!</mat-hint>
+          <mat-error>Email is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Password</mat-label>
+          <input type="password" matInput placeholder="Password" formControlName="passwordFormCtrl">
+          <mat-error>Email is required</mat-error>
+        </mat-form-field>
+
+      </mat-step>
+      <mat-step formGroupName="1" [stepControl]="formArray?.get([1])!">
+        <ng-template matStepLabel>Base config</ng-template>
+        <div class="example-full-width">
+          <label>Voulez vous avoir les configuration de base ?: </label>
+          <mat-radio-group formControlName="dataFormSample">
+            <mat-radio-button value="oui">Oui</mat-radio-button>
+            <mat-radio-button value="non">Non</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </mat-step>
+
+    </mat-stepper>
+    <div class="ion-padding form-tool">
+      <button mat-raised-button style="float: left;" [disabled]="backDisabled" (click)="back()">BACK</button>
+      <button mat-raised-button color="primary" style="float: right;"
+        (click)="next()">{{ stepper.selectedIndex === 1 ? 'SUBMIT' : 'NEXT'}}</button>
+    </div>
+  </form>
+
+</ion-content>

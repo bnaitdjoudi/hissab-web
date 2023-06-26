@@ -1,28 +1,28 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { skip, Subscription } from 'rxjs';
-import { Account } from '../../model/account.model';
-import { AccountPageStore } from './account-page.store';
-import { Operation } from '../../model/operation.model';
-import { PagingData } from '../../model/paging-data';
+import { Account } from '../../../model/account.model';
+import { AccountPageStore } from './../account-page.store';
+import { Operation } from '../../../model/operation.model';
+import { PagingData } from '../../../model/paging-data';
 import {
   ActionSheetController,
   AlertController,
   AlertInput,
 } from '@ionic/angular';
-import { actionSheetCtrlOperation } from '../../tools/action.sheet.controllers';
+import { actionSheetCtrlOperation } from '../../../tools/action.sheet.controllers';
 import { TranslateService } from '@ngx-translate/core';
 import { OperationFormComponent } from 'src/app/components/forms/operation-form/operation-form.component';
-import { parseFloatTool } from '../../tools/tools';
-import { LeafAccount } from '../../model/leaf-account.model';
+import { parseFloatTool } from '../../../tools/tools';
+import { LeafAccount } from '../../../model/leaf-account.model';
 import { Router } from '@angular/router';
-import { getLabelPeriode } from '../../tools/period.label';
+import { getLabelPeriode } from '../../../tools/period.label';
 
 @Component({
   selector: 'account-page',
   templateUrl: './account-page.component.html',
   styleUrls: ['./account-page.component.scss'],
 })
-export class AccountPageComponent implements OnInit {
+export class AccountPageViewComponent implements OnInit {
   newOperation: Operation;
   isCreateOpModalOpen = false;
 
@@ -149,7 +149,7 @@ export class AccountPageComponent implements OnInit {
   }
 
   createOperation() {
-    this.router.navigate(['/operation/new/' + this.currentAccount.id], {});
+    this.router.navigate(['/operation/new/'], {});
   }
 
   modalAccount() {
@@ -231,5 +231,17 @@ export class AccountPageComponent implements OnInit {
 
   goToHome() {
     this.router.navigate(['/dashboard'], {});
+  }
+
+  backToPrent() {
+    if (this.currentAccount.parentId > 0) {
+      this.router.navigate(['account/' + this.currentAccount.parentId], {});
+    } else {
+      this.router.navigate(['/dashboard'], {});
+    }
+  }
+
+  goToSearch() {
+    this.router.navigate(['account/search'], {});
   }
 }

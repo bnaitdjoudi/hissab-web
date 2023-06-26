@@ -15,11 +15,9 @@
               <button id="open-leaf" mat-mini-fab matSuffix aria-label="Search" (click)="openMode('from')">
                 <mat-icon color="primary">search</mat-icon>
               </button>
-              <div *ngIf="isError1A()"
-                class="mat-mdc-form-field-error mat-mdc-form-field-bottom-align ng-tns-c4048155087-65 ng-star-inserted">
-
-                <div>enter a valid first account tranfer </div>
-              </div>
+              <mat-error *ngIf="transferForm.get('transferF')?.hasError('required')">
+                Enter a valid first account tranfer!
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field class="example-full-width">
@@ -29,11 +27,10 @@
               <button mat-mini-fab matSuffix aria-label="Search" (click)="openMode('to')">
                 <mat-icon color="primary">search</mat-icon>
               </button>
-              <div *ngIf="isError1B()"
-                class="mat-mdc-form-field-error mat-mdc-form-field-bottom-align ng-tns-c4048155087-65 ng-star-inserted">
 
-                <div>enter a valid second account tranfer </div>
-              </div>
+              <mat-error *ngIf="transferForm.get('transfer')?.hasError('required')">
+                Enter a valid second account tranfer!
+              </mat-error>
             </mat-form-field>
           </div>
           <button (click)="transferForm.reset()" mat-raised-button color="accent" style="float: right;">RESET</button>
@@ -78,8 +75,8 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="example-full-width">
-            <mat-label>Debit</mat-label>
-            <input dir="rtl" matInput type="number" formControlName="debit" placeholder="0" step="0.01"
+            <mat-label>{{'forms.operation.'+accountType+'.debit' | translate}}</mat-label>
+            <input matInput type="number" formControlName="debit" placeholder="0" step="0.01"
               (change)="debitChanged($event)">
             <span class="prefix-currency" matTextPrefix>$&nbsp;</span>
             <mat-error *ngIf="operationForm.hasError('noMatch')">
@@ -88,8 +85,8 @@
           </mat-form-field>
 
           <mat-form-field class="example-full-width">
-            <mat-label>Credit</mat-label>
-            <input dir="rtl" matInput type="number" formControlName="credit" placeholder="0" step="0.01"
+            <mat-label>{{'forms.operation.'+accountType+'.credit' | translate}}</mat-label>
+            <input matInput type="number" formControlName="credit" placeholder="0" step="0.01"
               (change)="creditChanged($event)">
             <span class="prefix-currency" matTextPrefix>$&nbsp;</span>
           </mat-form-field>
@@ -102,21 +99,21 @@
         <form>
           <ion-list>
             <ion-item>
-              <ion-label for="accountIn" position="floating">First Account: </ion-label>
+              <ion-label class="resume-label" for="accountIn" position="floating">First Account: </ion-label>
 
               <ion-textarea for="accountIn" label="Regular textarea" readonly
                 [value]="defaultTransferFrom?.path"></ion-textarea>
             </ion-item>
 
             <ion-item>
-              <ion-label for="accountFrom" position="floating">Second Account: </ion-label>
+              <ion-label class="resume-label" for="accountFrom" position="floating">Second Account: </ion-label>
 
               <ion-textarea for="accountFrom" label="Regular textarea" readonly
                 [value]="currentOperation.transfer"></ion-textarea>
             </ion-item>
 
             <ion-item>
-              <ion-label for="timeD" position="floating">Date : </ion-label>
+              <ion-label class="resume-label" for="timeD" position="floating">Date : </ion-label>
 
               <ion-input for="timeD" label="Time" readonly [value]="getFormattedDate(
             this.currentOperation.time,
@@ -125,35 +122,35 @@
             </ion-item>
 
             <ion-item>
-              <ion-label for="statutD" position="floating">Statut : </ion-label>
+              <ion-label class="resume-label" for="statutD" position="floating">Statut : </ion-label>
 
               <ion-input for="statutD" label="Statut" readonly [value]="currentOperation.statut"></ion-input>
             </ion-item>
 
             <ion-item>
-              <ion-label for="descriptionD" position="floating">Description : </ion-label>
-
-              <ion-textarea for="descriptionD" label="Description" readonly
+              <ion-label class="resume-label" for="descriptionD" position="floating">Description : </ion-label>
+              <ion-textarea for="descriptionD" label="Statut" readonly
                 [value]="currentOperation.description"></ion-textarea>
             </ion-item>
-
-          </ion-list>
-
-          <ion-item>
-            <ion-label for="debitD">Debit : </ion-label>
-
-            <ion-input dir="rtl" for="debitD" label="Debit" readonly [value]="currentOperation.debit | currency
+            <ion-item>
+              <ion-label class="resume-label" position="floating"
+                for="debitD">{{'forms.operation.'+accountType+'.debit' | translate}} :
+              </ion-label>
+              <ion-input dir="rtl" for="debitD" label="Debit" readonly [value]="currentOperation.debit | currency
                                 :'CAD':'symbol-narrow':'1.2-2'
                                 "></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-label for="creditD">Credit : </ion-label>
-
-            <ion-input dir="rtl" for="creditD" label="Credit" readonly [value]="currentOperation.credit | currency
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating" class="resume-label"
+                for="creditD">{{'forms.operation.'+accountType+'.credit' | translate}} :
+              </ion-label>
+              <ion-input dir="rtl" for="creditD" label="Credit" readonly [value]="currentOperation.credit | currency
                                           :'CAD':'symbol-narrow':'1.2-2'
                                           "></ion-input>
-          </ion-item>
+            </ion-item>
+          </ion-list>
+
+
 
         </form>
       </div>

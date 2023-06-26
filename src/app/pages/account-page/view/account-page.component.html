@@ -1,6 +1,7 @@
+<header-simple [title]="currentAccount.acountName | translate" (onReturnClick)="backToPrent()"></header-simple>
 <ion-content class="content">
 
-  <header-simple [title]="currentAccount.acountName | translate"></header-simple>
+
 
   <actif-view class="" [account]="currentAccount" [operations]="operations" [accountData]="accountsData"
     [page]="accountStore._currentPageOperation" [accountPage]="accountStore._currentPageSubAccount"
@@ -65,6 +66,9 @@
     </ion-buttons>
 
     <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="goToSearch()">
+        <fa-icon icon="search"></fa-icon></ion-button>
+
       <ion-button fill="clear" slot="end" (click)="presentActionSheet()" id="menu-button">
         <fa-icon icon="ellipsis-vertical"></fa-icon></ion-button>
     </ion-buttons>
