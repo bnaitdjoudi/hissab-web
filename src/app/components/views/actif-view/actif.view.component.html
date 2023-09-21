@@ -1,11 +1,11 @@
 <ion-content>
-    <operation-list *ngIf="accountVal.resume.sons > 0 " [operations]="operations.data"
+    <operation-list *ngIf="accountVal.resume.sons > 0 " [operations]="operationsSubject.asObservable()"
         (onElementSelected)="onOperationSelected($event)" (onIonInfiniteScroll)="onIonInfiniteScrollOperation($event)"
-        [isMoreData]="operations.currentPage < operations.totalPage" (onDelete)="presentDeleteAlert($event)"
-        [currBalFun]="currBalfun" [account]="accountVal" [periodLabel]="periodLabel"></operation-list>
+        [isMoreData]="currentPage < totalPage" (onDelete)="presentDeleteAlert($event)" [currBalFun]="currBalfun"
+        [account]="accountVal" [periodLabel]="periodLabel"></operation-list>
     <account-list *ngIf="accountVal.resume.sons === 0 " [accountData]="currentAccountData"
         (onElementSelected)="onAccountSelected($event)" (onIonInfiniteScroll)="onIonInfiniteScrollAccount($event)"
         [isMoreData]="currentAccountData.currentPage < currentAccountData.totalPage"
-        (onDelete)="presentDeleteAlert($event)" [currBalFun]="currBalfun" [account]="accountVal"
+        (onDelete)="presentDeleteAlertAccount($event)" [currBalFun]="currBalfun" [account]="accountVal"
         [periodLabel]="periodLabel"></account-list>
 </ion-content>

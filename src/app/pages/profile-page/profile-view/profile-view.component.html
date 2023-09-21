@@ -1,0 +1,48 @@
+<ion-content [fullscreen]="true">
+    <ion-list>
+        <ion-item>
+            <mat-form-field class="example-full-width">
+                <mat-label>Email</mat-label>
+                <input matInput type="text" [(ngModel)]="profil.mail" readonly="true">
+                <button matSuffix mat-mini-fab aria-label="Clear" (click)="edit('mail')">
+                    <mat-icon color="primary">mode_edit</mat-icon>
+                </button>
+            </mat-form-field>
+        </ion-item>
+        <ion-item>
+            <mat-form-field class="example-full-width">
+                <mat-label>First name</mat-label>
+                <input matInput type="text" [(ngModel)]="profil.firstName" readonly="true">
+                <button matSuffix mat-mini-fab aria-label="Clear" (click)="edit('firstName')">
+                    <mat-icon color="primary">mode_edit</mat-icon>
+                </button>
+            </mat-form-field>
+        </ion-item>
+        <ion-item>
+            <mat-form-field class="example-full-width">
+                <mat-label>Last name</mat-label>
+                <input matInput type="text" [(ngModel)]="profil.lastName" readonly="true">
+                <button matSuffix mat-mini-fab aria-label="Clear" (click)="edit('lastName')">
+                    <mat-icon color="primary">mode_edit</mat-icon>
+                </button>
+            </mat-form-field>
+        </ion-item>
+        <ion-item>
+            <mat-form-field class="example-full-width">
+                <mat-label>Phone</mat-label>
+                <input matInput type="text" [(ngModel)]="profil.phone" readonly="true">
+                <button matSuffix mat-mini-fab aria-label="Clear" (click)="edit('phone')">
+                    <mat-icon color="primary">mode_edit</mat-icon>
+                </button>
+            </mat-form-field>
+        </ion-item>
+        <ion-item>
+            <button style="width: 100%;" mat-fab extended (click)="edit('pwd')">
+                <mat-icon color="primary">restart_alt</mat-icon>
+                Password reset
+            </button>
+        </ion-item>
+    </ion-list>
+    <ion-alert [isOpen]="isEdeting" (didDismiss)="isEdeting = false" header="Please enter your info"
+        [buttons]="alertButtons" [inputs]="alertInputs"></ion-alert>
+</ion-content>

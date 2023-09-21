@@ -4,7 +4,9 @@ import { GenericDataBase } from './generic.db';
 import { DataBaseService } from './database.service';
 import { tables } from './tables';
 import { Injectable } from '@angular/core';
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class FlagsDataBase
   extends GenericDb
   implements GenericDataBase<Flag, string>

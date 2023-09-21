@@ -3,4 +3,6 @@ export interface LeafAccount {
   acountName: string;
   path: string;
   isLeaf: boolean;
+  type: string;
+  balance?: number;
 }

@@ -9,8 +9,11 @@ import { GenericDataBase } from './generic.db';
 import { GenericDb } from './GenericDb';
 import { tables } from './tables';
 import { OperationSearchData } from 'src/app/model/operation-page.store.model';
+import { AccountBalance } from 'src/app/model/rapport-store.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class OperationDataBase
   extends GenericDb
   implements GenericDataBase<Operation, number>
@@ -45,7 +48,7 @@ export class OperationDataBase
         .executeSql(
           `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
             .filter((el) => el.name !== 'ID')
-            .map((el) => el.name)}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?); `,
+            .map((el) => el.name)}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?, ?); `,
           [
             model.numTrans,
             format(model.time, 'yyyy-MM-dd HH:mm:ss'),
@@ -56,16 +59,23 @@ export class OperationDataBase
             model.balance,
             model.idAccount,
             model.transfer,
+            model.profile,
           ]
         )
         .then(async () => {
-          let res = await this.sqLiteObject.executeSql(
-            `select seq from sqlite_sequence where name = '${tables.transaction.name}'; `
-          );
+          try {
+            let res = await this.sqLiteObject.executeSql(
+              `SELECT max(id) as seq from operation where transfer = ?;`,
+              [model.transfer]
+            );
 
-          if (res.rows.length > 0) {
-            resolve(res.rows.item(0).seq);
-          } else {
+            if (res.rows.length > 0) {
+              resolve(res.rows.item(0).seq);
+            } else {
+              resolve(0);
+            }
+          } catch (error) {
+            console.log(JSON.stringify(error));
             resolve(0);
           }
         })
@@ -108,7 +118,7 @@ export class OperationDataBase
             .map((el) => el.name + ' = ?')} WHERE ID = ? `,
           [
             operation.numTrans,
-            operation.time,
+            format(operation.time, 'yyyy-MM-dd HH:mm:ss'),
             operation.description,
             operation.statut,
             operation.credit,
@@ -116,6 +126,7 @@ export class OperationDataBase
             operation.balance,
             operation.idAccount,
             operation.transfer,
+            operation.profile,
             id,
           ]
         )
@@ -506,7 +517,17 @@ export class OperationDataBase
     await this.checkDataBaseOpened();
     return new Promise<any>(async (resolve, reject) => {
       if (this.sqLiteObject) {
-        resolve(await Promise.all(operations.map((el) => this.create(el))));
+        const resolvePromisesSeq = async (tasks: Promise<any>[]) => {
+          const results = [];
+          for (const task of tasks) {
+            results.push(await task);
+          }
+          console.log('ID S :' + JSON.stringify(results));
+          return results;
+        };
+        resolve(
+          await resolvePromisesSeq(operations.map((el) => this.create(el)))
+        );
       } else {
         reject('aucun instance de connexion a bd');
       }
@@ -898,11 +919,12 @@ export class OperationDataBase
     });
   }
 
-  getGlobalBalanceAccountBetweenDate(
+  async getGlobalBalanceAccountBetweenDate(
     endDate: Date,
     startDate: Date,
     type: string
   ): Promise<number> {
+    await this.checkDataBaseOpened();
     return new Promise<number>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
@@ -919,6 +941,47 @@ export class OperationDataBase
               resolve(res.rows.item(0).balance);
             } else {
               reject('no result');
+            }
+          })
+          .catch((e: any) => {
+            printError('erreur dans la requette de balance global', reject, e);
+          });
+      } else {
+        reject(' no db connexion');
+      }
+    });
+  }
+
+  async getBalanceOnLeafByTypeAccountAndDates(
+    endDate: Date,
+    startDate: Date,
+    type: string
+  ): Promise<AccountBalance[]> {
+    await this.checkDataBaseOpened();
+    return new Promise<AccountBalance[]>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.sqLiteObject
+          .executeSql(
+            `select id, name, debit - credit as balance from (select acc.id as id, acc.account_name as name, sum(op.credit) as credit, sum(op.debit) as debit from account acc left outer join operation op on acc.id = op.id_account and op.time <= ? and op.time >= ? where  acc.type = ? and acc.is_leaf = 1 group by acc.id, acc.account_name);`,
+            [
+              format(endDate, 'yyyy-MM-dd HH:mm:ss'),
+              format(startDate, 'yyyy-MM-dd HH:mm:ss'),
+              type,
+            ]
+          )
+          .then((res: any) => {
+            if (res.rows.length > 0) {
+              const accountBalances: AccountBalance[] = [];
+              for (let i = 0; i < res.rows.length; i++) {
+                accountBalances.push({
+                  accountId: res.rows.item(i).id,
+                  accountName: res.rows.item(i).name,
+                  balance: res.rows.item(i).balance,
+                });
+              }
+              resolve(accountBalances);
+            } else {
+              resolve([]);
             }
           })
           .catch((e: any) => {
@@ -992,6 +1055,67 @@ export class OperationDataBase
     });
   }
 
+  getActifAndPassifStateOnDateByPath(
+    date: Date,
+    path: string
+  ): Promise<Operation> {
+    return new Promise<Operation>(async (resolve, reject) => {
+      if (this.sqLiteObject) {
+        try {
+          const res = await this.sqLiteObject.executeSql(
+            `select sum(op.debit) as actif, sum(op.credit) as passif from operation op left join account acc on op.id_account = acc.id where (op.time  <= ? and op.time >= ? ) and ( acc.type like ?);`,
+            [
+              format(date, 'yyyy-MM-dd HH:mm:ss'),
+              format(
+                parseISO('2023-01-01 00:00:00'),
+
+                'yyyy-MM-dd HH:mm:ss'
+              ),
+              `${path}%`,
+            ]
+          );
+
+          if (res.rows.length > 0) {
+            const result: Operation = {
+              debit: res.rows.item(0).actif,
+              credit: res.rows.item(0).passif,
+            } as unknown as Operation;
+
+            resolve({
+              ...result,
+              assets: result.debit ? result.debit : 0,
+              liabilities: result.credit ? result.credit : 0,
+            });
+          }
+        } catch (error) {}
+      } else {
+        reject('no db connexion!!');
+      }
+    });
+  }
+
+  async getAllOperationAfterDate(
+    idAccount: number,
+    date: Date
+  ): Promise<Operation[]> {
+    this.checkDataBaseOpened();
+
+    return new Promise<Operation[]>(async (resolve, reject) => {
+      try {
+        let data = await this.sqLiteObject.executeSql(
+          `SELECT * FROM  ${tables.transaction.name} WHERE ${tables.transaction.columns[2].name} >= ?  
+          and ${tables.transaction.columns[8].name}  = ? order by ${tables.transaction.columns[2].name} ;`,
+          [format(date, 'yyyy-MM-dd HH:mm:ss'), idAccount]
+        );
+
+        resolve(this.constructAccountArray(data));
+      } catch (error) {
+        reject('erreur durant la requette');
+        console.log(error);
+      }
+    });
+  }
+
   private constructAccountArray(data: any): Operation[] {
     let operations: Operation[] = [];
 
@@ -1016,6 +1140,7 @@ export class OperationDataBase
       accountType: data.rows.item(i).TYPE,
       transfer: data.rows.item(i).TRANSFER,
       accountName: data.rows.item(i).ACCOUNT_NAME,
+      profile: data.rows.item(i).PROFILE,
     };
   }
 }

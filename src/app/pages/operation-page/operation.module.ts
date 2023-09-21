@@ -1,7 +1,7 @@
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { ComponentsModule } from '../../components/components.module';
@@ -15,6 +15,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MaterialModule } from 'src/app/material.module';
 import { OperationSearchPage } from './search/operation-search.page';
 
+import { ProfilePageModule } from '../profile-page/profile.module';
+import { ServicesModule } from 'src/app/services/services.module';
+
 @NgModule({
   imports: [
     ComponentsModule,
@@ -22,11 +25,13 @@ import { OperationSearchPage } from './search/operation-search.page';
     CommonModule,
     FormsModule,
     RouterModule,
+    ReactiveFormsModule,
     NgxTranslateModule,
     PipeModule,
     OperationPageRoutingModule,
     FontAwesomeModule,
     MaterialModule,
+    ServicesModule,
   ],
   declarations: [
     OperationPageViewComponent,

@@ -1,4 +1,3 @@
-import { SQLiteObject } from '@awesome-cordova-plugins/sqlite';
 import { DataBaseService } from './database.service';
 
 export class GenericDb {

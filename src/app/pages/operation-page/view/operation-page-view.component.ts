@@ -34,8 +34,6 @@ export class OperationPageViewComponent implements OnInit, OnDestroy {
     this.suscribtionOperation = this.operationStore.operation$.subscribe(
       (op) => {
         if (op && op.id) this.operation = op;
-
-      
       }
     );
 

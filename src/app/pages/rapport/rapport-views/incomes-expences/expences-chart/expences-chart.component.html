@@ -1,0 +1,12 @@
+<div>
+    <div echarts [options]="options" class="demo-chart" id="charts-pie"></div>
+    <div>
+
+        <ion-list>
+            <ion-item *ngFor="let item of dataComul">
+                <ion-label>{{item.name}}</ion-label>
+                <ion-badge slot="end">{{item.value}}</ion-badge>
+            </ion-item>
+        </ion-list>
+    </div>
+</div>

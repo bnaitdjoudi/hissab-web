@@ -1,0 +1,12 @@
+<ion-content>
+    <ion-list>
+        <ion-item>
+            <ion-select label="Period" placeholder="Select Period" [value]='period' (ionChange)="periodChange($event)">
+                <ion-select-option value="week">Week</ion-select-option>
+                <ion-select-option value="month">Month</ion-select-option>
+
+            </ion-select>
+        </ion-item>
+    </ion-list>
+    <div echarts [options]="options" class="demo-chart" id="charts"></div>
+</ion-content>

@@ -3,10 +3,11 @@
 
 
 
-  <actif-view class="" [account]="currentAccount" [operations]="operations" [accountData]="accountsData"
+  <actif-view class="" [account]="currentAccount" [operationsData]="operations" [accountData]="accountsData"
     [page]="accountStore._currentPageOperation" [accountPage]="accountStore._currentPageSubAccount"
     [deleteOperationSubject]="accountStore._deleteOperationSubject"
-    [isCreateOpModalOpen]="isCreateOpModalOpen && operations.data.length > 0" [periodLabel]="periodLabel"></actif-view>
+    [deleteAccountSubject]="accountStore._deleteAccountSubject"
+    [isCreateOpModalOpen]="isCreateOpModalOpen && operationData.data.length > 0" [periodLabel]="periodLabel"></actif-view>
   <ion-modal [isOpen]="isAccountModalOpen">
     <ng-template>
       <ion-header>

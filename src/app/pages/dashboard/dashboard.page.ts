@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Account } from '../../model/account.model';
 import { MainStore } from './../../store/main.store';
@@ -13,9 +13,10 @@ import { getLabelPeriode } from './../../tools/period.label';
 })
 export class DashboardPage implements OnInit, OnDestroy {
   balanceSuscription: Subscription;
+  mainAccountsSuscription: Subscription;
   isModalOpenActif = false;
 
-  mainAccounts$ = this.mainStore.mainAccounts$;
+  mainAccounts: Account[] = [];
   balanceAccount: Account;
   globalBalance: number;
   period$: Observable<Period> = this.mainStore.period$;
@@ -26,12 +27,23 @@ export class DashboardPage implements OnInit, OnDestroy {
     private readonly router: Router
   ) {}
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    console.log('DashboardPage::ngOnDestroy');
+    this.balanceSuscription?.unsubscribe();
+    this.mainAccountsSuscription?.unsubscribe();
+  }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
+    console.log('DashboardPage::ngOnInit');
     this.balanceSuscription = this.mainStore.globalBalance$.subscribe(
       (result) => {
         this.globalBalance = result;
+      }
+    );
+
+    this.mainAccountsSuscription = this.mainStore.mainAccounts$.subscribe(
+      (result) => {
+        this.mainAccounts = result;
       }
     );
 

@@ -4,7 +4,7 @@ import {
   ActivationEnd,
   Event,
   Router,
-  RouterEvent,
+  NavigationEnd,
 } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { MainStore } from './main.store';
@@ -19,7 +19,7 @@ describe('RouteParamStore ', () => {
     };
 
     let eventsSubject: BehaviorSubject<Event> = new BehaviorSubject<Event>(
-      new RouterEvent(0, '')
+      new NavigationEnd(0, '', '')
     );
 
     beforeEach(waitForAsync(() => {
@@ -55,7 +55,7 @@ describe('RouteParamStore ', () => {
       const spySetIdOperation = spyOn(routeParamsStore, 'setIdOperation');
       const spySetIdCount = spyOn(routeParamsStore, 'setIdCount');
 
-      eventsSubject.next(new RouterEvent(400, 'blablabla'));
+      eventsSubject.next(new NavigationEnd(400, 'blablabla', ''));
 
       //expect(mainStoreSpy.initMainAccounts).toHaveBeenCalledTimes(0);
       expect(spySetIdCount).toHaveBeenCalledTimes(0);

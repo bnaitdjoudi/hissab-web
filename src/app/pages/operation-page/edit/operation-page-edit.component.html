@@ -13,42 +13,62 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true" *ngIf="operation as op" class="ion-padding">
-  <operation-form #operationForm [operation]="op" [accountType]="op.accountType? op.accountType:''" [edit]="true"
-    [currentAccount]="operationStore.account$ | async" (onSubmit)="onSubmitFired()"></operation-form>
-  <!--  <ion-list>
-    <ion-item>
-      <ion-label for="time" position="stacked">Date:</ion-label>
-      <div id="time" class="time-div">
-        <ion-text>{{op.time | date : 'dd/MM/yyyy, HH:mm' }}</ion-text>
-      </div>
-    </ion-item>
-    <ion-item>
-      <ion-label for="trans" position="stacked">numero transaction:</ion-label>
-      <ion-text id="trans">{{op.numTrans}}</ion-text>
-    </ion-item>
-    <ion-item>
-      <ion-label for="description" position="stacked">Description:</ion-label>
-      <div id="description" class="time-div">
-        <ion-text>{{op.description}}</ion-text>
-      </div>
-    </ion-item>
-    <ion-item>
-      <ion-label for="path" position="stacked">Transfer to:</ion-label>
-      <div id="path" class="time-div">
-        <ion-text>{{op.transfer}}</ion-text>
-      </div>
-    </ion-item>
-    <ion-item>
-      <ion-label for="debit" position="stacked">Debit:</ion-label>
-      <ion-text id="debit">{{op.debit | currency}}</ion-text>
-    </ion-item>
-    <ion-item>
-      <ion-label for="credit" position="stacked">Credit:</ion-label>
-      <ion-text id="credit">{{op.credit | currency }}</ion-text>
-    </ion-item>
-    <ion-item>
-      <ion-label for="balance" position="stacked">Balance:</ion-label>
-      <ion-text id="balance">{{op.balance | currency }}</ion-text>
-    </ion-item>
-  </ion-list> -->
+
+  <div style="padding-top: 3%;">
+    <form [formGroup]="operationForm">
+      <!-- <ng-template matStepLabel>Name</ng-template> -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Date</mat-label>
+        <input matInput placeholder="Date" readonly formControlName="time">
+
+        <button id="open-leaf" mat-mini-fab matSuffix aria-label="Date" (click)="isOpen = true">
+          <mat-icon color="primary">calendar_month</mat-icon>
+        </button>
+
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>statut</mat-label>
+        <input matInput placeholder="Statut" readonly formControlName="statut">
+
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Description</mat-label>
+        <input matInput placeholder="Description" formControlName="description">
+        <mat-error *ngIf="operationForm.get('description')?.hasError('required')">
+          Description is required!
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="example-full-width" *ngIf="showDebitField">
+        <mat-label>{{'forms.operation.'+accountType+'.debit' | translate}}</mat-label>
+        <input matInput type="number" formControlName="debit" placeholder="0" step="0.01"
+          (change)="debitChanged($event)">
+        <span class="prefix-currency" matTextPrefix>$&nbsp;</span>
+
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width" *ngIf="showCreditField">
+        <mat-label>{{'forms.operation.'+accountType+'.credit' | translate}}</mat-label>
+        <input matInput type="number" formControlName="credit" placeholder="0" step="0.01"
+          (change)="creditChanged($event)">
+        <span class="prefix-currency" matTextPrefix>$&nbsp;</span>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div class="ion-padding form-tool">
+
+    <button mat-raised-button color="primary" (click)="submit()" style="float: right;">SUBMIT</button>
+  </div>
+
+  <ion-modal [isOpen]="isOpen">
+    <ng-template>
+
+      <ion-content class="ion-padding">
+        <ion-datetime #datetime [showDefaultButtons]="true" (ionCancel)="cancel()"
+          [value]="operation.time | dateHissab  " (ionChange)="onDateChange(datetime.value)"></ion-datetime>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

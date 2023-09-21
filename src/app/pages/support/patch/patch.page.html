@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Support/Patch
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content center text-center>
+  <ion-button (click)="chooseFile()">file</ion-button>
+
+
+  <div *ngIf="fileObject">
+    <ion-label>{{fileObject.name}}</ion-label>
+    <ion-button  (click)="apply()">apply</ion-button>
+  </div>
+
+
+
+</ion-content>

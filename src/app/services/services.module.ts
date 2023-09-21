@@ -26,5 +26,6 @@ import { SessionStorageService } from './sessionstorage.service';
     ProfileService,
     SessionStorageService,
   ],
+  
 })
 export class ServicesModule {}

@@ -37,7 +37,9 @@ mapTransferFunc.set('depense->balance', noChangeTransfer); // ok
 
 mapTransferFunc.set('actif->actif', debitCreditInverseTransfer); // ok
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AccountingService {
   constructor() {}
 

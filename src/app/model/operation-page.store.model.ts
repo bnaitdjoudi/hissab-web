@@ -8,6 +8,7 @@ export interface OperationPageStoreModel {
   currentAccount?: Account;
   operationSerachData?: OperationSearchData;
   operationSearchResult?: PagingData<Operation>;
+  
 }
 
 export interface OperationSearchData extends PagingRequest {
@@ -15,4 +16,5 @@ export interface OperationSearchData extends PagingRequest {
   endDate: Date | null;
   startDate: Date | null;
   accountId?: number;
+  
 }

@@ -14,8 +14,6 @@ import random from 'random-string-alphanumeric-generator';
 import { printError } from '../../tools/errorTools';
 import { MainStore } from '../../store/main.store';
 import { getDatesByPeriodValue } from '../../tools/date.tools';
-import { error } from 'console';
-import { resolve } from 'cypress/types/bluebird';
 
 @Injectable({
   providedIn: 'root',
@@ -83,6 +81,8 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
 
   _deleteOperationSubject: BehaviorSubject<number>;
 
+  _deleteAccountSubject: BehaviorSubject<number>;
+
   _newAccountSubject: BehaviorSubject<Account | null>;
 
   _searchAccount: BehaviorSubject<string>;
@@ -93,6 +93,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
     private readonly routeParamsStore: RouteParamsStore,
     private readonly mainStore: MainStore
   ) {
+    console.log('construct ::: AccountPageStore');
     super({
       currentAccount: {
         id: 0,
@@ -116,6 +117,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
       searchAccountResult: { currentPage: 1, data: [], totalPage: 0 },
     });
     this._deleteOperationSubject = new BehaviorSubject<number>(0);
+    this._deleteAccountSubject = new BehaviorSubject<number>(0);
     this._newAccountSubject = new BehaviorSubject<Account | null>(null);
     this._searchAccount = new BehaviorSubject<string>('');
     this.initSuscription();
@@ -133,9 +135,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
 
     //routeParamettre
     this.routeParamsStore.idAccount$.subscribe((id) => {
-      if (id > 0) {
-        this.loadAccount(id);
-      }
+      this.loadAccount(id);
     });
     // new operation
     this.newOperation$.subscribe((operation) => {
@@ -172,12 +172,42 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
               this.state.currentAccount.id !== undefined &&
               this.state.currentAccount.id >= 1
             ) {
+              const [startDate, endDate] = getDatesByPeriodValue(
+                this.mainStore.state.period
+              );
+
               this.accountService
-                .getAccountById(this.state.currentAccount.id)
-                .then((acc) => {
+                .findAccountStateByIdAndDates(
+                  this.state.currentAccount.id,
+                  startDate,
+                  endDate
+                )
+                .then(async (acc) => {
+                  let resume = await this.accountService.getResumeOfAccountById(
+                    this.state.currentAccount.id
+                  );
+                  acc = { ...acc, resume: resume };
                   this.setCurrentAccount(acc);
                   this._currentPageOperation.next({ page: 1, limit: 15 });
                 });
+            }
+          });
+        }
+      },
+    });
+
+    this._deleteAccountSubject.subscribe({
+      next: (id: number) => {
+        if (id !== null && id > 0) {
+          this.accountService.deleteAccountById(id).then(() => {
+            console.log(this.state.currentAccount.acountName);
+
+            if (this.state.currentAccount.parentId > 0) {
+              this.routeParamsStore.goto(
+                'account/' + this.state.currentAccount.parentId
+              );
+            } else {
+              this.routeParamsStore.goto('/dashboard');
             }
           });
         }
@@ -223,25 +253,30 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
   }
 
   private loadAccount(id: number) {
-    const [startDate, endDate] = getDatesByPeriodValue(
-      this.mainStore.state.period
-    );
+    if (id > 0) {
+      const [startDate, endDate] = getDatesByPeriodValue(
+        this.mainStore.state.period
+      );
 
-    this.accountService
-      .findAccountStateByIdAndDates(id, startDate, endDate)
-      .then((acc) => {
-        this.accountService
-          .getResumeOfAccountById(acc.id)
-          .then((res) => {
-            acc.resume = res;
-
-            this.setCurrentAccount(acc);
-            this._currentPageSubAccount.next({ page: 1, limit: 15 });
-            this._currentPageOperation.next({ page: 1, limit: 15 });
-          })
-          .catch((err) => console.error(err));
-      })
-      .catch((e) => console.error(e));
+      this.accountService
+        .findAccountStateByIdAndDates(id, startDate, endDate)
+        .then((acc) => {
+          this.accountService
+            .getResumeOfAccountById(acc.id)
+            .then((res) => {
+              acc.resume = res;
+              console.log('currentaccount:::loadAccount' + JSON.stringify(acc));
+              this.setCurrentAccount(acc);
+              this._currentPageSubAccount.next({ page: 1, limit: 15 });
+              this._currentPageOperation.next({ page: 1, limit: 15 });
+            })
+            .catch((err) => console.error(err));
+        })
+        .catch((e) => console.error(e));
+    } else {
+      this.setCurrentAccount({ resume: {} } as unknown as Account);
+      console.log('currentaccount:::loadAccount' + JSON.stringify(null));
+    }
   }
 
   private performUpdateSubAccountList(val: PagingRequest, id: number) {
@@ -270,6 +305,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
   }
 
   async setCurrentAccount(account: Account) {
+    console.log('currentaccount:::' + JSON.stringify(account));
     this.setState({
       ...this.state,
       currentAccount: account,
@@ -304,7 +340,10 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
           id,
           this.mainStore.state.period
         )
-        .then((val) => this.updateOperationsList(val))
+        .then((val) => {
+          console.log(JSON.stringify(val));
+          this.updateOperationsList(val);
+        })
         .catch((err) => console.log(err));
     }
   }
@@ -315,7 +354,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
     this.operationService
       .businessCreationOperationDate(operation)
       .then(() => {
-        this.reloadAccount(undefined);
+        this.reloadAccount(operation.idAccount);
       })
       .catch((err) => {
         console.error(err);

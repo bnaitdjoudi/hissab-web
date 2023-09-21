@@ -9,6 +9,8 @@ import { BalanceResult, Period } from '../model/balance.model';
 import { InitService } from '../services/init.service';
 import { Flag } from '../model/flags.model';
 import { FlagsService } from '../services/flags.service';
+import { ProfileModel } from '../model/profil.model';
+import { SessionStorageService } from '../services/sessionstorage.service';
 
 const store: MainStoreData = {
   globalBalance: 0,
@@ -50,15 +52,21 @@ export class MainStore extends Store<MainStoreData> {
 
   flags$ = this.select<Map<string, Flag>>((state) => state.flags);
   iSignedin$ = this.select<boolean>((state) => state.iSignedin);
+  currentProfile$ = this.select<ProfileModel | undefined>(
+    (state) => state.currentProfile
+  );
 
   constructor(
     private readonly accountsService: AccountsService,
     private readonly bordService: BordService,
     private readonly initService: InitService,
-    private readonly flagService: FlagsService
+    private readonly flagService: FlagsService,
+    private readonly sessionService: SessionStorageService
   ) {
     super(store);
-    console.log('construct main store');
+    this.sessionService.getSessionInfos().then((info) => {
+      this.currentProfile({ mail: info } as unknown as ProfileModel);
+    });
     this.initService.initialisationSubject.subscribe((init) => {
       if (init) {
         this._mainAccountsSubject.subscribe(() => {
@@ -139,6 +147,10 @@ export class MainStore extends Store<MainStoreData> {
 
   updateMenuRoute(menuRoute: 'dash' | 'account' | 'operation') {
     this.setState({ ...this.state, menuRoute: menuRoute });
+  }
+
+  currentProfile(profile: ProfileModel) {
+    this.setState({ ...this.state, currentProfile: profile });
   }
 
   async setSignedUpFlag() {

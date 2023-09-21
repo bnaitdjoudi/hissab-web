@@ -24,6 +24,8 @@ import { HeaderSimpleComponent } from './shared/header-simple/header-simple.comp
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TransferAccountsComponent } from './forms/transfer-accounts/transfer-accounts.component';
 import { SearchAccountComponent } from './search/search-account/search-account.component';
+import { ProfileListTypeheadComponent } from './data-list/profile-list-typehead/profile-list-typehead.component';
+import { RappelFormComponent } from './forms/rappel-form/rappel-form.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -52,6 +54,7 @@ registerLocaleData(localeFr, 'fr-FR');
     HeaderComponent,
     HeaderSimpleComponent,
     SearchAccountComponent,
+    RappelFormComponent,
   ],
   declarations: [
     CardMainAccountComponent,
@@ -68,6 +71,8 @@ registerLocaleData(localeFr, 'fr-FR');
     HeaderSimpleComponent,
     TransferAccountsComponent,
     SearchAccountComponent,
+    ProfileListTypeheadComponent,
+    RappelFormComponent,
   ],
   providers: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

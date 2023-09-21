@@ -1,0 +1,68 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Notification</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">notification</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list>
+    <ion-item *ngFor="let not  of notifications">
+
+      <mat-card class="not-card" matRipple>
+        <mat-card-header>
+
+          <mat-card-title-group>
+            <mat-card-title>{{not.accountName}}</mat-card-title>
+            <mat-card-title>{{not.eventDate | dateHissabDay:not.periode}}</mat-card-title>
+            <mat-card-subtitle>{{not.eventDate | onlyHour}}</mat-card-subtitle>
+            <div>
+              <button mat-icon-button aria-label="Date" id="open-modal" (click)="confirmDelete(not)">
+                <mat-icon color="primary">delete</mat-icon>
+              </button>
+            </div>
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            {{not.description}}
+          </p>
+        </mat-card-content>
+        <mat-card-actions class="not-actions">
+          <mat-slide-toggle [disabled]="!not.isOpen" [checked]="not.isOpen" (change)="notOpen(not)" class="slide"
+            color="succes" labelPosition="before">Notification
+            active</mat-slide-toggle>
+        </mat-card-actions>
+      </mat-card>
+
+
+    </ion-item>
+  </ion-list>
+  <ion-alert header="Alert!" [isOpen]="isAlertOpen" [buttons]="alertButtons"
+    message="Voullez vous vraiment supprimer ce rappel" (didDismiss)="setResult($event)"></ion-alert>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+
+    <ion-buttons slot="start">
+
+      <ion-button fill="clear" slot="start" (click)="goToHome()" id="menu-button">
+
+        <fa-icon icon="house"></fa-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" slot="end" id="menu-button">
+        <fa-icon icon="ellipsis-vertical"></fa-icon></ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-footer>

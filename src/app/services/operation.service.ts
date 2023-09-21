@@ -12,8 +12,16 @@ import { OperationDataBase } from './databases/operation.db';
 import { Period } from '../model/balance.model';
 import { getDatesByPeriodValue } from '../tools/date.tools';
 import { OperationSearchData } from '../model/operation-page.store.model';
+import {
+  AccountBalance,
+  AccountBalancePeriod,
+  AssetAtDateRapport,
+} from '../model/rapport-store.model';
+import { AssetRapportComponent } from '../pages/rapport/rapport-views/asset-rapport/asset-rapport.component';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class OperationService {
   constructor(
     private readonly operationDb: OperationDataBase,
@@ -42,7 +50,7 @@ export class OperationService {
   }
 
   async getOperationJoinAccountById(id: number): Promise<Operation> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.operationDb
         .selectOperationJoinAccountById(id)
         .then((op) => {
@@ -285,7 +293,7 @@ export class OperationService {
     endDate: Date,
     startDate: Date,
     type: string
-  ): number | PromiseLike<number> {
+  ): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
       try {
         let result: number =
@@ -298,6 +306,36 @@ export class OperationService {
       } catch (error) {
         if (error === 'no result') {
           resolve(0);
+        } else {
+          printError('erreur durant appel du service db kk', reject, error);
+        }
+      }
+    });
+  }
+
+  getBalanceOnLeafByTypeAccountAndDates(
+    endDate: Date,
+    startDate: Date,
+    type: string
+  ): Promise<AccountBalancePeriod> {
+    return new Promise<AccountBalancePeriod>(async (resolve, reject) => {
+      try {
+        let results: AccountBalance[] =
+          await this.operationDb.getBalanceOnLeafByTypeAccountAndDates(
+            endDate,
+            startDate,
+            type
+          );
+        resolve({
+          accountBalance: results,
+          periodDates: { end: endDate, start: startDate },
+        });
+      } catch (error) {
+        if (error === 'no result') {
+          resolve({
+            accountBalance: [],
+            periodDates: { end: endDate, start: startDate },
+          });
         } else {
           printError('erreur durant appel du service db kk', reject, error);
         }
@@ -378,5 +416,50 @@ export class OperationService {
         }
       }
     );
+  }
+
+  async getAllYearOperation(idAccount: number): Promise<Operation[]> {
+    return new Promise<Operation[]>(async (resolve, reject) => {
+      let date = new Date(2023, 1, 1, 0, 0, 1);
+      try {
+        resolve(
+          await this.operationDb.getAllOperationAfterDate(idAccount, date)
+        );
+      } catch (error) {
+        reject('erreur avec la bd');
+        console.error(error);
+      }
+    });
+  }
+
+  async getAssetsRapportStateOnDate(date: Date): Promise<AssetAtDateRapport> {
+    return new Promise<AssetAtDateRapport>(async (resolve, reject) => {
+      try {
+        let resp: AssetAtDateRapport = {
+          assets: 0,
+          liabilities: 0,
+          date: date,
+        };
+
+        const rActif: Operation =
+          await this.operationDb.getActifAndPassifStateOnDateByPath(
+            date,
+            'actif'
+          );
+        resp.assets = rActif.debit - rActif.credit;
+
+        const rPassif: Operation =
+          await this.operationDb.getActifAndPassifStateOnDateByPath(
+            date,
+            'passif'
+          );
+        resp.liabilities = rPassif.credit - rPassif.debit;
+
+        resolve(resp);
+      } catch (error) {
+        reject('error durant lappel a dao');
+        console.error(error);
+      }
+    });
   }
 }

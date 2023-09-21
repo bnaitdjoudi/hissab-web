@@ -348,7 +348,7 @@ export const accounts: Account[] = [
     acountName: 'Maison',
     totalAccount: 0,
     isMain: false,
-    isLeaf: false,
+    isLeaf: true,
     type: 'depense',
     parentId: 34,
     path: 'depense/Locations/Maison',

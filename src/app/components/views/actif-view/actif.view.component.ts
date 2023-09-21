@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, InfiniteScrollCustomEvent } from '@ionic/angular';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { Account } from 'src/app/model/account.model';
 import { LeafAccount } from 'src/app/model/leaf-account.model';
 import { Operation } from 'src/app/model/operation.model';
@@ -51,11 +51,16 @@ export class ActifViewComponent implements OnInit, OnDestroy {
 
   @Input() isCreateOpModalOpen: boolean = false;
 
-  @Input() operations: PagingData<Operation> = {
-    data: [],
-    currentPage: 0,
-    totalPage: 0,
-  };
+  @Input() operationsData: Observable<PagingData<Operation>>;
+
+  totalPage: number = 0;
+  currentPage: number = 0;
+
+  operationSuscription: Subscription;
+
+  operationsSubject: BehaviorSubject<Operation[]> = new BehaviorSubject<
+    Operation[]
+  >([]);
 
   currentAccountData: PagingData<Account> = {
     data: [],
@@ -79,6 +84,7 @@ export class ActifViewComponent implements OnInit, OnDestroy {
   };
 
   @Input() deleteOperationSubject: BehaviorSubject<number>;
+  @Input() deleteAccountSubject: BehaviorSubject<number>;
 
   @Output() ajusteAccount = new EventEmitter<void>();
 
@@ -100,7 +106,14 @@ export class ActifViewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnDestroy(): void {}
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.operationSuscription = this.operationsData.subscribe((val) => {
+      console.log('reloaded:' + JSON.stringify(this.accountVal));
+      this.operationsSubject.next(val.data);
+      this.totalPage = val.totalPage;
+      this.currentPage = val.currentPage;
+    });
+  }
 
   setOpen(open: boolean) {
     this.isCreateOpModalOpen = open;
@@ -189,12 +202,31 @@ export class ActifViewComponent implements OnInit, OnDestroy {
     await alert.present();
   }
 
+  async presentDeleteAlertAccount(id: number) {
+    const alert = await this.alertController.create(
+      deleteConfirmation(
+        'Alert Operation suppression!',
+        () => this.cancelDeleteOperation(id),
+        () => this.confirmDeleteAccount(id),
+        'custom-alert'
+      )
+    );
+
+    await alert.present();
+  }
+
   cancelDeleteOperation(id: number) {
     console.log('cancel:' + id);
   }
   confirmDeleteOperation(id: number) {
     if (!!this.deleteOperationSubject) {
       this.deleteOperationSubject.next(id);
+    }
+  }
+
+  confirmDeleteAccount(id: number) {
+    if (!!this.deleteOperationSubject) {
+      this.deleteAccountSubject.next(id);
     }
   }
 

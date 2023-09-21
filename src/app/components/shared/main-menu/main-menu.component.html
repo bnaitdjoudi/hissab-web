@@ -54,20 +54,31 @@
 
         </ion-menu-toggle>
 
-        <ion-item>
+        <ion-item (click)="goto('/rapport')">
             <mat-icon class="icon-size" aria-hidden="false">bar_chart</mat-icon>
             <ion-label> Reports </ion-label>
+        </ion-item>
+
+
+        <ion-item (click)="goto('/rappel')">
+            <mat-icon class="icon-size" aria-hidden="false">event</mat-icon>
+            <ion-label> Rappel </ion-label>
+        </ion-item>
+
+        <ion-item (click)="goto('/notification')">
+            <mat-icon class="icon-size" aria-hidden="false">add_alert</mat-icon>
+            <ion-label> Alert </ion-label>
         </ion-item>
 
         <ion-item-divider>
             <ion-label> Admin </ion-label>
         </ion-item-divider>
         <ion-menu-toggle>
-            <ion-item class="no-border" (click)="goto('/operation/new')">
+            <ion-item class="no-border" (click)="goto('/profile')">
                 <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="people"></mat-icon>
                 <ion-label>
-                    Profiles
+                    Profiles & Personnes
                 </ion-label>
             </ion-item>
         </ion-menu-toggle>
@@ -89,6 +100,11 @@
                 </ion-label>
             </ion-item>
         </ion-menu-toggle>
+
+        <ion-item (click)="goto('/support')">
+            <mat-icon class="icon-size" aria-hidden="false">support</mat-icon>
+            <ion-label> Support </ion-label>
+        </ion-item>
 
     </ion-list>
 </ion-content>

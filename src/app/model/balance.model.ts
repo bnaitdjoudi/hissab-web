@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 
-export type Period = 'month' | 'global' | '' | 'cyear';
+export type Period = 'month' | 'global' | '' | 'cyear' | 'week';
 
 export interface BalanceRequest {
   type: Period;

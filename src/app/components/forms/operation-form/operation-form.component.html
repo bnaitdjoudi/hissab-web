@@ -7,31 +7,89 @@
         <form [formGroup]="transferForm">
           <!-- <ng-template matStepLabel>Name</ng-template> -->
           <div class="example-form">
-            <mat-form-field class="example-full-width">
-              <mat-label>From account</mat-label>
-              <textarea matInput placeholder="From account" readonly formControlName="transferF"
-                [disabled]="true"></textarea>
+
+            <div class="example-full-width-field">
+
+              <mat-card (click)="openModeprofile()" matRipple [class]="'card-profile' + ' ' + classeValideTransferFrom">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-subtitle>Profile</mat-card-subtitle>
+                    <mat-card-title
+                      *ngIf="currentProfile">{{currentProfile.firstName + ' ' + currentProfile.lastName }}</mat-card-title>
+
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <div *ngIf="currentProfile" class="path">
+                    {{currentProfile.mail}}
+                  </div>
+
+                  <div *ngIf="!currentProfile" class="path">
+                    Veuiller selectionner un profile
+                  </div>
+                </mat-card-content>
+
+              </mat-card>
+            
+            </div>
+
+            <div class="example-full-width-field">
+
+              <mat-card (click)="openMode('from')" matRipple [class]="'card-account' + ' ' + classeValideTransferFrom">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-subtitle>Transfer from</mat-card-subtitle>
+                    <mat-card-title>{{defaultTransferFrom?.acountName}}</mat-card-title>
+                    <div class="price">{{(defaultTransferFrom? defaultTransferFrom.balance  :0) | currency
+                                                                          :'CAD':'symbol-narrow':'1.2-2'
+                                                                          }}</div>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <div *ngIf="defaultTransferFrom" class="path">
+                    {{defaultTransferFrom.path}}
+                  </div>
+
+                  <div *ngIf="!defaultTransferFrom" class="path">
+                    Veuiller selectionner un compte
+                  </div>
+                </mat-card-content>
+
+              </mat-card>
+              <input type="hidden" formControlName="transferF">
               <input type="hidden" [value]="currentOperation.idAccount" required formControlName="idAccount">
-              <button id="open-leaf" mat-mini-fab matSuffix aria-label="Search" (click)="openMode('from')">
-                <mat-icon color="primary">search</mat-icon>
-              </button>
-              <mat-error *ngIf="transferForm.get('transferF')?.hasError('required')">
-                Enter a valid first account tranfer!
-              </mat-error>
-            </mat-form-field>
+            </div>
 
-            <mat-form-field class="example-full-width">
-              <mat-label>Transfer to account</mat-label>
-              <textarea matInput placeholder="Transfer to account" formControlName="transfer" required
-                readonly></textarea>
-              <button mat-mini-fab matSuffix aria-label="Search" (click)="openMode('to')">
-                <mat-icon color="primary">search</mat-icon>
-              </button>
 
-              <mat-error *ngIf="transferForm.get('transfer')?.hasError('required')">
-                Enter a valid second account tranfer!
-              </mat-error>
-            </mat-form-field>
+            <div class="example-full-width-field">
+              <mat-card (click)="openMode('to')" matRipple [class]="'card-account' + ' '+classeValideTransferTo">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-subtitle>Transfer To</mat-card-subtitle>
+                    <mat-card-title>{{defaultTransferTo?.acountName}}</mat-card-title>
+                    <div class="price">
+                      {{(defaultTransferTo? defaultTransferTo.balance  :0) | currency
+                                                      :'CAD':'symbol-narrow':'1.2-2'
+                                                      }}
+                    </div>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <div *ngIf="defaultTransferTo" class="path">
+                    {{defaultTransferTo.path}}
+                  </div>
+
+                  <div *ngIf="!defaultTransferTo" class="path">
+                    Veuiller selectionner un compte
+                  </div>
+                </mat-card-content>
+
+              </mat-card>
+
+              <input type="hidden" [value]="currentOperation.transfer" required formControlName="transfer">
+            </div>
+
+
           </div>
           <button (click)="transferForm.reset()" mat-raised-button color="accent" style="float: right;">RESET</button>
         </form>
@@ -59,7 +117,16 @@
 
           <mat-form-field class="example-full-width">
             <mat-label>statut</mat-label>
-            <input matInput placeholder="Statut" readonly formControlName="statut">
+            <mat-select formControlName="statut" name="statut">
+
+              <mat-option value="r">
+                effectif
+              </mat-option>
+              <mat-option value="s">
+                waiting
+              </mat-option>
+            </mat-select>
+
             <div *ngIf="isError1A()"
               class="mat-mdc-form-field-error mat-mdc-form-field-bottom-align ng-tns-c4048155087-65 ng-star-inserted">
 
@@ -74,7 +141,7 @@
               Description is required!
             </mat-error>
           </mat-form-field>
-          <mat-form-field class="example-full-width">
+          <mat-form-field class="example-full-width" *ngIf="showDebitField">
             <mat-label>{{'forms.operation.'+accountType+'.debit' | translate}}</mat-label>
             <input matInput type="number" formControlName="debit" placeholder="0" step="0.01"
               (change)="debitChanged($event)">
@@ -84,7 +151,7 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="example-full-width">
+          <mat-form-field class="example-full-width" *ngIf="showCreditField">
             <mat-label>{{'forms.operation.'+accountType+'.credit' | translate}}</mat-label>
             <input matInput type="number" formControlName="credit" placeholder="0" step="0.01"
               (change)="creditChanged($event)">
@@ -150,8 +217,6 @@
             </ion-item>
           </ion-list>
 
-
-
         </form>
       </div>
     </mat-step>
@@ -164,91 +229,7 @@
   </div>
 
 
-  <!--
-  <form [formGroup]="operationForm">
-    <error-message message="les champs debit et credit ne peuvent pas tre a 0 en même temps"
-      *ngIf="!isCreditAndDebitValide"></error-message>
 
-    <ion-item>
-      <ion-label for="accountIn" position="stacked">Account: </ion-label>
-
-      <div id="accountIn">
-        <ion-input class="transInput" type="text" readonly [value]="account?account.acountName:''" slot="start">
-        </ion-input>
-        <ion-button fill="clear" slot="end" *ngIf="!edit" id="">
-          <ion-icon slot="end" name="list-outline"></ion-icon>
-        </ion-button>
-      </div>
-
-    </ion-item>
-
-    <ion-item>
-      <ion-label for="num-trans" position="stacked">Numero Transaction: </ion-label>
-      <ion-input id="num-trans" type="text" formControlName="numTrans" readonly></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label for="time" position="stacked">Time :</ion-label>
-      <ion-input id="time" type="text" formControlName="time" readonly>
-      </ion-input>
-
-      <ion-button id="open-modal" fill="clear" slot="end">
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>
-
-    </ion-item>
-
-    <ng-container *ngFor="let validation of validation_messages['time']">
-      <error-message [message]="validation.message" *ngIf="isError('time',validation.type)"></error-message>
-    </ng-container>
-
-    <ion-item>
-      <ion-label for="statut" position="floating">Statut: </ion-label>
-      <ion-input id="statut" type="text" formControlName="statut" value="r"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label for="description" position="stacked">Description: </ion-label>
-      <ion-input id="description" type="text" formControlName="description" class="form-controll"></ion-input>
-    </ion-item>
-
-    <ion-item id="open-leaf">
-      <ion-label for="transferToDiv" position="stacked">Transfer to: </ion-label>
-      <div id="transferToDiv">
-
-        <ion-input class="transInput" type="text" readonly
-          [value]="!edit ? defaultTransferTo?.acountName: currentOperation.transfer" slot="start">
-        </ion-input>
-        <ion-button fill="clear" slot="end" *ngIf="!edit" id="tranferToModal">
-          <ion-icon slot="end" name="list-outline"></ion-icon>
-        </ion-button>
-      </div>
-
-    </ion-item>
-
-    <ion-item>
-      <ion-label class="capitelize" for="debit"
-        position="stacked">{{'forms.operation.'+accountType+'.debit' | translate}}: </ion-label>
-      <number-input *ngIf="operationForm" id="debit" [precision]="2" [amount]="0" formControlName="debit"
-        [formGroup]="operationForm" (amountEntered)="debitChanged($event)" ngDefaultControl
-        style="width: 100%;margin-top: 10px;"></number-input>
-    </ion-item>
-    <ng-container *ngFor="let validation of validation_messages['debit']">
-      <error-message [message]="validation.message" *ngIf="isError('debit',validation.type)"></error-message>
-    </ng-container>
-
-    <ion-item>
-      <ion-label class="capitelize" for="credit"
-        position="stacked">{{'forms.operation.'+accountType+'.credit' | translate}}: </ion-label>
-      <number-input *ngIf="operationForm" id="credit" [precision]="2" [amount]="0" formControlName="credit"
-        [formGroup]="operationForm" (amountEntered)="creditChanged($event)" ngDefaultControl
-        style="width: 100%;margin-top: 10px;"></number-input>
-    </ion-item>
-
-    <ng-container *ngFor="let validation of validation_messages['credit']">
-      <error-message [message]="validation.message" *ngIf="isError('credit',validation.type)"></error-message>
-    </ng-container>
-  </form>
--->
   <ion-modal trigger="open-modal">
     <ng-template>
 
@@ -261,7 +242,7 @@
 
 
   <ion-modal #modal [isOpen]="isModalOpen" *ngIf="!edit" [initialBreakpoint]=".85" [breakpoints]="[ 0.85]"
-    [backdropBreakpoint]="0.85">
+    (didDismiss)="searchText = ''" [backdropBreakpoint]="0.85">
     <ng-template>
 
       <ion-content>
@@ -272,7 +253,7 @@
           </ion-buttons>
         </ion-toolbar>
         <ion-searchbar placeholder="Search" (click)="modal.setCurrentBreakpoint(0.75)" [(ngModel)]="searchText"
-          (ionChange)="search($event)"></ion-searchbar>
+          (ionInput)="search($event)"></ion-searchbar>
         <ion-content>
           <ion-progress-bar *ngIf="progressShown" type="indeterminate" color="danger"></ion-progress-bar>
 
@@ -293,6 +274,15 @@
         </ion-content>
 
       </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal #modalProfile [isOpen]="isModalProfileOpen">
+    <ng-template>
+
+      <profile-list-typehead class="ion-page" title="Favorite Fruits" [items]="items" [value]="currentProfile.mail"
+        (selectionChange)="profileSelectionChanged($event); isModalProfileOpen = false;"
+        (selectionCancel)="modalProfile.dismiss(); isModalProfileOpen = false"></profile-list-typehead>
     </ng-template>
   </ion-modal>
 

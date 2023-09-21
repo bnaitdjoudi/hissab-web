@@ -28,38 +28,46 @@
     </div>
   </ion-header>
   <ion-content>
-    <ion-list>
-      <ion-item-sliding *ngFor="let item of operations; let index">
-        <ion-item-options side="start">
-          <ion-item-option (click)="onDeleteFired(item.id)" color="clear">
-            <ion-icon size="large" color="danger" name="trash-outline">
-            </ion-icon></ion-item-option>
-        </ion-item-options>
-        <ion-item (click)="onSelectOperation(item)">
-          <ion-card>
-            <ion-card-content>
-              <div class="line-op-main">
-                <div class="detail-line left-line">
-                  <ion-label class="title">{{ item.description }}</ion-label>
-                  <ion-label class="date-line">{{ item.time | dateOperation }}</ion-label>
-                </div>
-                <div class="detail-line total-line">
-                  <ion-label><span
-                      class="number-line  {{ currBalFun(item.debit ,item.credit)[0] }}  {{ currBalFun(item.debit ,item.credit)[1] > 0 ? 'positif' : 'negatif' }}">{{
-                    (currBalFun(item.debit ,item.credit)[1] * multiply(currBalFun(1,1)[0]))  |
-                    currency:'CAD':'symbol-narrow':'1.2-2'
-                    }}</span></ion-label>
-                  <div style="width: 100%;" class="balance">
-                    <ion-label class="balance-text">balance :</ion-label>
-                    <ion-label class="number-line">{{ (item.balance * multiply(currBalFun(1,1)[0]) ) | currency:'CAD':'symbol-narrow':'1.2-2'
-                    }}</ion-label>
+    <ion-list *ngIf="groupeKeys.length > 0">
+
+      <ion-item-group *ngFor="let key of groupeKeys;" class="groupe-operation">
+        <ion-item-divider class="group-header">
+          <ion-label class="date-line">{{key}}</ion-label>
+        </ion-item-divider>
+        <ion-item-sliding *ngFor="let item of operationGroup.get(key); let index">
+          <ion-item-options side="start">
+            <ion-item-option (click)="onDeleteFired(item.id)" color="clear">
+              <ion-icon size="large" color="danger" name="trash-outline">
+              </ion-icon></ion-item-option>
+          </ion-item-options>
+          <ion-item (click)="onSelectOperation(item)">
+            <ion-card>
+              <ion-card-content>
+                <div class="line-op-main">
+                  <div class="detail-line left-line">
+                    <ion-label class="title">{{ item.description }}</ion-label>
+                    <ion-label *ngIf="item.statut !== 'r'" class="stat-line"> <ion-icon slot="start" name="time-outline"></ion-icon>{{'operations.'+item.statut | translate}}</ion-label>
+                  </div>
+                  <div class="detail-line total-line">
+                    <ion-label><span
+                        class="number-line  {{ currBalFun(item.debit ,item.credit)[0] }}  {{ currBalFun(item.debit ,item.credit)[1] > 0 ? 'positif' : 'negatif' }}">{{
+                            (currBalFun(item.debit ,item.credit)[1] * multiply(currBalFun(1,1)[0]))  |
+                            currency:'CAD':'symbol-narrow':'1.2-2'
+                            }}</span></ion-label>
+                    <div style="width: 100%;" class="balance">
+                      <ion-label class="balance-text">balance :</ion-label>
+                      <ion-label class="number-line">{{ (item.balance * multiply(currBalFun(1,1)[0]) ) | currency:'CAD':'symbol-narrow':'1.2-2'
+                            }}</ion-label>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </ion-item>
-      </ion-item-sliding>
+              </ion-card-content>
+            </ion-card>
+          </ion-item>
+        </ion-item-sliding>
+      </ion-item-group>
+
+
       <ion-item *ngIf="!isMoreData" style="height: 35px;">
       </ion-item>
     </ion-list>

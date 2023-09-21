@@ -1,0 +1,58 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            Rappel
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+
+    <ion-list lines="none">
+        <ion-item *ngFor="let item of rappels">
+            <mat-card class="rappel-card">
+                <mat-card-header>
+
+                    <mat-card-title-group>
+                        <div style="width: 100%;">
+                            <mat-card-subtitle>Is periodic: {{item.isPeriode ? 'Oui':'Non'}}</mat-card-subtitle>
+                            <mat-card-title>{{item.eventDate | dateHissabDay:item.periode}}</mat-card-title>
+                            <mat-card-subtitle>{{item.eventDate | onlyHour}}</mat-card-subtitle>
+                        </div>
+                    </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>
+                        {{item.description}}
+                    </p>
+                </mat-card-content>
+                <mat-card-actions class="rappel-actions">
+                    <button id="open-leaf" mat-mini-fab matSuffix aria-label="Date" id="open-modal"
+                        (click)="confirmDelete(item)">
+                        <mat-icon color="primary">delete</mat-icon>
+                    </button>
+                    <ion-toggle justify="end" [checked]="item.isActive" color="success">Is Active</ion-toggle>
+
+
+                </mat-card-actions>
+            </mat-card>
+
+        </ion-item>
+    </ion-list>
+    <ion-alert header="Alert!" [isOpen]="isAlertOpen" [buttons]="alertButtons"
+        message="Voullez vous vraiment supprimer ce rappel" (didDismiss)="setResult($event)"></ion-alert>
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button fill="clear" slot="start" id="menu-button" (click)="goHome()">
+                <fa-icon icon="house"></fa-icon>
+            </ion-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end">
+            <ion-button fill="clear" slot="start" id="menu-button" (click)="goToNew()">
+                <fa-icon icon="calendar-plus"></fa-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-footer>

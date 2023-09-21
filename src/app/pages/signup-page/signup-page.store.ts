@@ -47,23 +47,14 @@ export class SignUpPageStore extends Store<SignUpModel> {
         });
       }
     });
-
-    this.mainStore.iSignedin$.subscribe((val) => {
-      this.setState({
-        ...this.state,
-        isSignedIn: val ? 'signedin' : 'notsignedin',
-      });
-    });
-
-    this.checkIsSignedIn();
   }
 
   signupPage() {
-    this.router.navigate(['signup-page/signup']);
+    this.router.navigate(['signup-page/signup'], { replaceUrl: true });
   }
 
   signinPage() {
-    this.router.navigate(['signup-page/signin']);
+    this.router.navigate(['signup-page/signin'], { replaceUrl: true });
   }
 
   async signUp(params: any) {
@@ -81,7 +72,7 @@ export class SignUpPageStore extends Store<SignUpModel> {
         password: params.passwordFormCtrl,
       } as AuthModel);
       await this.mainStore.setSignedUpFlag();
-      this.router.navigate(['signup-page']);
+      this.router.navigate(['signup-page', { replaceUrl: true }]);
     } catch (error) {
       console.error(error);
     }
@@ -95,10 +86,24 @@ export class SignUpPageStore extends Store<SignUpModel> {
         password: params.passwordFormCtrl,
       });
 
+      const profiles = await this.profileService.findAllProfiles();
+      const profile = profiles.find((el) => el.mail === params.emailFormCtrl);
+
+      if (profile) {
+        console.log(JSON.stringify(profile));
+        this.mainStore.currentProfile(profile);
+      } else {
+        console.log('profile not found');
+      }
+
       console.log('is logged' + isLogged);
+
       this.setSignedin();
       const encrypted = this.encrypt(
-        JSON.stringify({ login: params.email, pwd: params.passwordFormCtrl })
+        JSON.stringify({
+          login: params.emailFormCtrl,
+          pwd: params.passwordFormCtrl,
+        })
       );
 
       const d = new Date();
@@ -107,7 +112,7 @@ export class SignUpPageStore extends Store<SignUpModel> {
 
       this.sessionStoreService.saveData(CONSTANTS.LOCAL_TOKEN_ID, encrypted);
       this.sessionStoreService.saveData(CONSTANTS.LOCAL_TOKEN_END, '' + ms);
-      this.router.navigate(['signup-page']);
+      this.router.navigate([''], { replaceUrl: true });
     } catch (error) {
       console.error(error);
     }
@@ -120,16 +125,16 @@ export class SignUpPageStore extends Store<SignUpModel> {
   private encrypt(txt: string): string {
     return CryptoJS.AES.encrypt(txt, this.key).toString();
   }
-  private decrypt(txtToDecrypt: string) {
+  decrypt(txtToDecrypt: string) {
     return CryptoJS.AES.decrypt(txtToDecrypt, this.key).toString(
       CryptoJS.enc.Utf8
     );
   }
 
-  checkIsSignedIn(): boolean {
-    let ms = this.sessionStoreService.getData(CONSTANTS.LOCAL_TOKEN_END);
+  async checkIsSignedIn(): Promise<boolean> {
+    let ms = await this.sessionStoreService.getData(CONSTANTS.LOCAL_TOKEN_END);
 
-    const msn = ms !== null ? +ms : 0;
+    const msn = ms ? +ms : 0;
 
     const mst = new Date().getTime();
 
@@ -139,6 +144,13 @@ export class SignUpPageStore extends Store<SignUpModel> {
       let ms = mst + 30 * 60 * 1000;
       this.sessionStoreService.saveData(CONSTANTS.LOCAL_TOKEN_END, '' + ms);
       this.mainStore.setSignedIn(true);
+
+      const token = await this.sessionStoreService.getData(
+        CONSTANTS.LOCAL_TOKEN_ID
+      );
+      const decodedToken = this.decrypt(token);
+      let credential = JSON.parse(decodedToken);
+      console.log(credential.login);
       return true;
     }
 

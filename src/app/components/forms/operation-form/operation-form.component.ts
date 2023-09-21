@@ -22,10 +22,15 @@ import {
 } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { AlertController, IonModal } from '@ionic/angular';
-import { parseFloatTool } from 'src/app/tools/tools';
+import {
+  parseFloatTool,
+  showCreditField,
+  showDebitField,
+} from 'src/app/tools/tools';
 import { LeafAccount } from 'src/app/model/leaf-account.model';
 import { Account } from 'src/app/model/account.model';
 import { MatStepper } from '@angular/material/stepper';
+import { ProfileModel } from 'src/app/model/profil.model';
 
 @Component({
   selector: 'operation-form',
@@ -34,10 +39,16 @@ import { MatStepper } from '@angular/material/stepper';
   providers: [CurrencyPipe],
 })
 export class OperationFormComponent implements OnInit, OnDestroy {
+  profileSelectionChanged($event: ProfileModel) {
+    this.currentProfile = $event;
+  }
+
+  isModalProfileOpen = false;
+
   @Input() accountType: string = 'actif';
+  @Input() currentProfile: ProfileModel;
   @Input() set operation(operation: Operation) {
     this.swiperRef?.reset();
-
     this.setOperation(operation);
     this.initTransferForm();
     this.iniOperationForm();
@@ -55,9 +66,19 @@ export class OperationFormComponent implements OnInit, OnDestroy {
 
     if (currentAccount && currentAccount.id) {
       this.defaultTransferFrom = { ...currentAccount };
+    } else {
+      this.defaultTransferFrom = undefined;
     }
-    console.log('ddfdfd::::ghghg' + JSON.stringify(this.defaultTransferFrom));
+    console.log(
+      'currentaccount:::OperationFormComponent:' +
+        JSON.stringify(currentAccount)
+    );
   }
+
+  @Input()
+  profiles: Observable<ProfileModel[]>;
+  profilesSuscrbtion: Subscription;
+  items: ProfileModel[] = [];
 
   @Output()
   onLoadLeafAccount: EventEmitter<number | undefined> = new EventEmitter<
@@ -67,12 +88,18 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   @Output()
   onSubmit: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output()
+  onProfileListOpened: EventEmitter<void> = new EventEmitter<void>();
+
   account: Account | undefined | null;
   defaultTransferFrom: LeafAccount | undefined;
   defaultTransferTo: LeafAccount | undefined;
   leafsAccountFiltred: LeafAccount[] = [];
   leafsAccountTotal: LeafAccount[] = [];
   currentOperation: Operation;
+  showDebitField: boolean = true;
+  showCreditField: boolean = true;
+
   @ViewChild('modal') modalLeaf: IonModal;
 
   required_message = 'ce champs ne peut pas etre null!';
@@ -115,6 +142,10 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   modalTitle: string;
   progressShown = true;
   controlNext = false;
+
+  classeValideTransferFrom: string = '';
+  classeValideTransferTo: string = '';
+
   constructor(
     private readonly fb: FormBuilder,
     private ref: ChangeDetectorRef,
@@ -130,10 +161,11 @@ export class OperationFormComponent implements OnInit, OnDestroy {
       ? this.defaultTransferTo.path
       : this.currentOperation.transfer;
 
-    //this.buildSlides();
+    this.buildLeafObserable();
+    this.profiles.subscribe((profiles) => (this.items = profiles));
   }
 
-  buildSlides() {
+  buildLeafObserable() {
     this.leafAccountSuscription = this.leafsAccount.subscribe((val) => {
       this.leafsAccountTotal = val;
       this.leafsAccountFiltred = val.filter((el) => this.filterLeaf(el));
@@ -174,7 +206,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
       const debit = control.get('debit')?.value;
       const credit = control.get('credit')?.value;
       console.log('test match');
-      return debit == 0 && credit == 0 ? { noMatch: true } : null;
+      return debit === 0 && credit === 0 ? { noMatch: true } : null;
     };
     this.operationForm = this.fb.group(
       {
@@ -272,6 +304,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
         time: new Date(),
         idAccount: 0,
         transfer: '',
+        profile: this.currentProfile?.mail,
       };
     }
   }
@@ -357,6 +390,12 @@ export class OperationFormComponent implements OnInit, OnDestroy {
         this.transferForm
           .get('transferF')
           ?.setValue(this.defaultTransferFrom?.path);
+
+        this.accountType = this.defaultTransferFrom
+          ? this.defaultTransferFrom.type
+          : 'actifs';
+
+        this.classeValideTransferFrom = 'card-account-valide';
       }
 
       if (this.modalTitle === 'Transfer to') {
@@ -377,6 +416,19 @@ export class OperationFormComponent implements OnInit, OnDestroy {
         this.transferForm
           .get('transfer')
           ?.setValue(this.currentOperation.transfer);
+        this.classeValideTransferTo = 'card-account-valide';
+      }
+
+      if (this.defaultTransferFrom && this.defaultTransferTo) {
+        this.showDebitField = showDebitField(
+          this.defaultTransferFrom.type,
+          this.defaultTransferTo.type
+        );
+
+        this.showCreditField = showCreditField(
+          this.defaultTransferFrom.type,
+          this.defaultTransferTo.type
+        );
       }
 
       this.modalLeaf.dismiss();
@@ -384,7 +436,8 @@ export class OperationFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  search(event: Event) {
+  search(event: any) {
+    this.searchText = event.target.value.toLowerCase();
     this.leafsAccountFiltred = this.leafsAccountTotal.filter((el) =>
       this.filterLeaf(el)
     );
@@ -402,6 +455,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   }
 
   openMode(mode: string) {
+    console.log('open modal:' + JSON.stringify(this.account));
     switch (mode) {
       case 'from': {
         this.modalTitle = 'Transfer from';
@@ -425,15 +479,20 @@ export class OperationFormComponent implements OnInit, OnDestroy {
 
     switch (this.swiperRef?.selectedIndex) {
       case 0: {
+        this.validateAccount();
         break;
       }
-      case 1:
+      case 1: {
+        console.log('validateAccount');
         if (this.operationForm.hasError('noMatch')) {
           this.presentAlert();
         }
         this.currentOperation.description =
           this.operationForm.get('description')?.value;
+
         break;
+      }
+
       case 2: {
         this.onSubmit.emit();
         break;
@@ -442,6 +501,14 @@ export class OperationFormComponent implements OnInit, OnDestroy {
 
     this.swiperRef?.next();
     this.controlNext = true;
+  }
+  validateAccount() {
+    this.classeValideTransferFrom = this.defaultTransferFrom
+      ? 'card-account-valide'
+      : 'card-account-invalide';
+    this.classeValideTransferTo = this.defaultTransferTo
+      ? 'card-account-valide'
+      : 'card-account-invalide';
   }
 
   back() {
@@ -484,8 +551,15 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Alert ',
-      subHeader: 'Alert Debit and Credit equals to 0',
-      message: 'At less one of debit or credit be greater than 0!',
+      subHeader: '',
+      message:
+        this.showCreditField && this.showDebitField
+          ? 'At less one of debit or credit be greater than 0!'
+          : this.showCreditField
+          ? 'Credit should greater than 0!'
+          : this.showDebitField
+          ? 'Debit should greater than 0!'
+          : '',
       buttons: ['OK'],
     });
 
@@ -494,5 +568,19 @@ export class OperationFormComponent implements OnInit, OnDestroy {
 
   getFormattedDate(arg0: Date, arg1: string) {
     return format(arg0, arg1);
+  }
+
+  reset() {
+    this.defaultTransferFrom = undefined;
+    this.defaultTransferTo = undefined;
+    this.classeValideTransferFrom = '';
+    this.classeValideTransferTo = '';
+    this.operationForm?.reset();
+    this.transferForm?.reset();
+  }
+
+  openModeprofile() {
+    this.onProfileListOpened.emit();
+    this.isModalProfileOpen = true;
   }
 }

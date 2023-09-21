@@ -5,7 +5,7 @@
     </ion-toolbar>
   </ion-header>
   <ion-content>
-    <main-menu [selectedRoute]='menuRoute$ | async' >
+    <main-menu [selectedRoute]='menuRoute$ | async'>
     </main-menu>
   </ion-content>
 </ion-menu>
@@ -16,7 +16,8 @@
     <ion-list>
       <ion-item>
         <ion-label class="period-label">Period</ion-label>
-        <ion-select label-placement="fixed" [value]="period$ | async " (ionChange)="onPeriodChange($event)">
+        <ion-select label="Period" label-placement="fixed" [value]="period$ | async "
+          (ionChange)="onPeriodChange($event)">
           <ion-select-option value="month">Current month</ion-select-option>
           <ion-select-option value="cyear">Current year</ion-select-option>
           <ion-select-option value="global">All</ion-select-option>
@@ -24,13 +25,13 @@
       </ion-item>
     </ion-list>
 
-    <ion-card>
+
+
+    <ion-card [class]=" globalBalance >=  0 ? 'positif':'negatif'">
       <ion-card-header>
         <ion-card-title>
           {{'pages.main.balance.balance' | translate}}
         </ion-card-title>
-
-
       </ion-card-header>
       <ion-card-content>
         <ion-label class="uppercase-text" slot="start">{{getMonth() | translate}}</ion-label>
@@ -38,18 +39,81 @@
       :'CAD':'symbol-narrow':'1.2-2'}}</ion-label>
       </ion-card-content>
     </ion-card>
-    <ion-list>
-      <ion-item *ngFor="let item of mainAccounts$| async" id="{{item.acountName}}" (click)="routeToAccount(item.id)">
-        <ion-label class="capitelize">{{ 'accounttype.'+item.acountName | translate }} </ion-label>
-        <ion-label [class]="accountClass(item)" slot="end">{{(item? (item.totalAccount) * multiplyFor(item.type):1) | currency
-                  :'CAD':'symbol-narrow':'1.2-2'
-                  }}</ion-label>
 
-        <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
 
-      </ion-item>
+    <ion-grid *ngIf="mainAccounts">
+      <ion-row>
+        <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[0]? mainAccounts[0].id:1)">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title>{{mainAccounts[0]? mainAccounts[0].acountName:'' | translate}}</mat-card-title>
 
-    </ion-list>
+
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <ion-label [class]="accountClass(mainAccounts[0])">{{(mainAccounts[0]? (mainAccounts[0].totalAccount) * multiplyFor(mainAccounts[0].type):1) | currency
+                                :'CAD':'symbol-narrow':'1.2-2'
+                                }}</ion-label>
+            </mat-card-content>
+          </mat-card></ion-col>
+        <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[1]? mainAccounts[1].id:1)">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title>{{mainAccounts[1]? mainAccounts[1].acountName:''| translate}}</mat-card-title>
+
+
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <ion-label [class]="accountClass(mainAccounts[1])">{{(mainAccounts[1]? (mainAccounts[1].totalAccount) * multiplyFor(mainAccounts[1].type):1) | currency
+                                        :'CAD':'symbol-narrow':'1.2-2'
+                                        }}</ion-label>
+            </mat-card-content>
+          </mat-card></ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[2]? mainAccounts[2].id:1)">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title>{{mainAccounts[2]? mainAccounts[2].acountName:'' | translate}}</mat-card-title>
+
+
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <ion-label [class]="accountClass(mainAccounts[2])">{{(mainAccounts[2]? (mainAccounts[2].totalAccount) * multiplyFor(mainAccounts[2].type):1) | currency
+                                        :'CAD':'symbol-narrow':'1.2-2'
+                                        }}</ion-label>
+            </mat-card-content>
+          </mat-card></ion-col>
+        <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[3]? mainAccounts[3].id:1)">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title>{{mainAccounts[3]? mainAccounts[3].acountName:'' | translate}}</mat-card-title>
+
+
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <ion-label [class]="accountClass(mainAccounts[3])">{{(mainAccounts[3]? (mainAccounts[3].totalAccount) * multiplyFor(mainAccounts[3].type):1) | currency
+                                        :'CAD':'symbol-narrow':'1.2-2'
+                                        }}</ion-label>
+            </mat-card-content>
+          </mat-card></ion-col>
+      </ion-row>
+    </ion-grid>
+
+    
 
   </ion-content>
+  <ion-footer>
+    <ion-toolbar>
+      <ion-buttons>
+        <ion-button>
+          fwefwe
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
 </div>

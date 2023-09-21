@@ -7,8 +7,11 @@ import { PagingRequest } from '../model/paging-request.model';
 import { AccountDataBase } from './databases/account.db';
 import { AccountResume } from '../model/account.resume.model';
 import { printError } from '../tools/errorTools';
+import { resolve } from 'cypress/types/bluebird';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AccountsService {
   constructor(private readonly accountDb: AccountDataBase) {}
 
@@ -158,6 +161,10 @@ export class AccountsService {
         .findAccountByTextSerach(text, withoutOp)
         .then((accounts: Account[]) => {
           resolve(accounts);
+        })
+        .catch((error) => {
+          console.error(error);
+          resolve([]);
         });
     });
   }
@@ -197,6 +204,46 @@ export class AccountsService {
       } else {
         resolve({ currentPage: 0, data: [], totalPage: 0 });
       }
+    });
+  }
+
+  async resetAllAccountTo(balance: number) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.accountDb.resetAllBalanceTo(balance);
+        resolve();
+      } catch (error) {
+        reject('erreur avec la reposotory');
+        console.error(error);
+      }
+    });
+  }
+
+  async updateAccountBalance(balance: number, accountId: number) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.accountDb.updateBalanceById(balance, accountId);
+        resolve();
+      } catch (error) {
+        reject('erreur');
+        console.log(error);
+      }
+    });
+  }
+  async deleteAccountById(id: number): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      if (id && id !== null) {
+        console.log('ddddddddddddddd');
+        try {
+          await this.accountDb.deleteById([id]);
+          resolve();
+        } catch (error) {
+          console.error(error);
+          reject('ncan delete');
+        }
+      }
+
+      resolve();
     });
   }
 }

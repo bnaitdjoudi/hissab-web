@@ -10,6 +10,7 @@ import { StoreModule } from 'src/app/store/store.module';
 import { SignupPage } from './signup/sign-up.page';
 import { MaterialModule } from 'src/app/material.module';
 import { SignInPage } from './signin/sign-in.page';
+import { ServicesModule } from 'src/app/services/services.module';
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { SignInPage } from './signin/sign-in.page';
     StoreModule,
     MaterialModule,
     ReactiveFormsModule,
+    ServicesModule,
   ],
   declarations: [SignupLoadPage, SignupPage, SignInPage],
 })

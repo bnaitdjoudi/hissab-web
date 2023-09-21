@@ -7,39 +7,41 @@ import {
   CREATE_ACCOUNT_TABLE,
   CREATE_AUTH_TABLE,
   CREATE_FLAGS,
+  CREATE_PATCH_TABLE,
   CREATE_PROFILES_TABLE,
   CREATE_TRANSACTION_TABLE,
   CREATE_TRANSACTION_VIEW,
   INITIAL_ACCOUNT_DATA,
   INSERT_INITIAL_ACCOUNT_DATA,
+  tables,
 } from './tables';
 import { SQLitePorter } from '@awesome-cordova-plugins/sqlite-porter/ngx';
 import { InjectDbTestService } from './injectDbTest.service';
 import { BehaviorSubject } from 'rxjs';
 import { printError } from '../../tools/errorTools';
 import { InitService } from '../init.service';
-import { Logger, LoggingService } from 'ionic-logging-service';
+import { PatchQuery } from 'src/app/model/patch.model';
 
 declare var window: any;
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class DataBaseService {
   sqLiteObject: any;
+  static sqlStaticValue: any;
 
   DATABASE: string = 'data6.db';
   DATABASE_V: string = '1.1';
   DDD: string = 'yes';
   isInserting: boolean = false;
-  private logger: Logger;
 
   constructor(
     private readonly sqlite: SQLite,
     private readonly platform: Platform,
     private readonly sqliteporter: SQLitePorter,
-    private readonly initService: InitService,
-    loggingService: LoggingService
+    private readonly initService: InitService
   ) {
-    this.logger = loggingService.getLogger('MyApp.DataBaseService');
     this.createDataBase();
   }
 
@@ -55,7 +57,7 @@ export class DataBaseService {
     console.info('CREATE WEBSQL DATABASE');
     let db = window.openDatabase(this.DATABASE, this.DATABASE_V, 'DEV', -1);
     this.sqLiteObject = browserDBInstance(db);
-
+    DataBaseService.sqlStaticValue = this.sqLiteObject;
     this.initAll();
   }
 
@@ -68,10 +70,22 @@ export class DataBaseService {
         await this.createTransactionView();
         await this.initProfilesTable();
         await this.initAuthTable();
+        await this.initPatchData();
         await this.initInitFlag();
       }
       this.initService.initialisationSubject.next(true);
     });
+  }
+
+
+  async initPatchData() {
+    console.info('CREATE PATCH TABLE');
+    this.sqLiteObject
+      .executeSql(CREATE_PATCH_TABLE, [])
+      .then((res: any) => {
+        console.info('PATCH TABLE CREATED');
+      })
+      .catch((error: any) => alert(JSON.stringify(error)));
   }
   initAuthTable() {
     console.info('CREATE PROFILES TABLE');
@@ -137,7 +151,7 @@ export class DataBaseService {
       })
       .then((db: SQLiteObject) => {
         this.sqLiteObject = db;
-
+        DataBaseService.sqlStaticValue = db;
         this.initAll();
       })
       .catch((e: any) => console.error(e));
@@ -156,16 +170,12 @@ export class DataBaseService {
             await inject.processTestDb();
             resolve();
           } catch (error) {
-            this.logger.error(
-              'createAccountTables',
-              'erreur apres  initalisation',
-              error
-            );
+            console.error(error);
             reject('erreur dans initialisation de account');
           }
         })
         .catch((e: any) => {
-          this.logger.error('createAccountTables', 'some error', e);
+          console.error(e);
         });
     });
   }
@@ -271,5 +281,62 @@ export class DataBaseService {
         resolve(this.sqLiteObject);
       });
     }
+  }
+
+  async runPatchQuery(query: PatchQuery): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const res = await this.runSqlQuery(
+          `SELECT * FROM PATCH_SQL WHERE ${tables.patchquery.columns[0].name} = '${query.codePatch}';`
+        );
+        if (res.rows.length > 0) {
+          console.log('NOT RUN :' + query.codePatch);
+          resolve(false);
+        } else {
+          console.log('RUN :' + query.codePatch);
+          await this.runSqlQuery(query.query);
+          resolve(true);
+        }
+      } catch (error) {
+        resolve(false);
+        console.log('ERROR :' + JSON.stringify(error));
+        alert(JSON.stringify(error));
+      }
+    });
+  }
+
+  async runSqlQuery(query: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.runSqlQuerySecure(query)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error: Error) => {
+            reject(error);
+            console.log(JSON.stringify(error));
+          });
+      } else {
+        this.openSQLObject().then((val: any) => {
+          this.sqLiteObject = val;
+          this.runSqlQuerySecure(query)
+            .then((res) => {
+              resolve(res);
+            })
+            .catch((error: Error) => {
+              reject(error);
+              console.log(JSON.stringify(error));
+            });
+        });
+      }
+    });
+  }
+  runSqlQuerySecure(query: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      this.sqLiteObject
+        .executeSql(query, [])
+        .then((res: any) => resolve(res))
+        .catch((error: any) => reject(error));
+    });
   }
 }

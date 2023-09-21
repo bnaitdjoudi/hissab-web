@@ -1,9 +1,9 @@
 <ion-content>
     <ion-searchbar placeholder="Search" (click)="onSearchInputClicked()"
-        (ionChange)="onTextInputChange($event)"></ion-searchbar>
+        (ionInput)="onTextInputChange($event)"></ion-searchbar>
     <ion-list>
 
-        <ion-item *ngFor="let item of accountData?.data" (click)="selectAccount(item)">
+        <ion-item *ngFor="let item of accountData.data" (click)="selectAccount(item)">
             <ion-label>
                 <h2>{{item.acountName}}</h2>
                 <p>{{item.path}}</p>

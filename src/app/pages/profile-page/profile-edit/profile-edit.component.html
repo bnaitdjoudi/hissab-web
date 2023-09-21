@@ -1,0 +1,80 @@
+<ion-header [translucent]="true">
+    <ion-toolbar>
+        <ion-title>Profile</ion-title>
+    </ion-toolbar>
+</ion-header>
+><ion-content [fullscreen]="true">
+    <form [formGroup]="profileForm">
+
+
+        <ion-list>
+            <ion-item>
+                <mat-form-field class="example-full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="text" formControlName="mail">
+
+                </mat-form-field>
+            </ion-item>
+            <ion-item>
+                <mat-form-field class="example-full-width">
+                    <mat-label>First name</mat-label>
+                    <input matInput type="text" formControlName="firstName">
+
+                </mat-form-field>
+            </ion-item>
+            <ion-item>
+                <mat-form-field class="example-full-width">
+                    <mat-label>Last name</mat-label>
+                    <input matInput type="text" formControlName="lastName">
+
+                </mat-form-field>
+            </ion-item>
+            <ion-item>
+                <mat-form-field class="example-full-width">
+                    <mat-label>Phone</mat-label>
+                    <input matInput type="text" formControlName="phone">
+
+                </mat-form-field>
+            </ion-item>
+            <ion-item>
+                <div>
+                    <label>is user ?: </label>
+                    <mat-radio-group [value]="isUser" formControlName="isUser">
+                        <mat-radio-button value="yes">Yes</mat-radio-button>
+                        <mat-radio-button value="no">No</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </ion-item>
+            <ion-item *ngIf="isUser === 'yes'">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Passeword</mat-label>
+                    <input matInput type="password" [(ngModel)]="password">
+
+                </mat-form-field>
+            </ion-item>
+
+            <ion-item>
+                <ion-button slot="start">reset</ion-button>
+                <ion-button slot="end" (click)="onSubmit()">submit</ion-button>
+            </ion-item>
+
+        </ion-list>
+
+    </form>
+
+    <ion-alert [isOpen]="isEdeting" (didDismiss)="isEdeting = false" header="Please enter your info"
+        [buttons]="alertButtons" [inputs]="alertInputs"></ion-alert>
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button fill="clear" slot="start" id="menu-button">
+                <fa-icon icon="house"></fa-icon>
+            </ion-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end">
+
+        </ion-buttons>
+    </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,22 @@
+ion-spinner {
+    width: 100px;
+    height: 100px;
+    --color: #54dc98;
+    display: flex !important;
+    align-content: center !important;
+    align-items: center !important;
+}
+
+.example-full-width {
+    width: 100%;
+}
+
+form {
+    height: 100%;
+}
+
+.form-tool {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+}

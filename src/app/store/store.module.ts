@@ -6,6 +6,7 @@ import { MainStore } from './main.store';
 import { RouteParamsStore } from './route.params.store';
 import { OperationPageStore } from '../pages/operation-page/operation-page.store';
 import { SignUpPageStore } from '../pages/signup-page/signup-page.store';
+import { RapportStore } from '../pages/rapport/rapport.store';
 
 @NgModule({
   imports: [ServicesModule],
@@ -16,6 +17,7 @@ import { SignUpPageStore } from '../pages/signup-page/signup-page.store';
     AccountPageStore,
     OperationPageStore,
     SignUpPageStore,
+    RapportStore,
   ],
 })
 export class StoreModule {}

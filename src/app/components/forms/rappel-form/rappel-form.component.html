@@ -1,0 +1,220 @@
+<ion-content>
+    <mat-vertical-stepper [linear]="true" #stepper labelPosition="bottom">
+        <mat-step label="Evenement" [optional]="false" [stepControl]="eventForm">
+            <div style="padding-top: 3%;">
+                <form *ngIf="eventForm" [formGroup]="eventForm">
+                    <!-- <ng-template matStepLabel>Name</ng-template> -->
+                    <div class="example-form">
+
+                        <div class="example-full-width-field">
+
+                            <mat-card matRipple [class]="'card-profile' + ' ' " (click)="setOpen(true)">
+                                <mat-card-header>
+                                    <mat-card-title-group>
+                                        <mat-card-subtitle>Account</mat-card-subtitle>
+                                        <mat-card-title>{{selectedAccount ? selectedAccount.acountName: 'select accout'}}</mat-card-title>
+
+                                    </mat-card-title-group>
+                                </mat-card-header>
+                                <mat-card-content>
+                                    <div class="path">
+                                        {{selectedAccount ? selectedAccount.path: ''}}
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                            <input type="hidden" formControlName="accountId" [value]="rappel.accountId">
+                        </div>
+
+                        <div class="example-full-width-field">
+
+                            <mat-form-field class="example-full-width">
+                                <mat-label>Date</mat-label>
+                                <input matInput placeholder="Date" formControlName="time" readonly>
+
+                                <button id="open-leaf" mat-mini-fab matSuffix aria-label="Date" id="open-modal">
+                                    <mat-icon color="primary">calendar_month</mat-icon>
+                                </button>
+
+                            </mat-form-field>
+
+                        </div>
+                        <div class="example-full-width-field">
+                            <mat-form-field class="example-full-width">
+                                <mat-label>Description</mat-label>
+                                <input matInput placeholder="Description" formControlName="description">
+                                <mat-error>
+                                    Description is required!
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class=" example-full-width-field">
+                            <label>Is Periodique: </label>
+                            <mat-radio-group [formControl]="periodLabelControl">
+                                <mat-radio-button value="non">Non</mat-radio-button>
+                                <mat-radio-button value="oui">Yes</mat-radio-button>
+                            </mat-radio-group>
+
+                        </div>
+                        <div class="example-full-width-field" *ngIf="rappel.isPeriode">
+
+                            <ion-label>Periode</ion-label>
+                            <ion-select aria-label="Periode" [formControl]="periodControl"
+                                placeholder="Select a period">
+                                <ion-select-option value="1w">{{"Une semaine"}}</ion-select-option>
+                                <ion-select-option value="2w">{{"Deux semaine"}}</ion-select-option>
+                                <ion-select-option value="1m">{{"Un mois"}}</ion-select-option>
+                                <ion-select-option value="2m">{{"Deux mois"}}</ion-select-option>
+
+                            </ion-select>
+
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </mat-step>
+        <mat-step label="Notification" [optional]="false" [stepControl]="notificationForm">
+            <form *ngIf="notificationForm" [formGroup]="notificationForm">
+                <div class="example-form">
+                    <div class="example-full-width-field">
+
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Date</mat-label>
+                            <input matInput placeholder="Date" formControlName="notifyDate" readonly>
+
+                            <button id="open-leaf" mat-mini-fab matSuffix aria-label="Date" id="open-modal2">
+                                <mat-icon color="primary">calendar_month</mat-icon>
+                            </button>
+
+                        </mat-form-field>
+
+                    </div>
+
+                  
+
+                </div>
+            </form>
+        </mat-step>
+
+        <mat-step label="Resumé">
+            <div>
+                <form>
+                    <ion-list>
+
+                        <ion-item-group>
+                            <ion-item-divider>
+                                <ion-label> Evennement </ion-label>
+                            </ion-item-divider>
+                            <ion-item>
+                                <ion-label class="resume-label" for="accountIn" position="floating">Account:
+                                </ion-label>
+
+                                <ion-textarea id="accountIn" readonly [value]="selectedAccount?.path"
+                                    aria-label="Account:"></ion-textarea>
+                            </ion-item>
+
+                            <ion-item>
+                                <ion-label class="resume-label" for="date" position="floating">Date:
+                                </ion-label>
+
+                                <ion-textarea id="date" readonly [value]="rappel.eventDate | dateHissab"
+                                    aria-label="Date:"></ion-textarea>
+                            </ion-item>
+
+                            <ion-item>
+                                <ion-label class="resume-label" for="description" position="floating">Description:
+                                </ion-label>
+
+                                <ion-textarea id="description" readonly [value]="rappel.description "
+                                    aria-label="Description"></ion-textarea>
+                            </ion-item>
+
+                            <ion-item>
+                                <ion-label class="resume-label" for="isperiod" position="floating">is Period ?:
+                                </ion-label>
+
+                                <ion-textarea id="isperiod" [value]="rappel.isPeriode ? 'yes': 'no'"
+                                    aria-label="Is Periodic ?:"></ion-textarea>
+                            </ion-item>
+
+                            <ion-item *ngIf="rappel.isPeriode">
+                                <ion-label class="resume-label" for="period" position="floating"> Period:
+                                </ion-label>
+
+                                <ion-textarea for="period" [value]="rappel.periode"
+                                    aria-label="Period :"></ion-textarea>
+                            </ion-item>
+                        </ion-item-group>
+                        <ion-item-group>
+                            <ion-item-divider>
+                                <ion-label> Notification</ion-label>
+                            </ion-item-divider>
+                            <ion-item>
+                                <ion-label class="resume-label" for="notifyDate" position="floating">Date:
+                                </ion-label>
+
+                                <ion-textarea id="notifyDate" readonly [value]="rappel.notifyDate | dateHissab"
+                                    aria-label="Date"></ion-textarea>
+                            </ion-item>
+
+                        </ion-item-group>
+                    </ion-list>
+
+                </form>
+            </div>
+        </mat-step>
+
+    </mat-vertical-stepper>
+
+
+    <div class="ion-padding form-tool">
+        <button mat-raised-button (click)="back()" style="float: left;"
+            [disabled]="swiperRef?.selectedIndex === 0">BACK</button>
+        <button mat-raised-button color="primary" (click)="next()"
+            style="float: right;">{{ this.swiperRef?.selectedIndex === 2 ? 'SUBMIT' : 'NEXT'}}</button>
+    </div>
+
+    <ion-modal trigger="open-modal" #dataModal>
+        <ng-template>
+
+            <ion-content class="ion-padding">
+                <ion-datetime #datetime [showDefaultButtons]="true" (ionCancel)="dataModal.dismiss(null, 'cancel')"
+                    (ionChange)="onEventDateChange(datetime.value)"></ion-datetime>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
+
+
+    <ion-modal trigger="open-modal2" #dataModal2>
+        <ng-template>
+
+            <ion-content class="ion-padding">
+                <ion-datetime #datetime [showDefaultButtons]="true" (ionCancel)="dataModal2.dismiss(null, 'cancel')"
+                    (ionChange)="onNotifyDateChange(datetime.value)"></ion-datetime>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
+
+    <ion-modal [isOpen]="isModalOpenAccount">
+        <ng-template>
+            <ion-header>
+                <ion-toolbar>
+
+                    <ion-buttons slot="start">
+                        <ion-button (click)="setOpen(false)">Cancel</ion-button>
+                    </ion-buttons>
+
+                    <ion-title>Modal</ion-title>
+                    <ion-buttons slot="end">
+                        <ion-button (click)="setOpen(false)">Done</ion-button>
+                    </ion-buttons>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <search-account [accountData]="accountData" (onSearchInputText)="onTextAccountSearch($event);"
+                    (onAccountSelected)="updateSelectedAccount($event)"></search-account>
+            </ion-content>
+        </ng-template>
+    </ion-modal>
+</ion-content>

@@ -15,8 +15,8 @@ ion-card-subtitle {
 }
 
 /* iOS places the subtitle above the title */
-ion-card-header {
-}
+ion-card-header {}
+
 ion-card-content {
   padding-top: 15px;
   display: contents;
@@ -26,6 +26,7 @@ ion-item {
   --padding-start: 10px;
   --inner-padding-end: 7px;
 }
+
 .line-op-main {
   width: 100%;
 }
@@ -44,6 +45,7 @@ ion-item {
       float: left;
       font-style: italic;
     }
+
     .balance-text {
       text-align: right;
       text-decoration: double;
@@ -102,4 +104,13 @@ ion-card {
   background-color: #4a4a4f;
   margin: 8px 6px;
   box-shadow: none;
+}
+
+.group-header {
+  --background: none;
+  --color: #d1ebd4;
+}
+
+ion-item-group.groupe-operation {
+  
 }

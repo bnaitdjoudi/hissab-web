@@ -1,6 +1,15 @@
 ion-card {
-    background: #33804b;
-    color: azure;
+
+    &.negatif {
+        background: #803333;
+        color: azure;
+    }
+
+    &.positif {
+        background: #33804b;
+        color: azure;
+    }
+
 
     ion-card-title {
         --color: aliceblue;
@@ -50,4 +59,27 @@ ion-select::part(icon) {
 
 .period-label {
     font-size: 18px;
+}
+
+.dash-card {
+    mat-card-title-group {
+        width: 100%;
+        display: block;
+
+        mat-card-title {
+            width: 100%;
+            text-align: center;
+            padding: 5px 0 3px 0;
+            text-transform: capitalize;
+            font-weight: bold;
+            color: #fcfcfc;
+            ;
+
+        }
+    }
+
+    mat-card-content {
+        text-align: center;
+        font-size: 16pt !important;
+    }
 }

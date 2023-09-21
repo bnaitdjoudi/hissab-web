@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   HostListener,
   OnDestroy,
@@ -13,13 +14,14 @@ import { avoidOperationNumberConfusion } from 'src/app/tools/tools';
 import { OperationPageStore } from '../operation-page.store';
 import { Account } from 'src/app/model/account.model';
 import { Router } from '@angular/router';
+import { ProfileModel } from 'src/app/model/profil.model';
 
 @Component({
   selector: 'app-operation-page-new',
   templateUrl: './operation-page-new.page.html',
   styleUrls: ['./operation-page-new.page.scss'],
 })
-export class OperationPageNewPage implements OnInit, OnDestroy {
+export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
   currentOperation: Operation;
   subscription: Subscription;
   subscriptionLeaf: Subscription;
@@ -27,6 +29,7 @@ export class OperationPageNewPage implements OnInit, OnDestroy {
   leafs: LeafAccount[] = [];
   accountType: string = 'actifs';
   currentAccount: Account;
+  currentProfile: ProfileModel;
 
   @ViewChild(OperationFormComponent)
   operationFormComponent: OperationFormComponent;
@@ -35,14 +38,19 @@ export class OperationPageNewPage implements OnInit, OnDestroy {
     readonly operationStore: OperationPageStore,
     readonly router: Router
   ) {}
-  @HostListener('unloaded')
+  ngAfterViewInit(): void {
+    this.operationStore.getCurrentProfile().then((profile) => {
+      this.currentProfile = profile;
+    });
+  }
+
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.subscriptionLeaf?.unsubscribe();
     this.subscriptionAccount?.unsubscribe();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.subscription = this.operationStore.operation$.subscribe((op) => {
       if (op) {
         this.currentOperation = op;
@@ -54,7 +62,7 @@ export class OperationPageNewPage implements OnInit, OnDestroy {
         if (acc) {
           this.accountType = acc.type;
         }
-        console.log('accccccc::::' + acc.acountName);
+        console.log('OperationPageNewPage:::' + JSON.stringify(acc));
         this.currentAccount = acc;
       });
   }
@@ -79,7 +87,12 @@ export class OperationPageNewPage implements OnInit, OnDestroy {
     this.operationStore.onLoadLeafAccount(exeptId);
   }
 
+  onProfileListOpened() {
+    this.operationStore.loadAllProfiles();
+  }
+
   goToHome() {
+    this.operationFormComponent.reset();
     this.router.navigate(['/dashboard'], {});
   }
 }

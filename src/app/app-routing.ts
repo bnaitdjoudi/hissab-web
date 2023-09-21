@@ -1,15 +1,14 @@
-import { Routes } from '@angular/router';
+import { CanActivateFn, CanLoadFn, Routes } from '@angular/router';
 
-export const routes: Routes = [
+export const routes: (
+  canLoadGuard: CanLoadFn,
+  canActivateGuard: CanActivateFn
+) => Routes = (canLoadGuard: CanLoadFn, canActivateGuard: CanActivateFn) => [
   {
     path: '',
-    redirectTo: 'signup-page',
-    pathMatch: 'full',
-  },
-  {
-    path: 'main',
     loadChildren: () =>
       import('./pages/main/main.module').then((m) => m.MainPageModule),
+    canActivate: [canActivateGuard],
   },
   {
     path: 'signup-page',

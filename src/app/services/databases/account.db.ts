@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
+
 import { BehaviorSubject } from 'rxjs';
 import { Account } from '../../model/account.model';
 import { LeafAccount } from '../../model/leaf-account.model';
@@ -13,8 +13,12 @@ import { tables } from './tables';
 import { AccountResume } from '../../model/account.resume.model';
 import { queriesAccount } from './queries';
 import { format } from 'date-fns';
+import { number } from 'echarts';
+import { resolve } from 'cypress/types/bluebird';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AccountDataBase
   extends GenericDb
   implements GenericDataBase<Account, number>
@@ -322,7 +326,36 @@ export class AccountDataBase
     });
   }
 
-  async deleteById(ids: number[]): Promise<void> {}
+  async deleteById(ids: number[]): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.sqLiteObject) {
+        this.sqLiteObject
+          .executeSql(
+            `DELETE FROM ${tables.account.name} WHERE  ${
+              tables.account.columns[0].name
+            } IN (${ids.join(',')})`
+          )
+          .then((res: any) => {
+            console.log(
+              'operation ids :' +
+                ids.join(',') +
+                ' deleted!:::' +
+                JSON.stringify(res)
+            );
+            resolve();
+          })
+          .catch((err: any) => {
+            if (err.rows.length === 0 && err.rowsAffected >= 0) {
+              resolve();
+            } else {
+              printError("erreur dans l'excecusion de le requete", reject, err);
+            }
+          });
+      } else {
+        reject('no bd connexion');
+      }
+    });
+  }
 
   async ajusteDiffByPath(paths: string[], diff: number): Promise<any> {
     await this.checkDataBaseOpened();
@@ -372,7 +405,7 @@ export class AccountDataBase
     return new Promise<LeafAccount[]>((resolve, reject) => {
       this.sqLiteObject
         .executeSql(
-          `SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF FROM ACCOUNT  WHERE IS_LEAF = 1 AND TYPE NOT IN (${types
+          `SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF , TYPE, BALANCE FROM ACCOUNT  WHERE IS_LEAF = 1 AND TYPE NOT IN (${types
             .map((el) => `'${el}'`)
             .join(',')});`,
           []
@@ -388,6 +421,8 @@ export class AccountDataBase
                 ACCOUNT_NAME: any;
                 PATH: any;
                 IS_LEAF: number;
+                TYPE: string;
+                BALANCE: number;
               };
             };
           }) => {
@@ -399,6 +434,8 @@ export class AccountDataBase
                   acountName: data.rows.item(i).ACCOUNT_NAME,
                   path: data.rows.item(i).PATH,
                   isLeaf: data.rows.item(i).IS_LEAF > 0,
+                  type: data.rows.item(i).TYPE,
+                  balance: data.rows.item(i).BALANCE,
                 });
               }
             }
@@ -426,7 +463,7 @@ export class AccountDataBase
     return new Promise<LeafAccount[]>((resolve, reject) => {
       this.sqLiteObject
         .executeSql(
-          `SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF FROM ACCOUNT  WHERE IS_LEAF = 1 AND ID NOT IN (${ids
+          `SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF, TYPE, BALANCE FROM ACCOUNT  WHERE IS_LEAF = 1 AND ID NOT IN (${ids
             .map((el) => `'${el}'`)
             .join(',')});`,
           []
@@ -442,6 +479,8 @@ export class AccountDataBase
                 ACCOUNT_NAME: any;
                 PATH: any;
                 IS_LEAF: number;
+                TYPE: string;
+                BALANCE: number;
               };
             };
           }) => {
@@ -453,6 +492,8 @@ export class AccountDataBase
                   acountName: data.rows.item(i).ACCOUNT_NAME,
                   path: data.rows.item(i).PATH,
                   isLeaf: data.rows.item(i).IS_LEAF > 0,
+                  type: data.rows.item(i).TYPE,
+                  balance: data.rows.item(i).BALANCE,
                 });
               }
             }
@@ -562,7 +603,11 @@ export class AccountDataBase
     });
   }
 
-  findAccountByTextSerach(text: string, withoutOp: boolean) {
+  async findAccountByTextSerach(
+    text: string,
+    withoutOp: boolean
+  ): Promise<Account[]> {
+    await this.checkDataBaseOpened();
     return new Promise<Account[]>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
@@ -626,6 +671,40 @@ export class AccountDataBase
             .catch((err: any) => reject(err));
         })
         .catch((err: any) => reject(err));
+    });
+  }
+
+  async updateBalanceById(balance: number, accountId: number): Promise<void> {
+    await this.checkDataBaseOpened();
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.sqLiteObject.executeSql(
+          `UPDATE  ${tables.account.name} SET 
+          ${tables.account.columns[2].name} = ? WHERE ${tables.account.columns[0].name} = ?`,
+          [balance, accountId]
+        );
+        resolve();
+      } catch (error) {
+        reject('erreur dans la bd');
+        console.error(error);
+      }
+    });
+  }
+
+  async resetAllBalanceTo(balance: number): Promise<void> {
+    await this.checkDataBaseOpened();
+
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.sqLiteObject.executeSql(
+          `UPDATE ${tables.account.name}  SET ${tables.account.columns[2].name} = ?`,
+          [balance]
+        );
+        resolve();
+      } catch (error) {
+        reject('erreur dans la bd');
+        console.error(error);
+      }
     });
   }
 

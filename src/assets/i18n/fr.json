@@ -37,5 +37,8 @@
         "global": "global"
       }
     }
+  },
+  "operations": {
+    "s": "En attente"
   }
 }

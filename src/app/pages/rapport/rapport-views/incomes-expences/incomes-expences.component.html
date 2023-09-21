@@ -1,0 +1,46 @@
+<ion-content class="ion-padding" scrollY="false">
+
+
+    <mat-tab-group (selectedTabChange)="selectedTabChange($event)" class="header-mat-tab">
+        <mat-tab label="Global"> <inex-rapport
+                [incomesExpenceRapport]="rapportStore.incomesExpenceRapport$ | async"></inex-rapport> </mat-tab>
+        <mat-tab label="Incomes"> <incomes-pie-chart
+                [incomesRapport]="rapportStore.incomesAccountsDetailsRapport$ | async"></incomes-pie-chart>
+        </mat-tab>
+
+        <mat-tab label="Expenses">
+            <div>
+                <expences-chart
+                    [expencesRapport]="rapportStore.expenseAccountsDetailsRapport$ | async"></expences-chart>
+
+            </div>
+
+        </mat-tab>
+
+    </mat-tab-group>
+
+
+
+    <ion-list>
+        <ion-item>
+            <ion-select label="Periodes" placeholder="Mois de l'année" (ionChange)="valueChange($event)" multiple="true"
+                [value]="periodSelections">
+                <ion-select-option value="jan">January</ion-select-option>
+                <ion-select-option value="feb">February</ion-select-option>
+                <ion-select-option value="mar">March</ion-select-option>
+                <ion-select-option value="apr">April</ion-select-option>
+                <ion-select-option value="mai">Mai</ion-select-option>
+                <ion-select-option value="jun">June</ion-select-option>
+                <ion-select-option value="jul">July</ion-select-option>
+                <ion-select-option value="aug">August</ion-select-option>
+                <ion-select-option value="sep">Septembre</ion-select-option>
+                <ion-select-option value="oct">October</ion-select-option>
+                <ion-select-option value="nov">November</ion-select-option>
+                <ion-select-option value="dec">Decembre</ion-select-option>
+            </ion-select>
+        </ion-item>
+    </ion-list>
+
+
+
+</ion-content>

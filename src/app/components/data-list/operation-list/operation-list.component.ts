@@ -1,7 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+import { Observable, Subscription, map } from 'rxjs';
 import { Account } from 'src/app/model/account.model';
-import { LeafAccount } from 'src/app/model/leaf-account.model';
+
 import { Operation } from 'src/app/model/operation.model';
 
 @Component({
@@ -10,7 +13,7 @@ import { Operation } from 'src/app/model/operation.model';
   styleUrls: ['./operation-list.component.scss', './../data-list-header.scss'],
 })
 export class OperationListComponent implements OnInit {
-  @Input() operations: Operation[] = [];
+  @Input() operations: Observable<Operation[]>;
   @Input() isMoreData: boolean = true;
   @Input() currBalFun: (debit: number, credit: number) => any[];
 
@@ -20,9 +23,33 @@ export class OperationListComponent implements OnInit {
   @Input() account: Account;
   @Input() periodLabel: string;
 
+  operationsData: Operation[] = [];
+  operationGroup: Map<string, Operation[]> = new Map<string, Operation[]>();
+  groupeKeys: string[] = [];
+  operationsObservable: Observable<Operation[]>;
+  suscribtion: Subscription;
+
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.suscribtion = this.operations.subscribe((val) => {
+      this.operationsData = val;
+      val.forEach((el) => {
+        let currentGroupe: Operation[] | undefined = this.operationGroup.get(
+          formatInTimeZone(el.time, 'America/New_York', 'dd MMM yyyy')
+        );
+        let pureGroupe: Operation[] = currentGroupe ? currentGroupe : [];
+        if (!pureGroupe.some((op) => op.id === el.id)) {
+          this.operationGroup.set(
+            formatInTimeZone(el.time, 'America/New_York', 'dd MMM yyyy'),
+            [...pureGroupe, el]
+          );
+        }
+      });
+
+      this.groupeKeys = Array.from(this.operationGroup.keys());
+    });
+  }
 
   onIonInfinite(ev: Event) {
     this.onIonInfiniteScroll.emit(ev as InfiniteScrollCustomEvent);

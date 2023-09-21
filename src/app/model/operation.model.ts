@@ -13,4 +13,5 @@ export interface Operation {
   accountType?: string;
   random?: string;
   accountName?: string;
+  profile?: string;
 }

@@ -1,0 +1,23 @@
+.rappel-card {
+    width: 100%;
+
+
+    mat-card-title,
+    mat-card-content {
+        color: azure;
+    }
+
+    mat-card-title {
+        font-weight: bold;
+    }
+
+    .rappel-actions {
+        width: 100%;
+
+        ion-toggle {
+            float: right;
+
+        }
+
+    }
+}

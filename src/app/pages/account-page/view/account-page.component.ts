@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { skip, Subscription } from 'rxjs';
+import { Observable, Subscription, map } from 'rxjs';
 import { Account } from '../../../model/account.model';
 import { AccountPageStore } from './../account-page.store';
 import { Operation } from '../../../model/operation.model';
@@ -46,13 +46,15 @@ export class AccountPageViewComponent implements OnInit {
     resume: { debit: 0, credit: 0, sons: 0 },
   };
 
-  operations: PagingData<Operation> = {
+  operations: Observable<PagingData<Operation>>;
+
+  accountsData: PagingData<Account> = {
     data: [],
     currentPage: 1,
     totalPage: 1,
   };
 
-  accountsData: PagingData<Account> = {
+  operationData: PagingData<Operation> = {
     data: [],
     currentPage: 1,
     totalPage: 1,
@@ -70,7 +72,11 @@ export class AccountPageViewComponent implements OnInit {
     private alertPeriodController: AlertController,
     private translateService: TranslateService,
     private router: Router
-  ) {}
+  ) {
+    this.operations = this.accountStore.listDataCombined$.pipe(
+      map((val) => val[1])
+    );
+  }
 
   ngOnDestroy(): void {
     this.accountSuscription.unsubscribe();
@@ -85,8 +91,9 @@ export class AccountPageViewComponent implements OnInit {
 
     this.dataListSubscription = this.accountStore.listDataCombined$.subscribe(
       (data) => {
-        console.log('account and operaton list updated');
-        [this.accountsData, this.operations] = data;
+        console.log('account and operaton list updated:::::');
+
+        [this.accountsData, this.operationData] = data;
       }
     );
 
@@ -97,7 +104,7 @@ export class AccountPageViewComponent implements OnInit {
         }
       }
     );
-    this.accountStore.reloadAccount(undefined);
+
     console.log('account local period:' + this.accountStore.getCurrentPeriod());
   }
 
@@ -153,7 +160,7 @@ export class AccountPageViewComponent implements OnInit {
   }
 
   modalAccount() {
-    this.isAccountModalOpen = !this.isAccountModalOpen;
+    this.router.navigate(['/account/new/'], {});
   }
 
   confirmAccount() {

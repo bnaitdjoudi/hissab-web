@@ -29,6 +29,7 @@ export const tables = {
       { name: 'BALANCE', type: 'REAL' },
       { name: 'ID_ACCOUNT', type: 'INTEGER' },
       { name: 'TRANSFER', type: 'TEXT' },
+      { name: 'PROFILE', type: 'VARCHAR(35)' },
     ],
   },
   flags: {
@@ -56,6 +57,40 @@ export const tables = {
       { name: 'mail', type: 'VARCHAR(35)' },
       { name: 'password', type: 'VARCHAR(56)' },
       { name: 'DATE', type: 'VARCHAR(21)' },
+    ],
+  },
+
+  patchquery: {
+    name: 'PATCH_SQL',
+    columns: [
+      { name: 'CODE', type: 'VARCHAR(35) PRIMARY KEY' },
+      { name: 'QUERY', type: 'TEXT' },
+    ],
+  },
+
+  rappel: {
+    name: 'RAPPEL',
+    columns: [
+      { name: 'ID', type: 'INTEGER PRIMARY KEY AUTOINCREMENT' },
+      { name: 'ACCOUNT_ID ', type: 'INTEGER' }, // ACCOUNT CIBLE
+      { name: 'EVENT_DATE', type: 'VARCHAR(21)' }, // ACCOUNT (A), OPERATION (O), EVENT_PLANE(E)
+      { name: 'NOTIFY_DATE', type: 'VARCHAR(21)' }, // IF EVENT_PLANE SET DATE
+      { name: 'IS_PERIODE', type: 'INTEGER(1)' }, // LESS OR EQUAL TO number
+      { name: 'PERIODE', type: 'VARCHAR(2)' }, // ENTITY ID (Operation or Account id)
+      { name: 'DESCRIPTION', type: 'TEXT' }, // description
+      { name: 'IS_ACTIVE', type: 'INTEGER(1)' }, // description
+    ],
+  },
+
+  notification: {
+    name: 'NOTIFICATION',
+    columns: [
+      { name: 'ID', type: 'INTEGER PRIMARY KEY AUTOINCREMENT' },
+      { name: 'ACCOUNT_ID ', type: 'INTEGER' }, // ACCOUNT CIBLE
+      { name: 'RAPPEL_ID ', type: 'INTEGER' }, // ACCOUNT CIBLE
+      { name: 'NOTIFY_DATE_BEGIN', type: 'VARCHAR(21)' }, // ACCOUNT (A), OPERATION (O), EVENT_PLANE(E)
+      { name: 'IS_OPEN', type: 'INTEGER(1)' }, // description
+      { name: 'EVENT_DATE', type: 'VARCHAR(21)' }, // ACCOUNT (A), OPERATION (O), EVENT_PLANE(E)
     ],
   },
 };
@@ -157,3 +192,18 @@ export const CREATE_PROFILES_TABLE = `CREATE TABLE  IF NOT EXISTS ${
 export const CREATE_AUTH_TABLE = `CREATE TABLE  IF NOT EXISTS ${
   tables.authentication.name
 } (${tables.authentication.columns.map((el) => el.name + ' ' + el.type)});`;
+
+export const CREATE_PATCH_TABLE = `CREATE TABLE  IF NOT EXISTS ${
+  tables.patchquery.name
+} (${tables.patchquery.columns.map((el) => el.name + ' ' + el.type)});`;
+
+// RAPPEL
+export const CREATE_RAPPEL_TABLE = `CREATE TABLE  IF NOT EXISTS ${
+  tables.rappel.name
+} (${tables.rappel.columns.map((el) => el.name + ' ' + el.type)});`;
+
+//ALTER TABLE OPERATION  ADD PROFILE  VARCHAR(35);
+//update OPERATION set PROFILE = 'bnaitdjoudi@gmail.com';
+
+//CREATE TABLE  IF NOT EXISTS NOTIFICATION_PLAN (ID INTEGER PRIMARY KEY AUTOINCREMENT, LEVEL VARCHER(1), TYPE VARCHER(1), PLANE_DATE  VARCHAR(21), GOE REAL, LOE REAL, ENTITY_ID INTEGER, DESCRIPTION TEXT, IS_ACTIVE INTEGER(1), PROFILE VARCHAR(35) );
+//CREATE TABLE  IF NOT EXISTS NOTIFICATION (ID INTEGER PRIMARY KEY AUTOINCREMENT, LEVEL VARCHAR(1), TYPE VARCHAR(1), ENTITY_ID INTEGER, DESCRIPTION TEXT, ID_PLANE INTEGER, PROFILE VARCHAR(35));

@@ -32,3 +32,20 @@ export const avoidOperationNumberConfusion = (
 export const xor = (a: boolean, b: boolean) => {
   return (a && !b) || (!a && b);
 };
+
+export const showCreditField = (from: string, to: string): boolean => {
+  return (
+    ((from === 'actif' || from === 'passif') &&
+      (to === 'actif' || to === 'depense' || to === 'passif')) ||
+    from === 'depense'
+  );
+};
+
+export const showDebitField = (from: string, to: string): boolean => {
+  return (
+    (from === 'actif' &&
+      (to === 'actif' || to === 'passif' || to === 'income')) ||
+    (from === 'passif' && (to === 'actif' || to === 'income')) ||
+    from === 'income'
+  );
+};

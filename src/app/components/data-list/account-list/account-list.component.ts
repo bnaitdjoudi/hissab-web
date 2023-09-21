@@ -26,7 +26,11 @@ export class AccountListComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(
+      'init ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg'
+    );
+  }
 
   onIonInfinite(ev: Event) {
     console.log('infinitie');

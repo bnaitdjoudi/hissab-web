@@ -11,7 +11,13 @@ import {
   MatNativeDateModule,
 } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatRippleModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 @NgModule({
   declarations: [],
   imports: [CommonModule],
@@ -23,6 +29,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatNativeDateModule,
     MatDatepickerModule,
     MatRadioModule,
+    MatTabsModule,
+    MatListModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatRippleModule,
+    MatListModule,
+    MatSelectModule,
+    MatSlideToggleModule,
   ],
   providers: [
     {

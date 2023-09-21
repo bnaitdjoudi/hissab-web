@@ -45,12 +45,11 @@ export class RouteParamsStore extends Store<RouteParams> {
 
         if (this.router.url === '/dashboard') {
           this.mainStore.synchronusData();
+          this.setIdCount(0);
         }
         if (this.router.url.includes('account/')) {
           this.setIdCount(event.params['id']);
         } else {
-          this.setIdCount(0);
-          this.mainStore._currentAccountId.next(0);
         }
 
         if (this.router.url.includes('operation/')) {
@@ -59,8 +58,6 @@ export class RouteParamsStore extends Store<RouteParams> {
           } else {
             this.setIdOperation(event.params['id']);
           }
-
-          this.setIdCount(0);
         } else {
           this.setIdOperation(0);
         }
@@ -68,8 +65,8 @@ export class RouteParamsStore extends Store<RouteParams> {
 
     this.mainStore.flags$.subscribe((mapFlags) => {
       console.log('ROOOOOOOOOOOOOOOOOO' + JSON.stringify(mapFlags));
-      if (mapFlags.size > 0 && !mapFlags.has('PROFIL_SIGNEDUP')) {
-        this.router.navigate(['sginns']);
+      if (mapFlags.size > 0 && !mapFlags.has('PROFIL_SIGNED_UP')) {
+        this.router.navigate(['sgins']);
       }
     });
   }
@@ -82,6 +79,7 @@ export class RouteParamsStore extends Store<RouteParams> {
   }
 
   setIdOperation(idOp: number) {
+    console.log('setIdOperation idOp == ' + idOp);
     this.setState({
       ...this.state,
       operationParams: { id: idOp },

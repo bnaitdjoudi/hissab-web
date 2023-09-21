@@ -15,7 +15,8 @@
   </ion-header>
   <operation-form #operationForm [leafsAccount]="this.operationStore.accountStore.leafAccounts$"
     [accountType]="accountType" [operation]="currentOperation" [currentAccount]="currentAccount"
-    (onLoadLeafAccount)="onLoadLeafAccount($event)" (onSubmit)="submit()"></operation-form>
+    [currentProfile]="currentProfile" (onLoadLeafAccount)="onLoadLeafAccount($event)" (onSubmit)="submit()"
+    (onProfileListOpened)="onProfileListOpened()"  [profiles]="this.operationStore.profileListSubject_.asObservable()"></operation-form>
 </ion-content>
 <ion-footer>
   <ion-toolbar>

@@ -1,0 +1,26 @@
+.not-card {
+    width: 100%;
+
+
+    mat-card-title,
+    mat-card-content {
+        color: azure;
+    }
+
+    mat-card-title {
+        font-weight: bold;
+    }
+
+    .not-actions {
+        display: block;
+
+        .slide {
+            float: right;
+        }
+
+    }
+}
+
+ion-item {
+    padding: 5px 0px 3px 0px;
+}

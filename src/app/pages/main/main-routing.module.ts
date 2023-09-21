@@ -29,6 +29,41 @@ const routes: Routes = [
         (m) => m.DashboardPageModule
       ),
   },
+  {
+    path: 'support',
+    loadChildren: () =>
+      import('./../support/support-page.module').then(
+        (m) => m.SupportPageModule
+      ),
+  },
+
+  {
+    path: 'profile',
+    loadChildren: () =>
+      import('./../profile-page/profile.module').then(
+        (m) => m.ProfilePageModule
+      ),
+  },
+
+  {
+    path: 'rapport',
+    loadChildren: () =>
+      import('./../rapport/rapport.module').then((m) => m.RapportPageModule),
+  },
+
+  {
+    path: 'rappel',
+    loadChildren: () =>
+      import('./../rappel/rappel.module').then((m) => m.RappelPageModule),
+  },
+
+  {
+    path: 'notification',
+    loadChildren: () =>
+      import('./../notification/notification.module').then(
+        (m) => m.NotificationPageModule
+      ),
+  },
 ];
 
 @NgModule({

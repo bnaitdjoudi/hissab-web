@@ -7,11 +7,12 @@ import { IonicModule } from '@ionic/angular';
 import { DashboardPage } from './dashboard.page';
 import { NgxTranslateModule } from 'src/app/translate/translate.module';
 import { ComponentsModule } from '../../components/components.module';
-import { StoreModule } from 'src/app/store/store.module';
+
 import { PipeModule } from 'src/app/pipes/pipes.moule';
 import { MaterialModule } from 'src/app/material.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterModule, Routes } from '@angular/router';
+import { ServicesModule } from 'src/app/services/services.module';
 
 const routes: Routes = [
   {
@@ -34,6 +35,7 @@ const routes: Routes = [
     MaterialModule,
     FontAwesomeModule,
     RouterModule.forChild(routes),
+    ServicesModule,
   ],
 })
 export class DashboardPageModule {}

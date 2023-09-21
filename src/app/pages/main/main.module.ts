@@ -14,7 +14,7 @@ import { NgxTranslateModule } from '../../translate/translate.module';
 import { PipeModule } from '../../pipes/pipes.moule';
 import { MaterialModule } from '../../material.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { MainMenuComponent } from 'src/app/components/shared/main-menu/main-menu.component';
+import { ServicesModule } from 'src/app/services/services.module';
 
 @NgModule({
   imports: [
@@ -29,6 +29,7 @@ import { MainMenuComponent } from 'src/app/components/shared/main-menu/main-menu
     PipeModule,
     MaterialModule,
     FontAwesomeModule,
+    ServicesModule,
   ],
   declarations: [MainPage],
 })

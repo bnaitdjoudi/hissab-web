@@ -1,0 +1,23 @@
+<div>
+    <div class="bar">
+        <mat-button-toggle-group #group="matButtonToggleGroup" [value]="charttype" (change)="onCharttypeChange($event)">
+            <mat-button-toggle value="pie" aria-label="Text align left">
+                <mat-icon>pie_chart</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="bar" aria-label="Text align center">
+                <mat-icon>bar_chart</mat-icon>
+            </mat-button-toggle>
+
+        </mat-button-toggle-group>
+    </div>
+    <div echarts [options]="options" class="demo-chart" id="charts-pie"></div>
+    <div>
+
+        <ion-list>
+            <ion-item *ngFor="let item of dataComul">
+                <ion-label>{{item.name}}</ion-label>
+                <ion-badge slot="end">{{item.value}}</ion-badge>
+            </ion-item>
+        </ion-list>
+    </div>
+</div>

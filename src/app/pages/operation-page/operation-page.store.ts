@@ -10,9 +10,12 @@ import {
   OperationPageStoreModel,
   OperationSearchData,
 } from '../../model/operation-page.store.model';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Account } from '../../model/account.model';
 import { PagingData } from 'src/app/model/paging-data';
+import { MainStore } from 'src/app/store/main.store';
+import { ProfileService } from 'src/app/services/profile.service';
+import { ProfileModel } from 'src/app/model/profil.model';
 
 let initialStore: OperationPageStoreModel = {};
 
@@ -36,18 +39,24 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
       (state) => state.operationSearchResult
     );
 
+  profileListSubject_: BehaviorSubject<ProfileModel[]> = new BehaviorSubject<
+    ProfileModel[]
+  >([]);
   constructor(
     private readonly operationService: OperationService,
     private readonly routeParamsStore: RouteParamsStore,
-    readonly accountStore: AccountPageStore
+    readonly accountStore: AccountPageStore,
+    readonly mainStore: MainStore,
+    readonly profileService: ProfileService
   ) {
     super(initialStore);
 
     this.routeParamsStore.idOperation$.subscribe(async (id) => {
       if (id > 0) {
+        console.log('suscribtion idOp:' + id);
         this.operationService
           .getOperationJoinAccountById(id)
-          .then(async (operation) => {
+          .then((operation) => {
             this.setOperation(operation);
           })
           .catch((e) => console.error(e));
@@ -64,7 +73,6 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
           idAccount: 0,
           transfer: '',
         });
-        this.accountStore.reloadAccount(0);
       }
     });
 
@@ -151,6 +159,7 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
   async createNewOperation(operation: Operation): Promise<number> {
     return new Promise<number>((resolve, reject) => {
       operation.numTrans = random.randomAlphanumeric(16, 'uppercase');
+      operation.profile = this.mainStore.state.currentProfile?.mail;
       this.operationService
         .businessCreationOperationDate(operation)
         .then((operation) => {
@@ -186,6 +195,30 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
           console.error(err);
           reject('error dans le service');
         });
+    });
+  }
+
+  async getCurrentProfile(): Promise<ProfileModel> {
+    return new Promise<ProfileModel>((resolve, reject) => {
+      try {
+        if (this.mainStore.state.currentProfile?.mail) {
+          this.profileService
+            .findProfileByMail(this.mainStore.state.currentProfile.mail)
+            .then((profile) => resolve(profile));
+        }
+      } catch (error) {
+        reject(
+          'error on getting profile:' +
+            this.mainStore.state.currentProfile?.mail
+        );
+        console.error(error);
+      }
+    });
+  }
+
+  loadAllProfiles() {
+    this.profileService.findAllProfiles().then((profiles) => {
+      this.profileListSubject_.next(profiles);
     });
   }
 }
