@@ -1,7 +1,7 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
   <ion-fab vertical="bottom" horizontal="end" translucent="true" *ngIf="fatButton">
-    <ion-badge color="danger" style="right: -5px; z-index: 3; position: absolute;">15</ion-badge>
+    <ion-badge color="danger" style="right: -5px; z-index: 3; position: absolute;">{{notifCount}}</ion-badge>
     <ion-fab-button id="cart-btn" color="primary" (click)="goToNotification()">
       <ion-icon name="notifications-outline" class="icon-button inner-center-btn"></ion-icon>
     </ion-fab-button>

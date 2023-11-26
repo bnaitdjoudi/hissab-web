@@ -14,4 +14,5 @@ export interface Operation {
   random?: string;
   accountName?: string;
   profile?: string;
+  attachment?: string;
 }

@@ -140,12 +140,7 @@ export class NotificationDataBase
     await this.checkDataBaseOpened();
     return new Promise<PagingData<Notify>>(async (resolve, reject) => {
       try {
-        let dateCount = await this.sqLiteObject.executeSql(
-          `SELECT COUNT (*) AS VAL FROM  ${tables.notification.name}`,
-          []
-        );
-
-        let totalElements: number = dateCount.rows.item(0).VAL;
+        let totalElements: number = await this.getActiveAcount();
         let offset: number = (request.page - 1) * request.limit;
         let totalPage: number = Math.ceil(totalElements / request.limit);
 
@@ -162,6 +157,24 @@ export class NotificationDataBase
         });
       } catch (error) {
         reject('erreur dans la requete');
+        console.error(error);
+      }
+    });
+  }
+
+  async getActiveAcount(): Promise<number> {
+    await this.checkDataBaseOpened();
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        let dateCount = await this.sqLiteObject.executeSql(
+          `SELECT COUNT (*) AS VAL FROM  ${tables.notification.name}  WHERE ${tables.notification.columns[3].name} <= ?`,
+          [format(new Date(), 'yyyy-MM-dd HH:mm:ss')]
+        );
+        let totalElements: number = dateCount.rows.item(0).VAL;
+
+        resolve(totalElements);
+      } catch (error) {
+        reject('erreur durant lappel de la bd');
         console.error(error);
       }
     });

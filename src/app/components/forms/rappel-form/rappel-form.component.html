@@ -31,7 +31,8 @@
                                 <mat-label>Date</mat-label>
                                 <input matInput placeholder="Date" formControlName="time" readonly>
 
-                                <button id="open-leaf" mat-mini-fab matSuffix aria-label="Date" id="open-modal">
+                                <button id="open-leaf" [value]="eventDateString" mat-mini-fab matSuffix
+                                    aria-label="Date" id="open-modal" (click)="initEventDate()">
                                     <mat-icon color="primary">calendar_month</mat-icon>
                                 </button>
 
@@ -83,7 +84,8 @@
                             <mat-label>Date</mat-label>
                             <input matInput placeholder="Date" formControlName="notifyDate" readonly>
 
-                            <button id="open-leaf" mat-mini-fab matSuffix aria-label="Date" id="open-modal2">
+                            <button id="open-leaf" mat-mini-fab matSuffix aria-label="Date" id="open-modal2"
+                                (click)="initNotificationDate()">
                                 <mat-icon color="primary">calendar_month</mat-icon>
                             </button>
 
@@ -91,7 +93,7 @@
 
                     </div>
 
-                  
+
 
                 </div>
             </form>
@@ -179,7 +181,8 @@
         <ng-template>
 
             <ion-content class="ion-padding">
-                <ion-datetime #datetime [showDefaultButtons]="true" (ionCancel)="dataModal.dismiss(null, 'cancel')"
+                <ion-datetime #datetime [value]="eventDateString" [showDefaultButtons]="true" [min]="minDate"
+                    (ionCancel)="dataModal.dismiss(null, 'cancel')"
                     (ionChange)="onEventDateChange(datetime.value)"></ion-datetime>
             </ion-content>
         </ng-template>
@@ -190,8 +193,9 @@
         <ng-template>
 
             <ion-content class="ion-padding">
-                <ion-datetime #datetime [showDefaultButtons]="true" (ionCancel)="dataModal2.dismiss(null, 'cancel')"
-                    (ionChange)="onNotifyDateChange(datetime.value)"></ion-datetime>
+                <ion-datetime #datetime2 [showDefaultButtons]="true" [value]="notifDateString" [max]="eventDateString"
+                    [min]="minDate" (ionCancel)="dataModal2.dismiss(null, 'cancel')"
+                    (ionChange)="onNotifyDateChange(datetime2.value)"></ion-datetime>
             </ion-content>
         </ng-template>
     </ion-modal>

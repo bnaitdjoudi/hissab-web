@@ -19,7 +19,7 @@
 
     <ion-item (click)="goToAccountParent()">
       <ion-label for="time" position="stacked">Account:</ion-label>
-      <ion-text >{{account.acountName }}</ion-text>
+      <ion-text>{{account.acountName }}</ion-text>
       <ion-icon name="open-outline" slot="end"></ion-icon>
     </ion-item>
 
@@ -35,6 +35,13 @@
     <ion-item>
       <ion-label for="description" position="stacked">{{ 'forms.operation.description' | translate }}:</ion-label>
       <ion-text id="description">{{op.description}}</ion-text>
+    </ion-item>
+
+    <ion-item (click)="openFile()">
+      <ion-label for="attachment" position="stacked">{{ 'forms.operation.attachment' | translate }}:</ion-label>
+      <ion-text id="attachment">{{op.attachment}}</ion-text>
+
+      <ion-icon name="document-attach-outline" slot="end"></ion-icon>
     </ion-item>
 
     <ion-item>

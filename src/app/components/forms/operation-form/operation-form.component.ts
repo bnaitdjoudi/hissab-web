@@ -31,6 +31,8 @@ import { LeafAccount } from 'src/app/model/leaf-account.model';
 import { Account } from 'src/app/model/account.model';
 import { MatStepper } from '@angular/material/stepper';
 import { ProfileModel } from 'src/app/model/profil.model';
+import { PickedFile } from '@capawesome/capacitor-file-picker';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 
 @Component({
   selector: 'operation-form',
@@ -39,11 +41,13 @@ import { ProfileModel } from 'src/app/model/profil.model';
   providers: [CurrencyPipe],
 })
 export class OperationFormComponent implements OnInit, OnDestroy {
+  fileAttachement: any;
   profileSelectionChanged($event: ProfileModel) {
     this.currentProfile = $event;
   }
 
   isModalProfileOpen = false;
+  isModalAttachmentOpen = false;
 
   @Input() accountType: string = 'actif';
   @Input() currentProfile: ProfileModel;
@@ -224,6 +228,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
           this.currentOperation.description,
           { validators: [Validators.required], updateOn: 'blur' },
         ],
+        attachment: [this.currentOperation.attachment],
         statut: [
           this.currentOperation.statut,
           { validators: [Validators.required], updateOn: 'blur' },
@@ -495,6 +500,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
 
       case 2: {
         this.onSubmit.emit();
+
         break;
       }
     }
@@ -582,5 +588,26 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   openModeprofile() {
     this.onProfileListOpened.emit();
     this.isModalProfileOpen = true;
+  }
+
+  async onAttachementDone(attachement: PickedFile) {
+    this.fileAttachement = attachement;
+    const regex: any = /(?:\.([^.]+))?$/;
+    const ext: string | null = regex.exec(attachement.name)[1];
+    const fileName = Math.random().toString(36).slice(2) + '.' + ext;
+    this.currentOperation.attachment = fileName;
+    this.operationForm.get('attachment')?.setValue(fileName);
+    this.isModalAttachmentOpen = false;
+  }
+
+  async validateAttachment() {
+    if (this.currentOperation.attachment) {
+      await Filesystem.writeFile({
+        path: this.currentOperation.attachment,
+        data: this.fileAttachement.data ? this.fileAttachement.data : '',
+        directory: Directory.Data,
+        encoding: Encoding.UTF8,
+      });
+    }
   }
 }

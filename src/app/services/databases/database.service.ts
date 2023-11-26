@@ -7,8 +7,10 @@ import {
   CREATE_ACCOUNT_TABLE,
   CREATE_AUTH_TABLE,
   CREATE_FLAGS,
+  CREATE_NOTIFICATION_TABLE,
   CREATE_PATCH_TABLE,
   CREATE_PROFILES_TABLE,
+  CREATE_RAPPEL_TABLE,
   CREATE_TRANSACTION_TABLE,
   CREATE_TRANSACTION_VIEW,
   INITIAL_ACCOUNT_DATA,
@@ -72,11 +74,22 @@ export class DataBaseService {
         await this.initAuthTable();
         await this.initPatchData();
         await this.initInitFlag();
+        await this.initInitRappel();
+        await this.initInitNotification();
       }
       this.initService.initialisationSubject.next(true);
     });
   }
-
+  async initInitNotification() {
+    console.info('CREATE NOTIFICATION TABLE');
+    await this.sqLiteObject.executeSql(CREATE_NOTIFICATION_TABLE, []);
+    console.info('NOTIFICATION CREATED');
+  }
+  async initInitRappel() {
+    console.info('CREATE RAPPEL TABLE');
+    await this.sqLiteObject.executeSql(CREATE_RAPPEL_TABLE, []);
+    console.info('RAPPEL CREATED');
+  }
 
   async initPatchData() {
     console.info('CREATE PATCH TABLE');

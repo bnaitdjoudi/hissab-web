@@ -12,6 +12,7 @@ import { getNextPeriodDate } from '../tools/date.tools';
 import { NotificationDataBase } from './databases/notification.db';
 import { PagingData } from '../model/paging-data';
 import { PagingRequest } from '../model/paging-request.model';
+import { resolve } from 'cypress/types/bluebird';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -154,11 +155,22 @@ export class NotificationService {
       }
     });
   }
+  async getActiveCount(): Promise<number> {
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        const count = await this.notificationDb.getActiveAcount();
+        resolve(count);
+      } catch (error) {
+        reject('erreur durant lappel au service');
+        console.error(error);
+      }
+    });
+  }
 
   private calculateScheduleOn(notifyDate: Date): ScheduleOn {
     return {
       minute: 0,
-     
+
       month: notifyDate.getMonth(),
       year: notifyDate.getFullYear(),
     };

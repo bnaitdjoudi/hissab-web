@@ -26,6 +26,7 @@ import { TransferAccountsComponent } from './forms/transfer-accounts/transfer-ac
 import { SearchAccountComponent } from './search/search-account/search-account.component';
 import { ProfileListTypeheadComponent } from './data-list/profile-list-typehead/profile-list-typehead.component';
 import { RappelFormComponent } from './forms/rappel-form/rappel-form.component';
+import { AttachmentComponent } from './attachment/attachment.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 
@@ -73,6 +74,8 @@ registerLocaleData(localeFr, 'fr-FR');
     SearchAccountComponent,
     ProfileListTypeheadComponent,
     RappelFormComponent,
+    AttachmentComponent
+
   ],
   providers: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

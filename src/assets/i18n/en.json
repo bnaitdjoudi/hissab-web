@@ -34,6 +34,7 @@
       "cancel": "cancel",
       "transferTo": "Transfer to",
       "description": "description",
+      "attachment": "attachment",
       "numTrans": "transaction number",
 
       "actif": {
@@ -76,10 +77,9 @@
         "global": "global"
       }
     }
-  }
+  },
 
-,
-"operations": {
-  "s":"waiting"
-}
+  "operations": {
+    "s": "waiting"
+  }
 }

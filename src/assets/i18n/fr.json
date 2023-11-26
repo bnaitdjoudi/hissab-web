@@ -15,6 +15,7 @@
     "operation": {
       "title": "Ajouter operation",
       "cancel": "Annuler",
+      "attachment": "attachment",
       "actifs": {
         "debit": "Dépos",
         "credit": "Retrait"

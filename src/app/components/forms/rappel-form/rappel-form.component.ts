@@ -29,6 +29,9 @@ export class RappelFormComponent implements OnInit {
   eventForm: FormGroup;
   notificationForm: FormGroup;
   isModalOpenAccount: boolean = false;
+  eventDateString: string = format(new Date(), "yyyy-MM-dd'T'HH:mm:ss");
+  notifDateString: string = format(new Date(), "yyyy-MM-dd'T'HH:mm:ss");
+  minDate: string = format(new Date(), "yyyy-MM-dd'T'HH:mm:ss");
 
   selectedAccount: Account;
 
@@ -153,7 +156,10 @@ export class RappelFormComponent implements OnInit {
     if (!!value) {
       if (value.length >= 0) {
         this.rappel.eventDate = parseISO(value.toString());
-
+        this.eventDateString = format(
+          this.rappel.eventDate ? this.rappel.eventDate : new Date(),
+          "yyyy-MM-dd'T'HH:mm:ss"
+        );
         this.eventForm
           .get('time')
           ?.setValue(format(this.rappel.eventDate, 'yyyy-MM-dd HH:mm:ss'));
@@ -197,11 +203,28 @@ export class RappelFormComponent implements OnInit {
     if (!!value) {
       if (value.length >= 0) {
         this.rappel.notifyDate = parseISO(value.toString());
-
+        this.notifDateString = format(
+          this.rappel.notifyDate ? this.rappel.notifyDate : new Date(),
+          "yyyy-MM-dd'T'HH:mm:ss"
+        );
         this.notificationForm
           .get('notifyDate')
           ?.setValue(format(this.rappel.notifyDate, 'yyyy-MM-dd HH:mm:ss'));
       }
     }
+  }
+
+  initEventDate() {
+    this.eventDateString = format(
+      this.rappel.eventDate ? this.rappel.eventDate : new Date(),
+      "yyyy-MM-dd'T'HH:mm:ss"
+    );
+  }
+
+  initNotificationDate() {
+    this.notifDateString = format(
+      this.rappel.notifyDate ? this.rappel.notifyDate : new Date(),
+      "yyyy-MM-dd'T'HH:mm:ss"
+    );
   }
 }

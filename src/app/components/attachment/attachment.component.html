@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-title>{{ title }}</ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div style="height: 50%;">
+    <div>
+
+      <img [src]="filethumb" alt="Red dot" />
+    </div>
+  </div>
+  <ion-button expand="block" size="large" (click)="openFileExplorer()">
+    From directory
+    <ion-icon slot="start" name="folder-open-outline"></ion-icon>
+  </ion-button>
+  <ion-button expand="block" size="large" (click)="openCallery()">
+    From gallery
+
+    <ion-icon slot="start" name="images-outline"></ion-icon>
+  </ion-button>
+
+  <ion-button expand="block" size="large" (click)="takePhoto()">
+    Camera
+    <ion-icon slot="start" name="camera-outline"></ion-icon>
+  </ion-button>
+
+
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button>Cancel</ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="done()">Done</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+</ion-footer>

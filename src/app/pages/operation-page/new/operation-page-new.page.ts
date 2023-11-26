@@ -15,7 +15,7 @@ import { OperationPageStore } from '../operation-page.store';
 import { Account } from 'src/app/model/account.model';
 import { Router } from '@angular/router';
 import { ProfileModel } from 'src/app/model/profil.model';
-
+import { FileOpener } from '@awesome-cordova-plugins/file-opener';
 @Component({
   selector: 'app-operation-page-new',
   templateUrl: './operation-page-new.page.html',
@@ -76,6 +76,7 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
           )
         );
 
+        this.operationFormComponent.validateAttachment();
         this.router.navigate(['operation/' + id]);
       } catch (error) {
         console.error(error);
@@ -95,4 +96,6 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
     this.operationFormComponent.reset();
     this.router.navigate(['/dashboard'], {});
   }
+
+  
 }

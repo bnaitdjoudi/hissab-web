@@ -11,7 +11,6 @@ export class SignupLoadPage implements OnInit {
 
   ngOnInit() {
     this.signUpPageStore.observable.subscribe((value) => {
-      console.log('fdsfsafdasdfsadf:' + JSON.stringify(value));
       if (value.isSignedUp === 'signedup') {
         if (value.isSignedIn === 'signedin') {
           console.log('redirect to dashboard');

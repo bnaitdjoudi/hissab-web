@@ -48,7 +48,7 @@ export class OperationDataBase
         .executeSql(
           `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
             .filter((el) => el.name !== 'ID')
-            .map((el) => el.name)}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?, ?); `,
+            .map((el) => el.name)}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?, ?, ?); `,
           [
             model.numTrans,
             format(model.time, 'yyyy-MM-dd HH:mm:ss'),
@@ -60,6 +60,7 @@ export class OperationDataBase
             model.idAccount,
             model.transfer,
             model.profile,
+            model.attachment,
           ]
         )
         .then(async () => {
@@ -127,6 +128,7 @@ export class OperationDataBase
             operation.idAccount,
             operation.transfer,
             operation.profile,
+            operation.attachment,
             id,
           ]
         )
@@ -1141,6 +1143,7 @@ export class OperationDataBase
       transfer: data.rows.item(i).TRANSFER,
       accountName: data.rows.item(i).ACCOUNT_NAME,
       profile: data.rows.item(i).PROFILE,
+      attachment: data.rows.item(i).ATTACHMENT,
     };
   }
 }

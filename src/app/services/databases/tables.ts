@@ -30,6 +30,7 @@ export const tables = {
       { name: 'ID_ACCOUNT', type: 'INTEGER' },
       { name: 'TRANSFER', type: 'TEXT' },
       { name: 'PROFILE', type: 'VARCHAR(35)' },
+      { name: 'ATTACHMENT', type: 'TEXT' },
     ],
   },
   flags: {
@@ -201,6 +202,10 @@ export const CREATE_PATCH_TABLE = `CREATE TABLE  IF NOT EXISTS ${
 export const CREATE_RAPPEL_TABLE = `CREATE TABLE  IF NOT EXISTS ${
   tables.rappel.name
 } (${tables.rappel.columns.map((el) => el.name + ' ' + el.type)});`;
+
+export const CREATE_NOTIFICATION_TABLE = `CREATE TABLE  IF NOT EXISTS ${
+  tables.notification.name
+} (${tables.notification.columns.map((el) => el.name + ' ' + el.type)});`;
 
 //ALTER TABLE OPERATION  ADD PROFILE  VARCHAR(35);
 //update OPERATION set PROFILE = 'bnaitdjoudi@gmail.com';

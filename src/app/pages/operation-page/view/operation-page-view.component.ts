@@ -7,7 +7,7 @@ import { OperationPageStore } from '../operation-page.store';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Account } from 'src/app/model/account.model';
-
+import { FileOpener } from '@awesome-cordova-plugins/file-opener';
 @Component({
   selector: 'app-operation-page',
   templateUrl: './operation-page-view.component.html',
@@ -117,5 +117,9 @@ export class OperationPageViewComponent implements OnInit, OnDestroy {
       .catch((err) => {
         console.error(err);
       });
+  }
+
+  async openFile() {
+    await FileOpener.open('/DATA/' + this.operation.attachment, 'image/png');
   }
 }
