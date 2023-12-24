@@ -16,7 +16,8 @@
   <operation-form #operationForm [leafsAccount]="this.operationStore.accountStore.leafAccounts$"
     [accountType]="accountType" [operation]="currentOperation" [currentAccount]="currentAccount"
     [currentProfile]="currentProfile" (onLoadLeafAccount)="onLoadLeafAccount($event)" (onSubmit)="submit()"
-    (onProfileListOpened)="onProfileListOpened()"  [profiles]="this.operationStore.profileListSubject_.asObservable()"></operation-form>
+    (onProfileListOpened)="onProfileListOpened()"
+    [profiles]="this.operationStore.profileListSubject_.asObservable()"></operation-form>
 </ion-content>
 <ion-footer>
   <ion-toolbar>
@@ -31,6 +32,10 @@
     </ion-buttons>
 
     <ion-buttons slot="end">
+      <button mat-raised-button (click)="back()" style="float: left;margin-right: 5px;"
+        [disabled]="selectedIndex === 0">BACK</button>
+      <button mat-raised-button color="primary" (click)="next()"
+        style="float: right;">{{ this.selectedIndex === 2 ? 'SUBMIT' : 'NEXT'}}</button>
       <ion-button fill="clear" slot="end" id="menu-button">
         <fa-icon icon="ellipsis-vertical"></fa-icon></ion-button>
     </ion-buttons>

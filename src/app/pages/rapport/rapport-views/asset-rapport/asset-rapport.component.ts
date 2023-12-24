@@ -10,7 +10,7 @@ import { IonTabs } from '@ionic/angular';
 @Component({
   selector: 'asset-rapport',
   templateUrl: './asset-rapport.component.html',
-  styleUrls: ['./asset-rapport.component.css'],
+  styleUrls: ['./asset-rapport.component.scss'],
 })
 export class AssetRapportComponent implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(IonTabs) tabs: IonTabs;

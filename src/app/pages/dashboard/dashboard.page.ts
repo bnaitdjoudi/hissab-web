@@ -21,7 +21,11 @@ export class DashboardPage implements OnInit, OnDestroy {
   globalBalance: number;
   period$: Observable<Period> = this.mainStore.period$;
   menuRoute$: Observable<any> = this.mainStore.menuRoute$;
-
+  alertOptions: {
+    header: 'Pizza Toppings';
+    subHeader: 'Select your favorite topping';
+    class: 'custom-alert';
+  };
   constructor(
     private readonly mainStore: MainStore,
     private readonly router: Router

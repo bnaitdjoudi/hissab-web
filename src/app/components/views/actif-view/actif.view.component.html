@@ -2,10 +2,11 @@
     <operation-list *ngIf="accountVal.resume.sons > 0 " [operations]="operationsSubject.asObservable()"
         (onElementSelected)="onOperationSelected($event)" (onIonInfiniteScroll)="onIonInfiniteScrollOperation($event)"
         [isMoreData]="currentPage < totalPage" (onDelete)="presentDeleteAlert($event)" [currBalFun]="currBalfun"
-        [account]="accountVal" [periodLabel]="periodLabel"></operation-list>
+        [account]="accountVal" [periodLabel]="periodLabel"
+        (onBackToParentFired)="onBackToParentFired()"></operation-list>
     <account-list *ngIf="accountVal.resume.sons === 0 " [accountData]="currentAccountData"
         (onElementSelected)="onAccountSelected($event)" (onIonInfiniteScroll)="onIonInfiniteScrollAccount($event)"
         [isMoreData]="currentAccountData.currentPage < currentAccountData.totalPage"
         (onDelete)="presentDeleteAlertAccount($event)" [currBalFun]="currBalfun" [account]="accountVal"
-        [periodLabel]="periodLabel"></account-list>
+        [periodLabel]="periodLabel" (onBackToParentFired)="onBackToParentFired()"></account-list>
 </ion-content>

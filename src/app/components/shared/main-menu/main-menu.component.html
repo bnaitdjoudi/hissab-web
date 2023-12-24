@@ -1,5 +1,5 @@
 <ion-content>
-    <ion-list>
+    <ion-list lines="none" [inset]="true">
         <ion-item [class]="'first no-border ' + getSelectedClass('dash')">
             <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
                 fontIcon="dashboard"></mat-icon>
@@ -54,6 +54,9 @@
 
         </ion-menu-toggle>
 
+        <ion-item-divider>
+            <ion-label> Managing tools </ion-label>
+        </ion-item-divider>
         <ion-item (click)="goto('/rapport')">
             <mat-icon class="icon-size" aria-hidden="false">bar_chart</mat-icon>
             <ion-label> Reports </ion-label>

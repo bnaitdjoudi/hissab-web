@@ -8,8 +8,7 @@ import { RapportStore } from '../../../rapport.store';
   styleUrls: ['./global-rapport.component.css'],
 })
 export class GlobalRapportComponent
-  implements OnDestroy, OnInit, AfterViewInit
-{
+  implements OnDestroy, OnInit{
   app: any = {};
   options: EChartsOption;
 
@@ -17,6 +16,7 @@ export class GlobalRapportComponent
   passifValue: number = 0;
 
   constructor(private readonly rapportStore: RapportStore) {}
+
   ngOnDestroy(): void {}
   async ngOnInit(): Promise<void> {
     console.log('view inited rapport');
@@ -30,7 +30,6 @@ export class GlobalRapportComponent
           this.passifValue = val.result;
         }
       });
-
       this.reloadChart();
     });
     this.rapportStore.loadAllBalance();
@@ -151,6 +150,10 @@ export class GlobalRapportComponent
       },
       legend: {
         data: ['Assets', 'Balances', 'Liabilities'],
+        textStyle: {
+          color: '#f1f1f2',
+          fontWeight: 'bold',
+        },
       },
 
       xAxis: [
@@ -158,11 +161,35 @@ export class GlobalRapportComponent
           type: 'category',
           axisTick: { show: false },
           data: ['Global'],
+
+          axisLabel: {
+            overflow: 'truncate',
+            color: '#f1f1f2',
+            fontWeight: 'bold',
+          },
         },
       ],
       yAxis: [
         {
           type: 'value',
+          axisLabel: {
+            formatter: (val: any) => {
+              if (Math.abs(val) < 1000) {
+                return val;
+              }
+              if (Math.abs(val) < 1000000) {
+                return `${val / 1000}K`;
+              }
+              if (Math.abs(val) < 1000000000) {
+                return `${val / 1000000}M`;
+              }
+
+              return;
+            },
+            overflow: 'truncate',
+            color: '#f1f1f2',
+            fontWeight: 'bold',
+          },
         },
       ],
       series: [
@@ -196,9 +223,5 @@ export class GlobalRapportComponent
         },
       ],
     };
-  }
-
-  ngAfterViewInit(): void {
-    //this.reloadChart();
   }
 }

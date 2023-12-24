@@ -53,6 +53,7 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
   async ngOnInit() {
     this.subscription = this.operationStore.operation$.subscribe((op) => {
       if (op) {
+        console.log('concourse');
         this.currentOperation = op;
       }
     });
@@ -76,7 +77,8 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
           )
         );
 
-        this.operationFormComponent.validateAttachment();
+        await this.operationFormComponent.validateAttachment();
+        await this.operationFormComponent.reset();
         this.router.navigate(['operation/' + id]);
       } catch (error) {
         console.error(error);
@@ -97,5 +99,13 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
     this.router.navigate(['/dashboard'], {});
   }
 
-  
+  selectedIndex: any;
+  next() {
+    this.operationFormComponent.next();
+    this.selectedIndex = this.operationFormComponent.swiperRef?.selectedIndex;
+  }
+  back() {
+    this.operationFormComponent.back();
+    this.selectedIndex = this.operationFormComponent.swiperRef?.selectedIndex;
+  }
 }

@@ -1,5 +1,7 @@
 <ion-content class="c-padding-top">
 
+
+
   <mat-vertical-stepper [linear]="true" #stepper labelPosition="bottom">
     <mat-step label="Accounts transaction" [optional]="false" [stepControl]="transferForm">
 
@@ -91,7 +93,7 @@
 
 
           </div>
-          <button (click)="transferForm.reset()" mat-raised-button color="accent" style="float: right;">RESET</button>
+          <button (click)="reset()" mat-raised-button color="accent" style="float: right;">RESET</button>
         </form>
       </div>
 
@@ -150,8 +152,8 @@
             </button>
           </mat-form-field>
 
-          <mat-form-field class="example-full-width" *ngIf="showDebitField">
-            <mat-label>{{'forms.operation.'+accountType+'.debit' | translate}}</mat-label>
+          <mat-form-field *ngIf="showDebit()" class="example-full-width">
+            <mat-label>{{'forms.operation.'+tranferCase+'.debit' | translate}}</mat-label>
             <input matInput type="number" formControlName="debit" placeholder="0" step="0.01"
               (change)="debitChanged($event)">
             <span class="prefix-currency" matTextPrefix>$&nbsp;</span>
@@ -160,8 +162,8 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="example-full-width" *ngIf="showCreditField">
-            <mat-label>{{'forms.operation.'+accountType+'.credit' | translate}}</mat-label>
+          <mat-form-field class="example-full-width" *ngIf="showCredit()">
+            <mat-label>{{'forms.operation.'+tranferCase+'.credit' | translate}}</mat-label>
             <input matInput type="number" formControlName="credit" placeholder="0" step="0.01"
               (change)="creditChanged($event)">
             <span class="prefix-currency" matTextPrefix>$&nbsp;</span>
@@ -175,54 +177,62 @@
         <form>
           <ion-list>
             <ion-item>
-              <ion-label class="resume-label" for="accountIn" position="floating">First Account: </ion-label>
 
-              <ion-textarea for="accountIn" label="Regular textarea" readonly
-                [value]="defaultTransferFrom?.path"></ion-textarea>
+
+              <ion-textarea labelPlacement="stacked" readonly [autoGrow]="true" [value]="defaultTransferFrom?.path">
+                <div class="account-label" slot="label">First account: </div>
+              </ion-textarea>
             </ion-item>
 
             <ion-item>
-              <ion-label class="resume-label" for="accountFrom" position="floating">Second Account: </ion-label>
 
-              <ion-textarea for="accountFrom" label="Regular textarea" readonly
-                [value]="currentOperation.transfer"></ion-textarea>
+
+              <ion-textarea for="accountFrom" labelPlacement="stacked" [autoGrow]="true" readonly
+                [value]="currentOperation.transfer">
+                <div class="account-label" slot="label">Second account: </div>
+              </ion-textarea>
             </ion-item>
 
             <ion-item>
-              <ion-label class="resume-label" for="timeD" position="floating">Date : </ion-label>
 
-              <ion-input for="timeD" label="Time" readonly [value]="getFormattedDate(
+
+              <ion-input class="resume" labelPlacement="stacked" readonly [value]="getFormattedDate(
             this.currentOperation.time,
             'yyyy-MM-dd HH:mm:ss'
-          )"></ion-input>
+          )">
+                <div class="account-label" slot="label">Date: </div>
+              </ion-input>
             </ion-item>
 
             <ion-item>
-              <ion-label class="resume-label" for="statutD" position="floating">Statut : </ion-label>
 
-              <ion-input for="statutD" label="Statut" readonly [value]="currentOperation.statut"></ion-input>
+
+              <ion-input class="resume" readonly labelPlacement="stacked" [value]="currentOperation.statut">
+                <div class="account-label" slot="label">Statut: </div>
+              </ion-input>
             </ion-item>
 
             <ion-item>
-              <ion-label class="resume-label" for="descriptionD" position="floating">Description : </ion-label>
-              <ion-textarea for="descriptionD" label="Statut" readonly
-                [value]="currentOperation.description"></ion-textarea>
+
+              <ion-textarea readonly labelPlacement="stacked" [value]="currentOperation.description">
+                <div class="account-label" slot="label">Description: </div>
+              </ion-textarea>
             </ion-item>
             <ion-item>
-              <ion-label class="resume-label" position="floating"
-                for="debitD">{{'forms.operation.'+accountType+'.debit' | translate}} :
-              </ion-label>
-              <ion-input dir="rtl" for="debitD" label="Debit" readonly [value]="currentOperation.debit | currency
+
+              <ion-input dir="rtl" labelPlacement="end" readonly [value]="currentOperation.debit | currency
                                 :'CAD':'symbol-narrow':'1.2-2'
-                                "></ion-input>
+                                ">
+                <div class="account-labelmount" slot="label">:Debit </div>
+              </ion-input>
             </ion-item>
             <ion-item>
-              <ion-label position="floating" class="resume-label"
-                for="creditD">{{'forms.operation.'+accountType+'.credit' | translate}} :
-              </ion-label>
-              <ion-input dir="rtl" for="creditD" label="Credit" readonly [value]="currentOperation.credit | currency
+
+              <ion-input dir="rtl" labelPlacement="end" readonly [value]="currentOperation.credit | currency
                                           :'CAD':'symbol-narrow':'1.2-2'
-                                          "></ion-input>
+                                          ">
+                <div class="account-labelmount" slot="label">:Credit </div>
+              </ion-input>
             </ion-item>
           </ion-list>
 
@@ -230,12 +240,7 @@
       </div>
     </mat-step>
   </mat-vertical-stepper>
-  <div class="ion-padding form-tool">
-    <button mat-raised-button (click)="back()" style="float: left;"
-      [disabled]="swiperRef?.selectedIndex === 0">BACK</button>
-    <button mat-raised-button color="primary" (click)="next()"
-      style="float: right;">{{ this.swiperRef?.selectedIndex === 2 ? 'SUBMIT' : 'NEXT'}}</button>
-  </div>
+
 
 
 
@@ -302,5 +307,7 @@
       <attachment class="ion-page" title="Attachment" (onAttachement)="onAttachementDone($event)"></attachment>
     </ng-template>
   </ion-modal>
+
+
 
 </ion-content>

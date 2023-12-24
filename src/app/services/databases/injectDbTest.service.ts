@@ -56,7 +56,7 @@ export class InjectDbTestService {
   resetBalanceAccount(sqLiteObject: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       sqLiteObject
-        .executeSql('UPDATE ACCOUNT SET BALANCE = 0, IS_LEAF = 0 ', [])
+        .executeSql('UPDATE ACCOUNT SET BALANCE = 0', [])
         .then(() => resolve())
         .catch((err: any) => reject(err));
     });

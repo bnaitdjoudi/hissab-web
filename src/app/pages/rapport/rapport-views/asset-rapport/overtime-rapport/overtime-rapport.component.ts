@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { EChartsOption, init } from 'echarts';
+import { EChartsOption } from 'echarts';
 import { RapportStore } from '../../../rapport.store';
 import { OverTimeAssetRapportResult } from 'src/app/model/rapport-store.model';
 import { format } from 'date-fns';
@@ -53,16 +53,20 @@ export class OverTimeRapportComponent
       dataZoom: [
         {
           type: 'inside',
-          start: 0,
-          end: 10,
+          start: 80,
+          end: 100,
         },
         {
-          start: 0,
-          end: 10,
+          start: 80,
+          end: 100,
         },
       ],
       legend: {
         data: ['Assets', 'Balance', 'Liabilities'],
+        textStyle: {
+          color: '#f1f1f2',
+          fontWeight: 'bold',
+        },
       },
       color: ['#33804b', '#0090e3', '#9c0b0b'],
       xAxis: {
@@ -73,6 +77,24 @@ export class OverTimeRapportComponent
       },
       yAxis: {
         type: 'value',
+        axisLabel: {
+          formatter: (val: any) => {
+            if (Math.abs(val) < 1000) {
+              return val;
+            }
+            if (Math.abs(val) < 1000000) {
+              return `${val / 1000}K`;
+            }
+            if (Math.abs(val) < 1000000000) {
+              return `${val / 1000000}M`;
+            }
+
+            return;
+          },
+          overflow: 'truncate',
+          color: '#f1f1f2',
+          fontWeight: 'bold',
+        },
       },
       tooltip: {
         trigger: 'axis',

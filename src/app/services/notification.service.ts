@@ -16,6 +16,7 @@ import { resolve } from 'cypress/types/bluebird';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
+ 
   constructor(
     readonly accountService: AccountsService,
     readonly notificationDb: NotificationDataBase

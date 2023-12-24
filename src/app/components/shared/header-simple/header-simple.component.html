@@ -1,12 +1,17 @@
 <ion-header class="header-color ion-no-border">
     <ion-toolbar class="ion-no-border">
         <ion-buttons slot="start">
-            <ion-button fill="clear" slot="end" id="menu-button" color="light" (click)="back()">
-                <ion-icon name="return-up-back-outline" size="large"></ion-icon>
+
+            <ion-button fill="clear" slot="end" id="menu-button" (click)="back()">
+                <ion-icon name="arrow-back-sharp" size="large"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title><ion-label class="capitelize">{{ title | translate }}
-            </ion-label></ion-title>
+
+        <ion-buttons slot="end">
+            <ion-button fill="clear" slot="end" id="menu-button" (click)="period()">
+                {{periodLabel | translate}}
+            </ion-button>
+        </ion-buttons>
 
     </ion-toolbar>
 </ion-header>

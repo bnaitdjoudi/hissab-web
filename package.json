@@ -88,6 +88,7 @@
     "@angular/compiler": "^16.0.0",
     "@angular/compiler-cli": "^16.0.0",
     "@angular/language-service": "^16.0.0",
+    "@capacitor/assets": "^3.0.1",
     "@capacitor/cli": "^5.0.5",
     "@cypress/schematic": "^2.5.0",
     "@ionic/angular-toolkit": "^9.0.0",

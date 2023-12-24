@@ -4,6 +4,7 @@ import { RapportStore } from './rapport.store';
 import { RapportType } from 'src/app/model/rapport-store.model';
 import { Subscription } from 'rxjs';
 import { JSONPath } from 'jsonpath-plus';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-rapport',
@@ -19,7 +20,8 @@ export class RapportPage implements OnInit, OnDestroy {
   constructor(
     private readonly rapportStore: RapportStore,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
   ) {}
 
   ngOnInit() {
@@ -55,7 +57,11 @@ export class RapportPage implements OnInit, OnDestroy {
     this.router.navigate(['/'], {});
   }
 
-  goto(go: string) {
-    this.router.navigate(['/rapport/' + go], {});
+  backNavigation() {
+    if (this.router.url.includes('/rapport/')) {
+      this.router.navigate(['/rapport'], {});
+    } else {
+      this.router.navigate(['/'], {});
+    }
   }
 }

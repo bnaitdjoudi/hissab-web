@@ -7,6 +7,7 @@ import { GoHome } from 'src/app/shared/direction.shared';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Operation } from 'src/app/model/operation.model';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'search',
@@ -24,7 +25,8 @@ export class OperationSearchPage extends GoHome implements OnInit {
 
   constructor(
     readonly operationStore: OperationPageStore,
-    override readonly router: Router
+    override readonly router: Router,
+    readonly location: Location
   ) {
     super(router);
   }
@@ -98,5 +100,9 @@ export class OperationSearchPage extends GoHome implements OnInit {
 
   goToSelected(arg0: number) {
     this.router.navigate(['/operation/' + arg0], {});
+  }
+
+  backNavigation() {
+    this.location.back();
   }
 }

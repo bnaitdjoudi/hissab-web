@@ -11,9 +11,10 @@ import { FlagsService } from './flags.service';
 import { ProfileService } from './profile.service';
 import { AuthService } from './auth.service';
 import { SessionStorageService } from './sessionstorage.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
-  imports: [DataBasesModule, NgxTranslateModule],
+  imports: [DataBasesModule, NgxTranslateModule, HttpClientModule],
   providers: [
     AssetsService,
     AccountsService,
@@ -26,6 +27,5 @@ import { SessionStorageService } from './sessionstorage.service';
     ProfileService,
     SessionStorageService,
   ],
-  
 })
 export class ServicesModule {}

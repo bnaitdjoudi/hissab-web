@@ -38,7 +38,7 @@
       "numTrans": "transaction number",
 
       "actif": {
-        "debit": "Deposite",
+        "debit": "deposite",
         "credit": "withdrawal"
       },
 
@@ -53,8 +53,55 @@
       },
 
       "depense": {
-        "debit": "bonus",
+        "debit": "refund",
         "credit": "charge"
+      },
+
+      "case1": {
+        "credit": "withdrawal"
+      },
+      "case2": {
+        "credit": "loans"
+      },
+      "case3": {
+        "credit": "refund"
+      },
+      "case4": {
+        "debit": "income"
+      },
+      "case5": {
+        "credit": "paiement"
+      },
+      "case6": {
+        "debit": "transfer"
+      },
+      "case7": {
+        "debit": "refund"
+      },
+      "case8": {
+        "debit": "paiement"
+      },
+      "case9": {
+        "credit": "charge"
+      },
+      "case10": {
+        "credit": "charge"
+      },
+
+      "case11": {
+        "debit": "transfer"
+      },
+      "case12": {
+        "debit": "charge"
+      },
+      "case13": {
+        "credit": "refund"
+      },
+      "case14": {
+        "credit": "transfer"
+      },
+      "case15": {
+        "debit": "refund"
       }
     },
     "account": {

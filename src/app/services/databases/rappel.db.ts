@@ -7,6 +7,7 @@ import { tables } from './tables';
 import { format, parseISO } from 'date-fns';
 import { PagingData } from 'src/app/model/paging-data';
 import { PagingRequest } from 'src/app/model/paging-request.model';
+import { resolve } from 'cypress/types/bluebird';
 
 @Injectable({
   providedIn: 'root',
@@ -57,8 +58,32 @@ export class RappelDataBase
       }
     });
   }
-  update(model: Rappel, id: number): Promise<Rappel> {
-    throw new Error('Method not implemented.');
+  async update(model: Rappel, id: number): Promise<Rappel> {
+    await this.checkDataBaseOpened();
+    return new Promise<Rappel>(async (resolve, reject) => {
+      try {
+        await this.sqLiteObject.executeSql(
+          `UPDATE  ${tables.rappel.name} SET ${tables.rappel.columns
+            .filter((el) => el.name !== 'ID')
+            .map((el) => el.name + ' = ?')} WHERE ${
+            tables.rappel.columns[0].name
+          } = ?`,
+          [
+            model.accountId,
+            format(model.eventDate, 'yyyy-MM-dd HH:mm:ss'),
+            format(model.notifyDate, 'yyyy-MM-dd HH:mm:ss'),
+            model.isPeriode,
+            model.periode,
+            model.description,
+            model.isActive,
+            id,
+          ]
+        );
+        resolve(model);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
   findById(id: number): Promise<Rappel> {
     throw new Error('Method not implemented.');

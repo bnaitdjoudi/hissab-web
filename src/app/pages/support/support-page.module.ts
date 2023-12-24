@@ -12,6 +12,7 @@ import { TicketPage } from './tickets/ticket.page';
 import { SupportPage } from './home/support.page';
 import { Chooser } from '@awesome-cordova-plugins/chooser/ngx';
 import { MaintenancePage } from './maintenance/maintenance.page';
+import { BackupPage } from './backup/backup.page';
 
 @NgModule({
   imports: [
@@ -25,6 +26,12 @@ import { MaintenancePage } from './maintenance/maintenance.page';
     ServicesModule,
   ],
   providers: [Chooser],
-  declarations: [PatchPage, TicketPage, SupportPage, MaintenancePage],
+  declarations: [
+    PatchPage,
+    TicketPage,
+    SupportPage,
+    MaintenancePage,
+    BackupPage,
+  ],
 })
 export class SupportPageModule {}

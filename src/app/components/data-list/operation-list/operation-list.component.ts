@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
 import { format } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -12,13 +19,14 @@ import { Operation } from 'src/app/model/operation.model';
   templateUrl: './operation-list.component.html',
   styleUrls: ['./operation-list.component.scss', './../data-list-header.scss'],
 })
-export class OperationListComponent implements OnInit {
+export class OperationListComponent implements OnInit, OnDestroy {
   @Input() operations: Observable<Operation[]>;
   @Input() isMoreData: boolean = true;
   @Input() currBalFun: (debit: number, credit: number) => any[];
 
   @Output() onElementSelected = new EventEmitter<Operation>();
   @Output() onIonInfiniteScroll = new EventEmitter<InfiniteScrollCustomEvent>();
+  @Output() onBackToParentFired = new EventEmitter<void>();
   @Output() onDelete = new EventEmitter<number>();
   @Input() account: Account;
   @Input() periodLabel: string;
@@ -31,10 +39,16 @@ export class OperationListComponent implements OnInit {
 
   constructor() {}
 
+  ngOnDestroy(): void {
+    console.log('operation list distroy!!');
+  }
+
   ngOnInit() {
     this.suscribtion = this.operations.subscribe((val) => {
-      this.operationsData = val;
-      val.forEach((el) => {
+      this.operationsData = val.filter(
+        (el) => el.idAccount === this.account.id
+      );
+      this.operationsData.forEach((el) => {
         let currentGroupe: Operation[] | undefined = this.operationGroup.get(
           formatInTimeZone(el.time, 'America/New_York', 'dd MMM yyyy')
         );
@@ -67,5 +81,9 @@ export class OperationListComponent implements OnInit {
 
   multiply(type: string): number {
     return type === 'actif' || type === 'income' ? 1 : -1;
+  }
+
+  backToParent() {
+    this.onBackToParentFired.emit();
   }
 }

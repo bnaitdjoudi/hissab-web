@@ -2,12 +2,12 @@
     <ion-toolbar class="ion-no-border">
         <ion-buttons slot="start">
             <ion-menu-toggle>
-                <ion-button color="light">
-                    <ion-icon name="reorder-four-sharp" color="light" size="large"></ion-icon>
+                <ion-button color="menu-button">
+                    <ion-icon name="reorder-four-sharp" color="menu-button" size="large"></ion-icon>
                 </ion-button>
             </ion-menu-toggle>
         </ion-buttons>
-        <ion-title>
+        <ion-title *ngIf="showTitle">
             {{title}}
         </ion-title>
     </ion-toolbar>

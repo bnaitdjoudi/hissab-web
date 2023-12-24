@@ -16,6 +16,8 @@ import { parseFloatTool } from '../../../tools/tools';
 import { LeafAccount } from '../../../model/leaf-account.model';
 import { Router } from '@angular/router';
 import { getLabelPeriode } from '../../../tools/period.label';
+import { Location } from '@angular/common';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'account-page',
@@ -71,7 +73,9 @@ export class AccountPageViewComponent implements OnInit {
     readonly actionSheetCtrl: ActionSheetController,
     private alertPeriodController: AlertController,
     private translateService: TranslateService,
-    private router: Router
+    private router: Router,
+    private location: Location,
+    private navCtrl: NavController
   ) {
     this.operations = this.accountStore.listDataCombined$.pipe(
       map((val) => val[1])
@@ -114,7 +118,7 @@ export class AccountPageViewComponent implements OnInit {
   }
 
   async presentActionSheet() {
-    let actions: string[] = ['cancel', 'period'];
+    let actions: string[] = ['cancel'];
     if (this.currentAccount.isLeaf && this.accountsData.data.length === 0) {
       actions = ['createOp', ...actions];
     }
@@ -125,12 +129,7 @@ export class AccountPageViewComponent implements OnInit {
     }
 
     const actionSheet = await this.actionSheetCtrl.create(
-      actionSheetCtrlOperation(
-        'Actions',
-        undefined,
-        actions,
-        this.translateService
-      )
+      actionSheetCtrlOperation('', undefined, actions, this.translateService)
     );
 
     await actionSheet.present();
@@ -197,6 +196,10 @@ export class AccountPageViewComponent implements OnInit {
     this.isCreateOpModalOpen = false;
   }
 
+  async showPeriodOption() {
+    await this.presentAlertPeriod();
+  }
+
   private async presentAlertPeriod() {
     let alertInputs: AlertInput[] = [
       {
@@ -246,6 +249,9 @@ export class AccountPageViewComponent implements OnInit {
     } else {
       this.router.navigate(['/dashboard'], {});
     }
+  }
+  backNavigation() {
+    this.navCtrl.back();
   }
 
   goToSearch() {

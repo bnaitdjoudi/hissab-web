@@ -1,6 +1,10 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AlertController, LoadingController } from '@ionic/angular';
-import { isObservable, Observable, Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  AlertController,
+  LoadingController,
+  NavController,
+} from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { Operation } from '../../../model/operation.model';
 import { deleteConfirmation } from '../../../tools/alert.contollers';
 import { OperationPageStore } from '../operation-page.store';
@@ -24,7 +28,8 @@ export class OperationPageViewComponent implements OnInit, OnDestroy {
     private alertController: AlertController,
     private _location: Location,
     private loadingCtrl: LoadingController,
-    readonly router: Router
+    readonly router: Router,
+    readonly navCtrl: NavController
   ) {}
   ngOnDestroy(): void {
     this.suscribtionOperation?.unsubscribe();
@@ -121,5 +126,9 @@ export class OperationPageViewComponent implements OnInit, OnDestroy {
 
   async openFile() {
     await FileOpener.open('/DATA/' + this.operation.attachment, 'image/png');
+  }
+
+  async back() {
+    this.navCtrl.back();
   }
 }

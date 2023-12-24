@@ -2,11 +2,17 @@
   <ion-header class="ion-no-border">
     <div class="header-div">
 
-      <div class="mcat">
-        <h5 *ngIf="periodLabel !== 'period.global'">Period: {{ periodLabel | translate}}</h5>
+      <div class="mcat top-title">
+        <ion-button fill="clear" (click)="backToParent()">
+          <ion-icon slot="icon-only" name="chevron-up-sharp"></ion-icon>
+        </ion-button>
+        <h3>{{account.acountName}}</h3>
         <h1>{{(account? (account.rbalance ? account.rbalance : 0) * multiply(account.type):1) | currency
-                                :'CAD':'symbol-narrow':'1.2-2'
-                                }}</h1>
+                                    :'CAD':'symbol-narrow':'1.2-2'
+                                    }}</h1>
+
+
+
       </div>
       <div class="mcat">
         <div>
@@ -25,32 +31,30 @@
     </div>
   </ion-header>
   <ion-content>
-    <ion-list class="mlist">
-      <ion-item-sliding *ngFor="let item of currentAccountData; trackBy: trackItem" (click)="onSelectAccount(item)"
-        [id]="'account-'+item.id">
+    <ion-list>
+      <ion-item-sliding *ngFor="let item of currentAccountData; trackBy: trackItem" [routerLink]="['/account', item.id]"
+        routerDirection="forward" [id]="'account-'+item.id">
         <ion-item-options side="start">
           <ion-item-option (click)="onDeleteFired(item.id)" color="clear">
             <ion-icon size="large" color="danger" name="trash-outline">
             </ion-icon></ion-item-option>
         </ion-item-options>
-        <ion-item>
+        <ion-item detail="true" button>
           <ion-label class="capitelize">{{ item.acountName | translate }} </ion-label>
           <ion-label [class]="accountClass(item)" slot="end">{{(item? ((item.rbalance? item.rbalance:0) * multiply(item.type)):0) | currency
                           :'CAD':'symbol-narrow':'1.2-2'
                           }}</ion-label>
-          <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+
         </ion-item>
       </ion-item-sliding>
       <ion-item *ngIf="!isMoreData" style="height: 35px;">
       </ion-item>
-      <ion-item *ngIf="!isMoreData" style="height: 35px;">
-      </ion-item>
-      <ion-item *ngIf="!isMoreData" style="height: 35px;">
-      </ion-item>
-      <ion-item *ngIf="!isMoreData" style="height: 35px;">
-      </ion-item>
-      <ion-item *ngIf="!isMoreData" style="height: 35px;">
-      </ion-item>
+
+      <ion-item-divider class="group-header">
+        <ion-label class="date-line"></ion-label>
+      </ion-item-divider>
+      <ion-item></ion-item>
+
     </ion-list>
     <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)" *ngIf="isMoreData">
       <ion-infinite-scroll-content loadingText="Please wait..." loadingSpinner="bubbles"></ion-infinite-scroll-content>

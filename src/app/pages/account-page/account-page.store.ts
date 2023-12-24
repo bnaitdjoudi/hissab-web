@@ -341,7 +341,6 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
           this.mainStore.state.period
         )
         .then((val) => {
-          console.log(JSON.stringify(val));
           this.updateOperationsList(val);
         })
         .catch((err) => console.log(err));

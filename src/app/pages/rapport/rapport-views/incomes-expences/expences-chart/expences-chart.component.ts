@@ -53,6 +53,10 @@ export class ExpencesChartComponent
       legend: {
         orient: 'vertical',
         left: 'left',
+        textStyle: {
+          color: '#f1f1f2',
+          fontWeight: 'bold',
+        },
       },
       series: [
         {

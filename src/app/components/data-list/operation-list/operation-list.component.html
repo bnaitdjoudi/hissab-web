@@ -2,8 +2,12 @@
   <ion-header>
     <div class="header-div">
 
-      <div class="mcat">
-        <h5 *ngIf="periodLabel !== 'period.global'">Period: {{ periodLabel | translate}}</h5>
+
+      <div class="mcat top-title">
+        <ion-button fill="clear" (click)="backToParent()">
+          <ion-icon slot="icon-only" name="chevron-up-sharp"></ion-icon>
+        </ion-button>
+        <h3>{{account.acountName}}</h3>
         <h1>{{(account? (account.rbalance ? account.rbalance : 0) * multiply(account.type):1) | currency
                               :'CAD':'symbol-narrow':'1.2-2'
                               }}</h1>
@@ -40,13 +44,17 @@
               <ion-icon size="large" color="danger" name="trash-outline">
               </ion-icon></ion-item-option>
           </ion-item-options>
-          <ion-item (click)="onSelectOperation(item)">
+          <ion-item button="true" [routerLink]="['/operation', item.id]" routerDirection="forward">
             <ion-card>
               <ion-card-content>
+
                 <div class="line-op-main">
                   <div class="detail-line left-line">
-                    <ion-label class="title">{{ item.description }}</ion-label>
-                    <ion-label *ngIf="item.statut !== 'r'" class="stat-line"> <ion-icon slot="start" name="time-outline"></ion-icon>{{'operations.'+item.statut | translate}}</ion-label>
+
+                    <ion-label class="ion-text-wrap m-label">
+                      <h2>{{ item.transfer }}</h2>
+                      <p>{{item.description}}</p>
+                    </ion-label>
                   </div>
                   <div class="detail-line total-line">
                     <ion-label><span
@@ -54,8 +62,8 @@
                             (currBalFun(item.debit ,item.credit)[1] * multiply(currBalFun(1,1)[0]))  |
                             currency:'CAD':'symbol-narrow':'1.2-2'
                             }}</span></ion-label>
-                    <div style="width: 100%;" class="balance">
-                      <ion-label class="balance-text">balance :</ion-label>
+                    <div style="width: 100%;" class="actual-balance">
+
                       <ion-label class="number-line">{{ (item.balance * multiply(currBalFun(1,1)[0]) ) | currency:'CAD':'symbol-narrow':'1.2-2'
                             }}</ion-label>
                     </div>
@@ -67,6 +75,12 @@
         </ion-item-sliding>
       </ion-item-group>
 
+      <ion-item-group *ngFor="let key of groupeKeys;" class="groupe-operation">
+        <ion-item-divider class="group-header">
+          <ion-label class="date-line"></ion-label>
+        </ion-item-divider>
+        <ion-item></ion-item>
+      </ion-item-group>
 
       <ion-item *ngIf="!isMoreData" style="height: 35px;">
       </ion-item>

@@ -52,6 +52,10 @@ p {
   }
 }
 
+
+
+
+
 mat-horizontal-stepper {
   width: 100%;
   height: calc(100% - 60px);
@@ -62,10 +66,8 @@ mat-horizontal-stepper {
 }
 
 .form-tool {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
 
+  display: flow-root;
 }
 
 .resume-label {
@@ -75,9 +77,29 @@ mat-horizontal-stepper {
   color: #cfb6b6 !important;
 }
 
-ion-textarea {
-  color: #fff
+.account-labelmount {
+  font-size: large;
+  font-weight: 700;
+  color: #cfb6b6 !important;
 }
+
+ion-textarea {
+  --color: #6c7d94
+}
+
+ion-input.resume {
+  --color: #6c7d94 !important
+}
+
+.account-label {
+  color: #fff9f9;
+  font-size: 18pt;
+  font-weight: bold;
+  padding-bottom: 5px;
+
+}
+
+
 
 mat-label,
 ion-label {

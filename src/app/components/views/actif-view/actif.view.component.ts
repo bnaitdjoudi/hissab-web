@@ -69,7 +69,6 @@ export class ActifViewComponent implements OnInit, OnDestroy {
   };
 
   @Input() set accountData(data: PagingData<Account>) {
-    console.log(JSON.stringify(data));
     if (data) this.currentAccountData = data;
   }
 
@@ -87,6 +86,7 @@ export class ActifViewComponent implements OnInit, OnDestroy {
   @Input() deleteAccountSubject: BehaviorSubject<number>;
 
   @Output() ajusteAccount = new EventEmitter<void>();
+  @Output() onBackToParentFiredEvent = new EventEmitter<void>();
 
   @Output() addOperationEmitter = new EventEmitter<Operation>();
 
@@ -108,7 +108,6 @@ export class ActifViewComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
   ngOnInit(): void {
     this.operationSuscription = this.operationsData.subscribe((val) => {
-      console.log('reloaded:' + JSON.stringify(this.accountVal));
       this.operationsSubject.next(val.data);
       this.totalPage = val.totalPage;
       this.currentPage = val.currentPage;
@@ -146,8 +145,6 @@ export class ActifViewComponent implements OnInit, OnDestroy {
   }
 
   cancel() {
-    console.log('cancel');
-
     this.setOpen(false);
   }
 
@@ -215,9 +212,7 @@ export class ActifViewComponent implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  cancelDeleteOperation(id: number) {
-    console.log('cancel:' + id);
-  }
+  cancelDeleteOperation(id: number) {}
   confirmDeleteOperation(id: number) {
     if (!!this.deleteOperationSubject) {
       this.deleteOperationSubject.next(id);
@@ -232,5 +227,9 @@ export class ActifViewComponent implements OnInit, OnDestroy {
 
   calculMultiplication(total: number, type: string): number {
     return type === 'passif' || type === 'depense' ? -total : total;
+  }
+
+  onBackToParentFired() {
+    this.onBackToParentFiredEvent.emit();
   }
 }

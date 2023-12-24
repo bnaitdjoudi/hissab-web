@@ -34,7 +34,7 @@
             "styles": [
               "src/theme/variables.scss",
               "src/global.scss",
-              "node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css"
+              "src/theme.css"
             ],
             "scripts": []
           },

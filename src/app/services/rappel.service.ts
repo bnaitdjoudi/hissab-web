@@ -60,4 +60,15 @@ export class RappelService {
       }
     });
   }
+
+  async update(rappel: Rappel) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.rappelBd.update(rappel, rappel.id);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }

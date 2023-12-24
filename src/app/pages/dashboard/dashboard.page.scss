@@ -59,6 +59,7 @@ ion-select::part(icon) {
 
 .period-label {
     font-size: 18px;
+
 }
 
 .dash-card {
@@ -82,4 +83,76 @@ ion-select::part(icon) {
         text-align: center;
         font-size: 16pt !important;
     }
+}
+
+ion-toolbar {
+    padding: 10px 5px 10px 5px !important;
+
+}
+
+ion-select {
+    --placeholder-color: #eff6f1;
+    --placeholder-opacity: 1;
+    width: 100%;
+    justify-content: center;
+    --color: #f1f1f2
+}
+
+ion-select::part(placeholder),
+ion-select::part(text) {
+    flex: 0 0 auto;
+}
+
+ion-select::part(placeholder)::first-letter {
+    font-size: 24px;
+    font-weight: 500;
+}
+
+ion-select::part(text) {
+    color: #eff6f1;
+    opacity: 1;
+    font-weight: bold;
+}
+
+ion-select::part(icon) {
+    color: #eff6f1;
+    opacity: 1;
+}
+
+ion-select::part(label) {
+    color: #eff6f1;
+    opacity: 1;
+    font-weight: bold;
+}
+
+ion-alert.custom-alert {
+    --backdrop-opacity: 0.7;
+}
+
+.custom-alert .alert-button-group {
+    padding: 8px;
+}
+
+button.alert-button.alert-button-confirm {
+    background-color: var(--ion-color-success);
+    color: var(--ion-color-success-contrast);
+}
+
+.md button.alert-button.alert-button-confirm {
+    border-radius: 4px;
+}
+
+.ios .custom-alert button.alert-button {
+    border: 0.55px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.2);
+}
+
+.ios button.alert-button.alert-button-cancel {
+    border-right: 0;
+    border-bottom-left-radius: 13px;
+    border-top-left-radius: 13px;
+}
+
+.ios button.alert-button.alert-button-confirm {
+    border-bottom-right-radius: 13px;
+    border-top-right-radius: 13px;
 }

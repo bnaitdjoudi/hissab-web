@@ -4,6 +4,7 @@ import { TicketPage } from './tickets/ticket.page';
 import { PatchPage } from './patch/patch.page';
 import { SupportPage } from './home/support.page';
 import { MaintenancePage } from './maintenance/maintenance.page';
+import { BackupPage } from './backup/backup.page';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: 'auto-maintenance',
     component: MaintenancePage,
+  },
+  {
+    path: 'backup',
+    component: BackupPage,
   },
 ];
 

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { Account } from 'src/app/model/account.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'account-new',
@@ -20,7 +21,8 @@ export class AccountNewPage implements OnInit, OnDestroy {
   constructor(
     readonly accountStore: AccountPageStore,
     private readonly fb: FormBuilder,
-    private readonly router: Router
+    private readonly router: Router,
+    private navCtrl: NavController
   ) {}
 
   ngOnDestroy(): void {
@@ -93,5 +95,9 @@ export class AccountNewPage implements OnInit, OnDestroy {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  backNavigation() {
+    this.navCtrl.back();
   }
 }

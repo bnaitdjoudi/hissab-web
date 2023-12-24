@@ -1,48 +1,63 @@
-ion-card {
-  --color: #444646;
-  width: 100%;
-  border-radius: 5px;
-  margin: 6px 2px;
-  box-shadow: rgb(255 255 255 / 12%) 0px 4px 16px;
-}
-
-ion-card-title {
-  --color: #444646;
-}
-
-ion-card-subtitle {
-  --color: #444646;
-}
-
-/* iOS places the subtitle above the title */
-ion-card-header {}
-
 ion-card-content {
   padding-top: 15px;
   display: contents;
 }
 
 ion-item {
-  --padding-start: 10px;
-  --inner-padding-end: 7px;
+  --padding-start: 5px;
+  --inner-padding-end: 4px;
 }
 
 .line-op-main {
   width: 100%;
 }
 
+.top-title {
+  text-align: center;
+}
+
 .detail-line {
   width: 50%;
   float: left;
+
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* number of lines to show */
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+.m-label {
+  padding: 2pt;
+
+  h2 {
+    font-style: italic;
+    text-transform: lowercase;
+
+    font-weight: 600;
+  }
+}
+
+.date-line {
+  font-size: medium;
+  font-weight: 600;
 }
 
 .total-line {
   text-align: right;
+  float: right;
+  width: 40%;
 
   .balance {
+    width: 100%;
+
     ion-label {
-      width: 50%;
-      float: left;
+
+
       font-style: italic;
     }
 
@@ -56,9 +71,13 @@ ion-item {
 }
 
 .left-line {
+  width: 60%;
+  display: block;
+  float: left;
+
   .title {
     font-size: larger;
-    text-overflow: ellipsis;
+    text-overflow: clip;
   }
 
   .date-line {
@@ -74,6 +93,7 @@ ion-item {
   font-size: small;
   font-weight: 600;
   display: inline-block;
+
 }
 
 .actif.positif {
@@ -101,16 +121,14 @@ ion-item {
 }
 
 ion-card {
-  background-color: #4a4a4f;
-  margin: 8px 6px;
+  width: 100%;
+  background-color: #212934;
+  margin: 4px 3px;
   box-shadow: none;
+  padding: .5em;
 }
 
 .group-header {
   --background: none;
   --color: #d1ebd4;
-}
-
-ion-item-group.groupe-operation {
-  
 }

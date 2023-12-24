@@ -39,6 +39,7 @@ ion-card-content {
       float: left;
       font-style: italic;
     }
+
     .balance-text {
       text-align: right;
       text-decoration: double;
@@ -46,6 +47,10 @@ ion-card-content {
       color: #a9adad;
     }
   }
+}
+
+.top-title {
+  text-align: center;
 }
 
 .left-line {
@@ -115,4 +120,8 @@ ion-card-content {
   font-size: medium;
   font-weight: 600;
   background-color: rgb(250, 186, 186);
+}
+
+.group-header {
+  --background: #151a20;
 }

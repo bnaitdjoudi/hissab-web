@@ -13,11 +13,11 @@ ion-item::part(native) {
 
 
 ion-item-divider {
-  --background: #4a4a4f;
-  --border-color: #4a4a4f;
+  --background: #151a20;
+
   --color: #919491;
 
-  --padding-top: 10px;
+
   --padding-bottom: 0px;
   --padding-start: 10px;
   --padding-end: 20px;
@@ -31,13 +31,13 @@ ion-item {
   }
 
   &.no-border {
-    --background: #4a4a4f;
-    --border-color: #4a4a4f;
+    --background: #151a20;
+    --border-color: #151a20;
   }
 
   &.selected {
-    --background: #6e6a6abf;
-    --border-color: #6e6a6abf;
+    --background: #1a2431;
+    --border-color: #1a2431;
     font-weight: bold;
   }
 }

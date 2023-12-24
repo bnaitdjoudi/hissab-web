@@ -20,6 +20,9 @@ const config: CapacitorConfig = {
       interval: 2,
       autoStart: false,
     },
+    CapacitorHttp: {
+      enabled: true,
+    },
   },
 };
 

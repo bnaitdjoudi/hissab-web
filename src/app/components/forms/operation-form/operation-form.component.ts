@@ -101,8 +101,6 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   leafsAccountFiltred: LeafAccount[] = [];
   leafsAccountTotal: LeafAccount[] = [];
   currentOperation: Operation;
-  showDebitField: boolean = true;
-  showCreditField: boolean = true;
 
   @ViewChild('modal') modalLeaf: IonModal;
 
@@ -149,6 +147,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
 
   classeValideTransferFrom: string = '';
   classeValideTransferTo: string = '';
+  tranferCase: string;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -209,8 +208,9 @@ export class OperationFormComponent implements OnInit, OnDestroy {
     const validatorCross: ValidatorFn = (control: AbstractControl) => {
       const debit = control.get('debit')?.value;
       const credit = control.get('credit')?.value;
-      console.log('test match');
-      return debit === 0 && credit === 0 ? { noMatch: true } : null;
+      const mmm = debit === 0 && credit === 0 ? { noMatch: true } : null;
+
+      return mmm;
     };
     this.operationForm = this.fb.group(
       {
@@ -425,14 +425,9 @@ export class OperationFormComponent implements OnInit, OnDestroy {
       }
 
       if (this.defaultTransferFrom && this.defaultTransferTo) {
-        this.showDebitField = showDebitField(
-          this.defaultTransferFrom.type,
-          this.defaultTransferTo.type
-        );
-
-        this.showCreditField = showCreditField(
-          this.defaultTransferFrom.type,
-          this.defaultTransferTo.type
+        this.tranferCase = this.performTransferCase(
+          this.defaultTransferFrom?.type,
+          this.defaultTransferTo?.type
         );
       }
 
@@ -479,16 +474,14 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   }
 
   next() {
-    this.transferForm.updateValueAndValidity();
     this.operationForm.updateValueAndValidity();
-
+    this.transferForm.updateValueAndValidity();
     switch (this.swiperRef?.selectedIndex) {
       case 0: {
         this.validateAccount();
         break;
       }
       case 1: {
-        console.log('validateAccount');
         if (this.operationForm.hasError('noMatch')) {
           this.presentAlert();
         }
@@ -509,6 +502,12 @@ export class OperationFormComponent implements OnInit, OnDestroy {
     this.controlNext = true;
   }
   validateAccount() {
+    if (this.defaultTransferFrom) {
+      this.transferForm
+        .get('transferF')
+        ?.setValue(this.defaultTransferFrom.path);
+    }
+
     this.classeValideTransferFrom = this.defaultTransferFrom
       ? 'card-account-valide'
       : 'card-account-invalide';
@@ -559,11 +558,11 @@ export class OperationFormComponent implements OnInit, OnDestroy {
       header: 'Alert ',
       subHeader: '',
       message:
-        this.showCreditField && this.showDebitField
+        this.showCredit() && this.showDebit()
           ? 'At less one of debit or credit be greater than 0!'
-          : this.showCreditField
+          : this.showCredit()
           ? 'Credit should greater than 0!'
-          : this.showDebitField
+          : this.showDebit()
           ? 'Debit should greater than 0!'
           : '',
       buttons: ['OK'],
@@ -598,6 +597,58 @@ export class OperationFormComponent implements OnInit, OnDestroy {
     this.currentOperation.attachment = fileName;
     this.operationForm.get('attachment')?.setValue(fileName);
     this.isModalAttachmentOpen = false;
+  }
+
+  private performTransferCase(
+    sourceType: string,
+    destinationType: string
+  ): string {
+    const config: { [key: string]: any } = {
+      actif: {
+        actif: 'case1',
+        passif: 'case5',
+        depense: 'case9',
+        income: 'case13',
+      },
+      passif: {
+        actif: 'case2',
+        passif: 'case6',
+        depense: 'case10',
+        income: 'case14',
+      },
+      depense: {
+        actif: 'case3',
+        passif: 'case7',
+        depense: 'case11',
+        income: 'case15',
+      },
+      income: {
+        actif: 'case4',
+        passif: 'case8',
+        depense: 'case12',
+        income: '',
+      },
+    };
+
+    return config[sourceType][destinationType];
+  }
+
+  showDebit(): boolean {
+    return (
+      this.tranferCase === 'case6' ||
+      this.tranferCase === 'case3' ||
+      this.tranferCase === 'case4' ||
+      this.tranferCase === 'case6' ||
+      this.tranferCase === 'case7' ||
+      this.tranferCase === 'case8' ||
+      this.tranferCase === 'case11' ||
+      this.tranferCase === 'case12' ||
+      this.tranferCase === 'case15'
+    );
+  }
+
+  showCredit(): boolean {
+    return !this.showDebit();
   }
 
   async validateAttachment() {

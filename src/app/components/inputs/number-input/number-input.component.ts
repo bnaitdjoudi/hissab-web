@@ -55,7 +55,7 @@ export class NumberInputComponent implements OnInit, ControlValueAccessor {
 
   valueChange(event: any) {
     // this handles keyboard input for backspace
-    console.log(event.target.value);
+
     this.amountEntered.emit(event.target.value);
   }
 

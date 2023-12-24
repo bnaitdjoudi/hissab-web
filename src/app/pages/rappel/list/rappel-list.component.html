@@ -30,7 +30,9 @@
                         (click)="confirmDelete(item)">
                         <mat-icon color="primary">delete</mat-icon>
                     </button>
-                    <ion-toggle justify="end" [checked]="item.isActive" color="success">Is Active</ion-toggle>
+
+                    <ion-toggle justify="end" slot="end" [checked]="item.isActive" color="success"
+                        (ionChange)="isActivechange($event, item)">Is Active</ion-toggle>
 
 
                 </mat-card-actions>

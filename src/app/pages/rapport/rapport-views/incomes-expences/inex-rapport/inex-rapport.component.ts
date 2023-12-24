@@ -218,6 +218,10 @@ export class InexRapportComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       legend: {
         data: ['Incomes', 'Expenses', 'Worth'],
+        textStyle: {
+          color: '#f1f1f2',
+          fontWeight: 'bold',
+        },
       },
 
       xAxis: [
@@ -227,11 +231,34 @@ export class InexRapportComponent implements OnInit, OnDestroy, AfterViewInit {
           data: this.inexRapport.result.map((el) =>
             format(el.date, 'MMM yyyy')
           ),
+          axisLabel: {
+            overflow: 'truncate',
+            color: '#f1f1f2',
+            fontWeight: 'bold',
+          },
         },
       ],
       yAxis: [
         {
           type: 'value',
+          axisLabel: {
+            formatter: (val: any) => {
+              if (Math.abs(val) < 1000) {
+                return val;
+              }
+              if (Math.abs(val) < 1000000) {
+                return `${val / 1000}K`;
+              }
+              if (Math.abs(val) < 1000000000) {
+                return `${val / 1000000}M`;
+              }
+
+              return;
+            },
+            overflow: 'truncate',
+            color: '#f1f1f2',
+            fontWeight: 'bold',
+          },
         },
       ],
 

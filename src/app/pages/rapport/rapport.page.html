@@ -1,6 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-
+    <ion-buttons slot="start">
+      <ion-button (click)="backNavigation()">
+        <ion-icon name="arrow-back-sharp" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
 
     <ion-title>Repports</ion-title>
   </ion-toolbar>
@@ -14,7 +18,8 @@
     </ion-toolbar>
   </ion-header>
   <div *ngIf=" (currentRap && currentRap.length > 0);else rapport">
-    <ion-card *ngFor="let item of currentRap" button="true" (click)="goto(item.short);">
+    <ion-card *ngFor="let item of currentRap" button="true" [routerLink]="['/rapport', item.short]"
+      routerDirection="forward">
       <ion-card-header>
         <ion-card-title>{{item.name}}</ion-card-title>
         <ion-card-subtitle></ion-card-subtitle>
@@ -22,7 +27,7 @@
     </ion-card>
   </div>
 
-  <ng-template #rapport [ngSwitch]="short">
+  <ng-template #rapport [ngSwitch]=" short">
 
     <asset-rapport *ngSwitchCase="'al'"></asset-rapport>
     <incomes-expences *ngSwitchCase="'ie'"></incomes-expences>

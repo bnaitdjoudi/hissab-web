@@ -1,4 +1,5 @@
-<header-simple [title]="currentAccount.acountName | translate" (onReturnClick)="backToPrent()"></header-simple>
+<header-simple [title]="currentAccount.acountName | translate" (onReturnClick)="backNavigation()"
+  (onPeriodClick)="showPeriodOption()" [periodLabel]="periodLabel"></header-simple>
 <ion-content class="content">
 
 
@@ -7,7 +8,8 @@
     [page]="accountStore._currentPageOperation" [accountPage]="accountStore._currentPageSubAccount"
     [deleteOperationSubject]="accountStore._deleteOperationSubject"
     [deleteAccountSubject]="accountStore._deleteAccountSubject"
-    [isCreateOpModalOpen]="isCreateOpModalOpen && operationData.data.length > 0" [periodLabel]="periodLabel"></actif-view>
+    [isCreateOpModalOpen]="isCreateOpModalOpen && operationData.data.length > 0" [periodLabel]="periodLabel"
+    (onBackToParentFiredEvent)="backToPrent()"></actif-view>
   <ion-modal [isOpen]="isAccountModalOpen">
     <ng-template>
       <ion-header>
@@ -71,7 +73,7 @@
         <fa-icon icon="search"></fa-icon></ion-button>
 
       <ion-button fill="clear" slot="end" (click)="presentActionSheet()" id="menu-button">
-        <fa-icon icon="ellipsis-vertical"></fa-icon></ion-button>
+        <fa-icon icon="plus"></fa-icon></ion-button>
     </ion-buttons>
 
   </ion-toolbar>

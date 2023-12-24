@@ -36,6 +36,11 @@ ion-alert.custom-alert {
   }
 }
 
+ion-button {
+  --color: #fff;
+  color: #fff;
+}
+
 :host {
   --color: #fcfcfc;
 
@@ -99,11 +104,11 @@ ion-modal ion-toolbar {
 
 
 ion-header {
-  --background: #424242;
+  --background: #151a20;
   ;
 
   ion-toolbar {
-    --background: #424242;
+    --background: #151a20;
     ;
     --border-style: none;
     border: 0px !important;
@@ -143,11 +148,11 @@ ion-header {
 
 
 ion-footer {
-  --background: #424242;
+  --background: #151a20;
   ;
 
   ion-toolbar {
-    --background: #424242;
+    --background: #151a20;
     --border-style: none;
     border: 0px !important;
     border-bottom-color: transparent !important;
@@ -185,7 +190,7 @@ ion-footer {
 
 
 ion-content {
-  --background: #424242;
+  --background: #151a20;
 
   ::-webkit-scrollbar {
     display: none;
@@ -198,11 +203,11 @@ ion-content.content {
 }
 
 ion-item {
-  --background: #424242;
+  --background: #151a20;
   ;
   --padding-start: 7px;
   --padding-end: 7px;
-  --border-color: #616161;
+  --border-color: #151a20;
   --inner-padding-end: 0px;
   --padding-bottom: 1px;
 
@@ -222,15 +227,15 @@ ion-item {
 }
 
 .list-md {
-  background-color: #424242;
+  background-color: #151a20;
 }
 
 .balance {
   border-radius: 3px;
-  padding: 8px;
+  padding: 6px 5px 3px 8px;
   font-size: medium;
   font-weight: 600;
-  background-color: #46464bfa;
+
 }
 
 .uppercase-text {

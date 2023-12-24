@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Backup
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content center text-center>
+
+  <div class="center-content">
+
+    <div class="spinner">
+      <ion-spinner *ngIf="showSpinner"></ion-spinner>
+    </div>
+
+
+    <div class="coucou">
+      <ion-button (click)="restore()">Restore from backup</ion-button>
+    </div>
+
+    <div class="coucou">
+      <ion-button (click)="makebackup()">Make a backup</ion-button>
+    </div>
+
+
+  </div>
+
+
+</ion-content>

@@ -52,6 +52,11 @@ export class RappelListComponent implements OnInit, AfterViewInit {
     this.isAlertOpen = true;
   }
 
+  isActivechange(event: any, rappel: Rappel) {
+    rappel.isActive = event.target.checked;
+    this.rappelStore.updateRappel(rappel).then(() => {});
+  }
+
   setResult(ev: any) {
     console.log(`Dismissed with role: ${ev.detail.role}`);
     this.isAlertOpen = false;

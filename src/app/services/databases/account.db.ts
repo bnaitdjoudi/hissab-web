@@ -140,15 +140,15 @@ export class AccountDataBase
     return new Promise<Account[]>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(`SELECT * FROM ${tables.account.name};`)
+          .executeSql(`SELECT * FROM ${tables.account.name};`, [])
           .then((res: any) => resolve(this.constructAccountArray(res)))
-          .catch((err: any) =>
+          .catch((err: any) => {
             printError(
               "error l'ors de la recuperation des accounts",
               reject,
               err
-            )
-          );
+            );
+          });
       }
     });
   }

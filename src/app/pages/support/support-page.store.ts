@@ -9,8 +9,13 @@ import { DataBaseService } from 'src/app/services/databases/database.service';
 import { Patch } from 'src/app/model/patch.model';
 import { OperationService } from 'src/app/services/operation.service';
 import { AccountsService } from 'src/app/services/accounts.service';
-import { number } from 'echarts';
+
 import { pathToAllParentUniquePath } from 'src/app/tools/tools';
+import { BackupService } from 'src/app/services/backup.service';
+import { Account } from 'src/app/model/account.model';
+import { AccountDto } from 'src/app/model/dtos/account.dto';
+import { Operation } from 'src/app/model/operation.model';
+import { OperationDto } from 'src/app/model/dtos/operation.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +28,8 @@ export class SupportPageStore extends Store<SupportModel> {
     readonly mainStore: MainStore,
     readonly dataBaseService: DataBaseService,
     readonly operationService: OperationService,
-    readonly accountService: AccountsService
+    readonly accountService: AccountsService,
+    readonly backupService: BackupService
   ) {
     super({ validDate: false });
   }
@@ -92,5 +98,72 @@ export class SupportPageStore extends Store<SupportModel> {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async makeBackup() {
+    const accounts: Account[] = await this.accountService.getAllAccounts();
+
+    await Promise.all(
+      accounts
+        .map((account) => this.getAccountDtos(account))
+        .map((account) => this.performAccount(account))
+    );
+
+    await this.backupService.orderTreeAccount();
+  }
+
+  private async performAccount(account: AccountDto) {
+    console.log('creating account : ', account.acountName);
+    const acc = await this.backupService.createAccounts(account);
+    console.log('created ! ', acc.accountId);
+
+    if (acc.isLeaf) {
+      console.log('creating operations account : ', account.acountName);
+      const operations = await this.operationService.getOperationsByAccountId(
+        acc.profileId
+      );
+
+      const operationDtos = operations.map((op) =>
+        this.createOperationDtos(op)
+      );
+      operationDtos.forEach(
+        (op) => (op.idAccount = acc.accountId ? acc.accountId : 0)
+      );
+
+      await Promise.all(
+        operationDtos.map((op) => this.backupService.createOperation(op))
+      );
+      console.log('operation created ! ', acc.acountName);
+    }
+  }
+
+  private createOperationDtos(operation: Operation): OperationDto {
+    return {
+      operationProfile: 'brahim',
+      numTrans: operation.numTrans,
+      time: operation.time,
+      description: operation.description,
+      statut: operation.statut,
+      credit: operation.credit,
+      debit: operation.debit,
+      balance: operation.balance,
+      idAccount: operation.idAccount,
+      transfer: operation.transfer,
+      attachement: operation.attachment,
+    };
+  }
+
+  private getAccountDtos(account: Account): AccountDto {
+    return {
+      accountProfile: 'brahim',
+      profileId: account.id,
+      acountName: account.acountName,
+      balance: account.rbalance ? account.rbalance : 0,
+      isMain: account.isMain,
+      type: account.type,
+
+      path: account.path,
+      isLeaf: account.isLeaf,
+    };
   }
 }

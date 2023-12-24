@@ -1,17 +1,30 @@
+<ion-header>
+
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="backNavigation()">
+        <ion-icon name="arrow-back-sharp" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title> Search Operation </ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
 <ion-content>
-  <ion-header>
-    <ion-toolbar>
-      <ion-title>Search Operation </ion-title>
-    </ion-toolbar>
-  </ion-header>
+
   <ion-grid>
     <ion-row>
 
       <ion-col><ion-searchbar placeholder="Description" [value]="description"
           (ionInput)="handleInput($event)"></ion-searchbar></ion-col>
-      <ion-col size="auto"><button id="open-filter" mat-mini-fab matSuffix aria-label="End Date">
-          <mat-icon color="primary">tune</mat-icon>
-        </button></ion-col>
+      <ion-col size="auto">
+
+        <ion-button id="open-filter" fill="clear">
+          <ion-icon name="options-outline" size="large"></ion-icon>
+        </ion-button>
+
+      </ion-col>
     </ion-row>
   </ion-grid>
 
@@ -124,16 +137,22 @@
 
     <ion-buttons slot="start">
 
-      <button mat-mini-fab matSuffix aria-label="End Date" (click)="goHome()">
-        <mat-icon color="primary">home</mat-icon>
-      </button>
+
+
+      <ion-button fill="clear" slot="start" (click)="goHome()" id="menu-button">
+
+        <fa-icon icon="house"></fa-icon>
+      </ion-button>
 
     </ion-buttons>
 
     <ion-buttons slot="end">
-      <button mat-mini-fab matSuffix aria-label="reate" (click)="add()">
-        <mat-icon color="primary">add</mat-icon>
-      </button>
+
+
+      <ion-button fill="clear" slot="end" (click)="add()" id="menu-button">
+        <fa-icon icon="plus"></fa-icon></ion-button>
+
+
 
     </ion-buttons>
 

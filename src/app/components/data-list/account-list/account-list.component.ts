@@ -19,7 +19,7 @@ export class AccountListComponent implements OnInit {
   @Input() currBalFun: (debit: number, credit: number) => any[];
   @Input() account: Account;
   @Input() periodLabel: string;
-
+  @Output() onBackToParentFired = new EventEmitter<void>();
   @Output() onElementSelected = new EventEmitter<Account>();
   @Output() onIonInfiniteScroll = new EventEmitter<InfiniteScrollCustomEvent>();
   @Output() onDelete = new EventEmitter<number>();
@@ -27,9 +27,7 @@ export class AccountListComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    console.log(
-      'init ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg'
-    );
+   
   }
 
   onIonInfinite(ev: Event) {
@@ -61,5 +59,9 @@ export class AccountListComponent implements OnInit {
 
   multiplyFor(type: string): number {
     return type === 'actif' || type === 'income' ? 1 : -1;
+  }
+
+  backToParent() {
+    this.onBackToParentFired.emit();
   }
 }

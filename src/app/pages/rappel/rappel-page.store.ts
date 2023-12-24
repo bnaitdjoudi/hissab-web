@@ -56,6 +56,22 @@ export class RappelPageStore extends Store<RappelModel> {
     });
   }
 
+  async updateRappel(rappel: Rappel) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.rappelService.update(rappel);
+        if (rappel.isActive) {
+          await this.notificationService.createRappelNotification(rappel);
+        } else {
+          await this.notificationService.deleteByRappelId(rappel.id);
+        }
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   async deleteRappel(rap: Rappel): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {

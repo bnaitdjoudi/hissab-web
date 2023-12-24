@@ -17,7 +17,6 @@ export class AccountSearchPage implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
   ngOnInit(): void {
     this.accountStore.listAccounts$.subscribe((accs) => {
-      console.log(JSON.stringify(accs));
       this.results = accs;
     });
 

@@ -1,8 +1,10 @@
-<ion-header class="header-color">
+<ion-header>
   <ion-toolbar>
 
     <ion-buttons slot="start">
-
+      <ion-button fill="clear" slot="end" id="menu-button" (click)="back()">
+        <ion-icon name="arrow-back-sharp" size="large"></ion-icon>
+      </ion-button>
     </ion-buttons>
 
     <ion-title><ion-label class="capitelize">
@@ -14,6 +16,8 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" *ngIf="operation as op" class="ion-padding">
+
+
 
   <ion-list class="operation-details">
 
