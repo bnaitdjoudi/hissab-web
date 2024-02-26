@@ -13,6 +13,8 @@ export const tables = {
       { name: 'PARENT_ID', type: 'INTEGER' },
       { name: 'PATH', type: 'TEXT' },
       { name: 'IS_LEAF', type: 'INTEGER(1)' },
+      { name: 'LIMIT_MAX', type: 'REAL' },
+      { name: 'LIMIT_MIN', type: 'REAL' },
     ],
   },
 
@@ -65,7 +67,7 @@ export const tables = {
     name: 'PATCH_SQL',
     columns: [
       { name: 'CODE', type: 'VARCHAR(35) PRIMARY KEY' },
-      { name: 'QUERY', type: 'TEXT' },
+      { name: 'query', type: 'TEXT' },
     ],
   },
 
@@ -92,6 +94,17 @@ export const tables = {
       { name: 'NOTIFY_DATE_BEGIN', type: 'VARCHAR(21)' }, // ACCOUNT (A), OPERATION (O), EVENT_PLANE(E)
       { name: 'IS_OPEN', type: 'INTEGER(1)' }, // description
       { name: 'EVENT_DATE', type: 'VARCHAR(21)' }, // ACCOUNT (A), OPERATION (O), EVENT_PLANE(E)
+    ],
+  },
+
+  limites: {
+    name: 'ACCOUNT_LIMIT',
+    columns: [
+      { name: 'ID', type: 'INTEGER PRIMARY KEY AUTOINCREMENT' },
+      { name: 'ACCOUNT_ID ', type: 'INTEGER' }, // ACCOUNT CIBLE
+      { name: 'MAX', type: 'REEL' }, // ACCOUNT MAX
+      { name: 'MIN', type: 'REEL' }, // ACCOUNT MIN
+      { name: 'PERIOD', type: 'VARCHAR(2)' }, // LIMITE PERIODE
     ],
   },
 };
@@ -206,6 +219,10 @@ export const CREATE_RAPPEL_TABLE = `CREATE TABLE  IF NOT EXISTS ${
 export const CREATE_NOTIFICATION_TABLE = `CREATE TABLE  IF NOT EXISTS ${
   tables.notification.name
 } (${tables.notification.columns.map((el) => el.name + ' ' + el.type)});`;
+
+export const CREATE_ACCOUNT_LIMIT_TABLE = `CREATE TABLE IF NOT EXISTS ${
+  tables.limites.name
+} (${tables.limites.columns.map((el) => el.name + ' ' + el.type)});`;
 
 //ALTER TABLE OPERATION  ADD PROFILE  VARCHAR(35);
 //update OPERATION set PROFILE = 'bnaitdjoudi@gmail.com';

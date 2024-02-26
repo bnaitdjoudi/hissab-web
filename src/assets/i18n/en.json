@@ -1,6 +1,42 @@
 {
+  "menu": {
+    "dashbord": "dashboard",
+
+    "account": {
+      "text": "Account",
+      "new": " New Account",
+      "search": "Search Account"
+    },
+
+    "operation": {
+      "text": "operations",
+      "new": "new operation",
+      "search": "search operation"
+    },
+
+    "magaging": {
+      "text": "managing tools",
+      "rapport": "reports",
+      "remind": "reminder",
+      "alert": "alert"
+    },
+
+    "admin": {
+      "text": "admin",
+      "profiles": "profiles & personnes",
+      "subscription": "subscription",
+      "langues": "languages",
+      "support": "support"
+    }
+  },
+
   "period": {
-    "global": "global"
+    "global": "global",
+    "gl": "global",
+    "an": "annuale",
+    "dl": "daily",
+    "ml": "monthly",
+    "wl": "weekly"
   },
   "month": {
     "January": "January",
@@ -36,6 +72,7 @@
       "description": "description",
       "attachment": "attachment",
       "numTrans": "transaction number",
+      "path": "path",
 
       "actif": {
         "debit": "deposite",
@@ -105,9 +142,13 @@
       }
     },
     "account": {
-      "title": "New account",
-      "name": "Enter name of account",
-      "placeholder": "Account name"
+      "title": "new account",
+      "parent": "parent account",
+      "name": "account name",
+      "name_message": "Enter a valide account name",
+      "path": "path",
+      "reset": "reset",
+      "submit": "submit"
     }
   },
 
@@ -123,10 +164,17 @@
         "balance": "balance",
         "global": "global"
       }
+    },
+    "lang": {
+      "apply": "apply",
+      "cancel": "cancel"
     }
   },
 
   "operations": {
     "s": "waiting"
+  },
+  "titles": {
+    "lang": "languages"
   }
 }

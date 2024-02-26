@@ -48,12 +48,12 @@ export class ProfileListTypeheadComponent implements OnInit {
    * query is provided, all data
    * will be rendered.
    */
-  filterList(searchQuery: string | undefined) {
+  filterList(searchquery: string | undefined) {
     /**
      * If no search query is defined,
      * return all options.
      */
-    if (searchQuery === undefined) {
+    if (searchquery === undefined) {
       this.filteredItems = [...this.items];
     } else {
       /**
@@ -61,11 +61,11 @@ export class ProfileListTypeheadComponent implements OnInit {
        * query and check to see which items
        * contain the search query as a substring.
        */
-      const normalizedQuery = searchQuery.toLowerCase();
+      const normalizedquery = searchquery.toLowerCase();
       this.filteredItems = this.items.filter((item) => {
         return (item.firstName + item.lastName)
           .toLowerCase()
-          .includes(normalizedQuery);
+          .includes(normalizedquery);
       });
     }
   }

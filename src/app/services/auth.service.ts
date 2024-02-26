@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthModel } from '../model/auth.model';
 import { AuthDataBase } from './databases/auth.db';
+import * as CryptoJS from 'crypto-js';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
   }
 
   async isLogginSuccess(auth: AuthModel): Promise<boolean> {
+    console.log('PASSWORD:', auth.password);
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         let auths = await this.authDb.findByEmailAndPassword({
@@ -32,8 +34,9 @@ export class AuthService {
   async generateSHA256Hash(data: any): Promise<string> {
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
-    const hashBuffer = await window.crypto.subtle.digest('SHA-256', dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    CryptoJS.SHA256(CryptoJS.enc.Hex.parse(data)).toString(CryptoJS.enc.Hex);
+    const hashBuffer = CryptoJS.SHA256(CryptoJS.enc.Hex.parse(data));
+    const hashArray = Array.from(new Uint8Array(hashBuffer.sigBytes));
     const hashHex = hashArray
       .map((byte) => byte.toString(16).padStart(2, '0'))
       .join('');

@@ -16,6 +16,7 @@ import { Account } from 'src/app/model/account.model';
 import { AccountDto } from 'src/app/model/dtos/account.dto';
 import { Operation } from 'src/app/model/operation.model';
 import { OperationDto } from 'src/app/model/dtos/operation.dto';
+import { LeafAccount } from 'src/app/model/leaf-account.model';
 
 @Injectable({
   providedIn: 'root',
@@ -42,28 +43,45 @@ export class SupportPageStore extends Store<SupportModel> {
     let data: string = this.state.fileObject.dataURI;
     console.log(atob(atob(data.replace('data:text/plain;base64,', ''))));
     if (this.state.fileObject) {
-      const patch: Patch = JSON.parse(
-        atob(atob(data.replace('data:text/plain;base64,', '')))
-      );
-      const results = patch.queries.map(async (query) => {
-        console.log('QUERY:' + query.query);
-        return {
-          code: query.codePatch,
-          statut: await this.dataBaseService.runPatchQuery(query),
-        };
-      });
+      console.log('Patch: parsing');
+      try {
+        const patch: Patch = JSON.parse(
+          atob(atob(data.replace('data:text/plain;base64,', '')))
+        );
 
-      alert(JSON.stringify(results));
+        console.log('Patch:', JSON.stringify(patch));
+
+        const results = patch.queries.map(async (query) => {
+          console.log('query:' + query.query);
+          return {
+            code: query.codePatch,
+            statut: await this.dataBaseService.runPatchquery(query),
+          };
+        });
+
+        alert(JSON.stringify(results));
+      } catch (error) {
+        console.log('errreur:', JSON.stringify(error));
+      }
     }
   }
 
   async processToMaintaine(): Promise<void> {
-    try {
-      await this.accountService.resetAllAccountTo(0);
-      const leafAccounts =
-        await this.accountService.getLeatAccountExceptOneByIds([0]);
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.accountService.resetAllAccountTo(0);
+        const leafAccounts =
+          await this.accountService.getLeatAccountExceptOneByIds([0]);
+        await Promise.all(leafAccounts.map((leaf) => this.leafProcess(leaf)));
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
 
-      leafAccounts.forEach(async (leaf) => {
+  private async leafProcess(leaf: LeafAccount): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
         let balance: number = 0;
         const operations = await this.operationService.getAllYearOperation(
           leaf.id
@@ -88,16 +106,15 @@ export class SupportPageStore extends Store<SupportModel> {
               this.operationService.updateOperation(op, op.id)
             )
           );
+          await this.accountService.updateTotalByAccountPath(
+            [...pathToAllParentUniquePath(leaf.path)],
+            balance
+          );
         }
-
-        await this.accountService.updateTotalByAccountPath(
-          [...pathToAllParentUniquePath(leaf.path)],
-          balance
-        );
-      });
-    } catch (error) {
-      console.error(error);
-    }
+      } catch (error) {
+        console.error(error);
+      }
+    });
   }
 
   async makeBackup() {

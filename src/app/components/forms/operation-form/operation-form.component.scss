@@ -138,3 +138,35 @@ ion-label {
     color: #cfb6b6;
   }
 }
+
+.detail-leaf {
+  width: 50%;
+  padding: 0.1em;
+
+  span {
+    width: 100%;
+  }
+
+  .account-name {
+    font-size: 14pt;
+    font-weight: bold;
+  }
+
+  .account-path {
+    font-style: italic;
+    color: #fcfcfc;
+
+  }
+}
+
+ion-radio {
+  float: left;
+}
+
+.mat-mdc-card-title {
+  color: #fcfcfc;
+}
+
+.account-name {
+  color: #fcfcfc;
+}

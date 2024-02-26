@@ -53,11 +53,29 @@ ion-header::after {
 
 ion-label {
   color: #fcfcfc;
+
+
+
+}
+
+.ltr-label {
+  text-align: left;
+}
+
+.rtl-label {
+  text-align: right;
 }
 
 button {
   span {
     text-transform: capitalize;
+  }
+
+}
+
+.input-wrapper.sc-ion-input-md {
+  .label-text-wrapper {
+    text-align: left;
   }
 
 }
@@ -96,8 +114,9 @@ button.alert-button.alert-button-confirm {
 }
 
 ion-modal ion-toolbar {
-  --background: #33804b;
+  --background: #151a20;
   --color: white;
+  color: white;
 }
 
 
@@ -204,12 +223,7 @@ ion-content.content {
 
 ion-item {
   --background: #151a20;
-  ;
-  --padding-start: 7px;
-  --padding-end: 7px;
-  --border-color: #151a20;
-  --inner-padding-end: 0px;
-  --padding-bottom: 1px;
+
 
   ion-label {
     color: #eff6f1 !important;

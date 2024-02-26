@@ -18,6 +18,7 @@ import {
   AssetAtDateRapport,
 } from '../model/rapport-store.model';
 import { AssetRapportComponent } from '../pages/rapport/rapport-views/asset-rapport/asset-rapport.component';
+import { Account } from '../model/account.model';
 
 @Injectable({
   providedIn: 'root',
@@ -98,21 +99,18 @@ export class OperationService {
     countId: number,
     diff: number
   ): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      this.operationDb
-        .adjusteAfterOperationByDate(date, countId, diff)
-        .then(() => {
-          this.accountService.getAccountById(countId).then((account) => {
-            this.accountService
-              .updateTotalByAccountPath(
-                [...pathToAllParentUniquePath(account.path)],
-                diff
-              )
-              .then(() => resolve(null))
-              .catch((err) => reject(err));
-          });
-        })
-        .catch((err: any) => reject(err));
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        await this.operationDb.adjusteAfterOperationByDate(date, countId, diff);
+        const account = await this.accountService.getAccountById(countId);
+        await this.accountService.updateTotalByAccountPath(
+          [...pathToAllParentUniquePath(account.path)],
+          diff
+        );
+        resolve(null);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
@@ -137,77 +135,53 @@ export class OperationService {
   async businessCreationOperationDate(
     operationS: Operation
   ): Promise<Operation> {
-    return new Promise<Operation>((resolve, reject) => {
-      this.accountService
-        .getAccountById(operationS.idAccount)
-        .then((accountS) => {
-          this.accountService
-            .findAccountByPath(operationS.transfer)
-            .then(async (accountD) => {
-              let operationD: Operation =
-                this.accountingService.processTransferingOperation(
-                  accountS.type + '->' + accountD.type,
-                  operationS
-                );
+    return new Promise(async (resolve, reject) => {
+      try {
+        const [accountS, accountD] = await Promise.all([
+          this.accountService.getAccountById(operationS.idAccount),
+          this.accountService.findAccountByPath(operationS.transfer),
+        ]);
 
-              operationD.transfer = accountS.path;
-              operationS.transfer = accountD.path;
+        let operationD: Operation =
+          this.accountingService.processTransferingOperation(
+            accountS.type + '->' + accountD.type,
+            operationS
+          );
+        operationD.transfer = accountS.path;
+        operationS.transfer = accountD.path;
 
-              operationD.idAccount = accountD.id;
-              operationS.idAccount = accountS.id;
+        operationD.idAccount = accountD.id;
+        operationS.idAccount = accountS.id;
 
-              try {
-                let balanceS = await this.getBalanceBeforeDate(
-                  operationS.time,
-                  operationS.idAccount
-                );
+        const [balanceS, balanceD] = await Promise.all([
+          this.getBalanceBeforeDate(operationS.time, operationS.idAccount),
+          this.getBalanceBeforeDate(operationD.time, operationD.idAccount),
+        ]);
 
-                let balanceD = await this.getBalanceBeforeDate(
-                  operationD.time,
-                  operationD.idAccount
-                );
+        operationD.balance = operationD.debit + balanceD - operationD.credit;
+        operationS.balance = balanceS + operationS.debit - operationS.credit;
+        let operations = [operationD, operationS];
 
-                operationD.balance =
-                  operationD.debit + balanceD - operationD.credit;
-                operationS.balance =
-                  balanceS + operationS.debit - operationS.credit;
-                let operations = [operationD, operationS];
-                this.operationDb
-                  .createListIdReturning(operations, false)
-                  .then((ids) => {
-                    Promise.all(
-                      operations.map((op) =>
-                        this.adjusteAfterOperationByDate(
-                          op.time,
-                          op.idAccount,
-                          op.debit - op.credit
-                        )
-                      )
-                    )
-                      .then(() => {
-                        operationS.id = ids[1];
-                        resolve(operationS);
-                      })
-                      .catch((err) =>
-                        printError('erreur durant la ajustement', reject, err)
-                      );
-                  })
-                  .catch((err) =>
-                    printError(
-                      'erreur durant lajout de loperation',
-                      reject,
-                      err
-                    )
-                  );
-              } catch (error) {
-                printError(
-                  'erreur dans la recuperation de la balance',
-                  reject,
-                  error
-                );
-              }
-            });
-        });
+        const ids = await this.operationDb.createListIdReturning(
+          operations,
+          false
+        );
+
+        await Promise.all(
+          operations.map((op) =>
+            this.adjusteAfterOperationByDate(
+              op.time,
+              op.idAccount,
+              op.debit - op.credit
+            )
+          )
+        );
+
+        operationS.id = ids[1];
+        resolve(operationS);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
@@ -459,6 +433,38 @@ export class OperationService {
       } catch (error) {
         reject('error durant lappel a dao');
         console.error(error);
+      }
+    });
+  }
+
+  async getAccountBalanceBetweenDates(
+    startDate: Date,
+    endDate: Date,
+    accountId: number
+  ): Promise<number> {
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        const accountMain = await this.accountService.getAccountById(accountId);
+        if (accountMain.isLeaf) {
+          const balance = await this.operationDb.getAccountBalanceBetweenDates(
+            startDate,
+            endDate,
+            [accountId]
+          );
+          resolve(balance);
+        } else {
+          const accounts: Account[] =
+            await this.accountService.findAllLeafChildAccounst(accountId);
+          const balance = await this.operationDb.getAccountBalanceBetweenDates(
+            startDate,
+            endDate,
+            accounts.map((el) => el.id)
+          );
+          resolve(balance);
+        }
+      } catch (error) {
+        console.error(error);
+        resolve(0);
       }
     });
   }

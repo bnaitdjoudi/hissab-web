@@ -1,22 +1,22 @@
 <ion-content>
     <ion-list lines="none" [inset]="true">
         <ion-item [class]="'first no-border ' + getSelectedClass('dash')">
-            <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+            <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                 fontIcon="dashboard"></mat-icon>
-            <ion-label>
-                DashBorad
+            <ion-label [class]="labelclass">
+                {{ 'menu.dashbord' | traduction }}
             </ion-label>
         </ion-item>
         <ion-item-divider>
-            <ion-label> Account </ion-label>
+            <ion-label [slot]="iconslot" [class]="labelclass"> {{'menu.account.text' | traduction  }} </ion-label>
         </ion-item-divider>
         <ion-menu-toggle>
             <ion-item class="no-border" (click)="goto('/account/new')">
 
-                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="create_new_folder"></mat-icon>
-                <ion-label>
-                    New Account
+                <ion-label [class]="labelclass">
+                    {{'menu.account.new' | traduction}}
                 </ion-label>
 
 
@@ -24,89 +24,90 @@
         </ion-menu-toggle>
         <ion-menu-toggle>
             <ion-item [class]="'no-border '" (click)="goto('/account/search')">
-                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="search"></mat-icon>
-                <ion-label>
-                    Search Accounts
+                <ion-label [class]="labelclass">
+                    {{'menu.account.search' | traduction}}
                 </ion-label>
             </ion-item>
         </ion-menu-toggle>
         <ion-menu-toggle>
             <ion-item-divider>
-                <ion-label> Operations </ion-label>
+                <ion-label [slot]="iconslot" [class]="labelclass"> {{'menu.operation.text' | traduction}} </ion-label>
             </ion-item-divider>
             <ion-item class="no-border" (click)="goto('/operation/new')">
-                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="create_new_folder"></mat-icon>
-                <ion-label>
-                    New Operation
+                <ion-label [class]="labelclass">
+                    {{'menu.operation.new' | traduction}}
                 </ion-label>
             </ion-item>
         </ion-menu-toggle>
         <ion-menu-toggle>
             <ion-item class="no-border" (click)="goto('/operation/search')">
-                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="search"></mat-icon>
-                <ion-label>
-                    Search Operations
+                <ion-label [class]="labelclass">
+                    {{'menu.operation.search' | traduction}}
                 </ion-label>
             </ion-item>
 
         </ion-menu-toggle>
 
         <ion-item-divider>
-            <ion-label> Managing tools </ion-label>
+            <ion-label [slot]="iconslot" [class]="labelclass"> {{'menu.magaging.text' | traduction}} </ion-label>
         </ion-item-divider>
         <ion-item (click)="goto('/rapport')">
-            <mat-icon class="icon-size" aria-hidden="false">bar_chart</mat-icon>
-            <ion-label> Reports </ion-label>
+            <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false">bar_chart</mat-icon>
+            <ion-label [class]="labelclass"> {{'menu.magaging.rapport' | traduction}} </ion-label>
         </ion-item>
 
 
         <ion-item (click)="goto('/rappel')">
-            <mat-icon class="icon-size" aria-hidden="false">event</mat-icon>
-            <ion-label> Rappel </ion-label>
+            <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false">event</mat-icon>
+            <ion-label [class]="labelclass"> {{'menu.magaging.remind' | traduction}} </ion-label>
         </ion-item>
 
         <ion-item (click)="goto('/notification')">
-            <mat-icon class="icon-size" aria-hidden="false">add_alert</mat-icon>
-            <ion-label> Alert </ion-label>
+            <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false">add_alert</mat-icon>
+            <ion-label [class]="labelclass"> {{'menu.magaging.alert' | traduction}} </ion-label>
         </ion-item>
 
         <ion-item-divider>
-            <ion-label> Admin </ion-label>
+            <ion-label [slot]="iconslot" [class]="labelclass"> {{'menu.admin.text' | traduction}} </ion-label>
         </ion-item-divider>
         <ion-menu-toggle>
             <ion-item class="no-border" (click)="goto('/profile')">
-                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="people"></mat-icon>
-                <ion-label>
-                    Profiles & Personnes
+                <ion-label [class]="labelclass">
+                    {{'menu.admin.profiles' | traduction}}
                 </ion-label>
             </ion-item>
         </ion-menu-toggle>
         <ion-menu-toggle>
             <ion-item class="no-border" (click)="goto('/operation/search')">
-                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+                <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="card_membership"></mat-icon>
-                <ion-label>
-                    Abonnement
+                <ion-label [class]="labelclass">
+                    {{'menu.admin.subscription' | traduction}}
                 </ion-label>
             </ion-item>
         </ion-menu-toggle>
+
         <ion-menu-toggle>
-            <ion-item class="no-border" (click)="goto('/operation/new')">
-                <mat-icon class="icon-size" aria-hidden="false" aria-label="Example home icon"
+            <ion-item class="no-border" (click)="goto('/admin/lang')">
+                <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false" aria-label="Example home icon"
                     fontIcon="translate"></mat-icon>
-                <ion-label>
-                    Langues
+                <ion-label [class]="labelclass">
+                    {{'menu.admin.langues' | traduction}}
                 </ion-label>
             </ion-item>
         </ion-menu-toggle>
 
         <ion-item (click)="goto('/support')">
-            <mat-icon class="icon-size" aria-hidden="false">support</mat-icon>
-            <ion-label> Support </ion-label>
+            <mat-icon [slot]="iconslot" class="icon-size" aria-hidden="false">support</mat-icon>
+            <ion-label [class]="labelclass"> {{'menu.admin.support' | traduction}} </ion-label>
         </ion-item>
 
     </ion-list>

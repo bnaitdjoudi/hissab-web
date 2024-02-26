@@ -99,8 +99,8 @@ describe('OperationDataBase', () => {
 
   beforeEach(waitForAsync(() => {
     let sqLiteObject: any = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.returnValue(Promise.resolve('created')),
     };
 
@@ -129,7 +129,7 @@ describe('OperationDataBase', () => {
   it('OperationDataBase  create', async () => {
     await operationBd.create(operation);
     expect(dataBaseService.openSQLObject).toHaveBeenCalledTimes(1);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
         .filter((el) => el.name !== 'ID')
         .map((el) => el.name)}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?);`,
@@ -147,10 +147,10 @@ describe('OperationDataBase', () => {
     }
   });
 
-  it('OperationDataBase  create sqLiteObject.executeSql reject', async () => {
+  it('OperationDataBase  create sqLiteObject.query reject', async () => {
     operationBd.sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.returnValue(Promise.reject('error')),
     };
 
@@ -161,10 +161,10 @@ describe('OperationDataBase', () => {
     }
   });
 
-  it('OperationDataBase  create sqLiteObject.executeSql reject code 6', async () => {
+  it('OperationDataBase  create sqLiteObject.query reject code 6', async () => {
     operationBd.sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.returnValue(Promise.reject({ code: 6 })),
     };
 
@@ -177,19 +177,19 @@ describe('OperationDataBase', () => {
 
   it('OperationDataBase  update all good', async () => {
     operationBd.findById = jasmine
-      .createSpy('executeSql')
+      .createSpy('query')
       .and.returnValue(Promise.resolve(operation));
 
     await operationBd.update(operation, operation.id);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE  OPERATION SET NUM_TRANS = ?,TIME = ?,DESCRIPTION = ?,STATUT = ?,CREDIT = ?,DEBIT = ?,BALANCE = ?,ID_ACCOUNT = ?,TRANSFER = ? WHERE ID = ? ',
       ['', operation.time, '', '', 0, 0, 0, 0, '', 0]
     );
   });
 
-  it('OperationDataBase  update executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase  update query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject('error'));
 
     try {
@@ -198,7 +198,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('error dans le update doperation');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE  OPERATION SET NUM_TRANS = ?,TIME = ?,DESCRIPTION = ?,STATUT = ?,CREDIT = ?,DEBIT = ?,BALANCE = ?,ID_ACCOUNT = ?,TRANSFER = ? WHERE ID = ? ',
       ['', operation.time, '', '', 0, 0, 0, 0, '', 0]
     );
@@ -215,7 +215,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('error dans le update doperation');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE  OPERATION SET NUM_TRANS = ?,TIME = ?,DESCRIPTION = ?,STATUT = ?,CREDIT = ?,DEBIT = ?,BALANCE = ?,ID_ACCOUNT = ?,TRANSFER = ? WHERE ID = ? ',
       ['', operation.time, '', '', 0, 0, 0, 0, '', 0]
     );
@@ -232,64 +232,60 @@ describe('OperationDataBase', () => {
   });
 
   it('OperationDataBase  findById all good', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 1,
-            item: (i: number) => {
-              return {
-                ID: operation.id,
-                NUM_TRANS: operation.numTrans,
-                TIME: operation.time.toISOString(),
-                BALANCE: operation.balance,
-                DESCRIPTION: operation.description,
-                STATUT: operation.statut,
-                CREDIT: operation.credit,
-                DEBIT: operation.debit,
-                ID_ACCOUNT: operation.idAccount,
-                TYPE: operation.accountType,
-                TRANSFER: operation.transfer,
-              };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 1,
+          item: (i: number) => {
+            return {
+              ID: operation.id,
+              NUM_TRANS: operation.numTrans,
+              TIME: operation.time.toISOString(),
+              BALANCE: operation.balance,
+              DESCRIPTION: operation.description,
+              STATUT: operation.statut,
+              CREDIT: operation.credit,
+              DEBIT: operation.debit,
+              ID_ACCOUNT: operation.idAccount,
+              TYPE: operation.accountType,
+              TRANSFER: operation.transfer,
+            };
           },
-        })
-      );
+        },
+      })
+    );
 
     let operationresult = await operationBd.findById(operation.id);
     expect(operation).toEqual(operationresult);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM OPERATION WHERE ID = 0;',
       []
     );
   });
 
-  it('OperationDataBase  findById executeSql no operation found', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 0,
-            item: (i: number) => {
-              return {
-                ID: operation.id,
-                NUM_TRANS: operation.numTrans,
-                TIME: operation.time.toISOString(),
-                BALANCE: operation.balance,
-                DESCRIPTION: operation.description,
-                STATUT: operation.statut,
-                CREDIT: operation.credit,
-                DEBIT: operation.debit,
-                ID_ACCOUNT: operation.idAccount,
-                TYPE: undefined,
-                TRANSFER: operation.transfer,
-              };
-            },
+  it('OperationDataBase  findById query no operation found', async () => {
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 0,
+          item: (i: number) => {
+            return {
+              ID: operation.id,
+              NUM_TRANS: operation.numTrans,
+              TIME: operation.time.toISOString(),
+              BALANCE: operation.balance,
+              DESCRIPTION: operation.description,
+              STATUT: operation.statut,
+              CREDIT: operation.credit,
+              DEBIT: operation.debit,
+              ID_ACCOUNT: operation.idAccount,
+              TYPE: undefined,
+              TRANSFER: operation.transfer,
+            };
           },
-        })
-      );
+        },
+      })
+    );
 
     try {
       await operationBd.findById(operation.id);
@@ -297,15 +293,15 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('erreur pour retrouver une operation');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM OPERATION WHERE ID = 0;',
       []
     );
   });
 
-  it('OperationDataBase  findById executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase  findById query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject('error'));
 
     try {
@@ -314,7 +310,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('erreur pour retrouver une operation');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM OPERATION WHERE ID = 0;',
       []
     );
@@ -359,33 +355,31 @@ describe('OperationDataBase', () => {
 
     let operations: Operation[] = [operation1, operation2];
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 2,
-            item: (i: number) => {
-              return {
-                ID: operations[i].id,
-                NUM_TRANS: operations[i].numTrans,
-                TIME: operations[i].time.toISOString(),
-                BALANCE: operations[i].balance,
-                DESCRIPTION: operations[i].description,
-                STATUT: operations[i].statut,
-                CREDIT: operations[i].credit,
-                DEBIT: operations[i].debit,
-                ID_ACCOUNT: operations[i].idAccount,
-                TRANSFER: operations[i].transfer,
-              };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 2,
+          item: (i: number) => {
+            return {
+              ID: operations[i].id,
+              NUM_TRANS: operations[i].numTrans,
+              TIME: operations[i].time.toISOString(),
+              BALANCE: operations[i].balance,
+              DESCRIPTION: operations[i].description,
+              STATUT: operations[i].statut,
+              CREDIT: operations[i].credit,
+              DEBIT: operations[i].debit,
+              ID_ACCOUNT: operations[i].idAccount,
+              TRANSFER: operations[i].transfer,
+            };
           },
-        })
-      );
+        },
+      })
+    );
 
     let operationresult = await operationBd.findByIdAccount(0);
     expect(operations).toEqual(operationresult);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM OPERATION WHERE ID_ACCOUNT = ? ORDER BY TIME DESC;',
       [0]
     );
@@ -401,9 +395,9 @@ describe('OperationDataBase', () => {
     }
   });
 
-  it('OperationDataBase  findByIdAccount sqLiteObject.executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase  findByIdAccount sqLiteObject.query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject('erreur'));
 
     try {
@@ -442,8 +436,8 @@ describe('OperationDataBase', () => {
 
     let operations: Operation[] = [operation1, operation2];
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.callFake((query: string, values: any[]) => {
         if (
           query ===
@@ -491,7 +485,7 @@ describe('OperationDataBase', () => {
       0
     );
     expect(operations).toEqual(operationresult.data);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT COUNT (*) AS VAL FROM OPERATION  WHERE  ID_ACCOUNT = ?',
       [0]
     );
@@ -526,8 +520,8 @@ describe('OperationDataBase', () => {
 
     let operations: Operation[] = [operation1, operation2];
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.callFake((query: string, values: any[]) => {
         if (
           query ===
@@ -567,16 +561,16 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('erreur lors de la recuperation des données');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT COUNT (*) AS VAL FROM OPERATION  WHERE  ID_ACCOUNT = ?',
       [0]
     );
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledTimes(1);
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledTimes(1);
   });
 
   it('OperationDataBase  findByIdAccountAndPaging select list reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.callFake((query: string, values: any[]) => {
         if (
           query ===
@@ -607,18 +601,18 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('erreur lors de la recuperation des données');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT COUNT (*) AS VAL FROM OPERATION  WHERE  ID_ACCOUNT = ?',
       [0]
     );
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  *  FROM OPERATION  WHERE ID_ACCOUNT = ? ORDER BY TIME DESC LIMIT ?  OFFSET ?;',
       [0, 0, -0]
     );
   });
 
-  it('OperationDataBase  findByIdAccountAndPaging sqLiteObject.executeSql', async () => {
+  it('OperationDataBase  findByIdAccountAndPaging sqLiteObject.query', async () => {
     operationBd.sqLiteObject = undefined;
 
     let pagingRequest: PagingRequest = {
@@ -643,21 +637,21 @@ describe('OperationDataBase', () => {
   });
 
   it('OperationDataBase  adjusteAfterOperation all good', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.resolve());
 
     await operationBd.adjusteAfterOperation(0, 4, 522);
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledOnceWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledOnceWith(
       'UPDATE  OPERATION SET BALANCE = BALANCE + ? WHERE id > ? and ID_ACCOUNT = ?',
       [522, 0, 4]
     );
   });
 
-  it('OperationDataBase  adjusteAfterOperation sqLiteObject.executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase  adjusteAfterOperation sqLiteObject.query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject());
     try {
       await operationBd.adjusteAfterOperation(0, 4, 522);
@@ -665,7 +659,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('erreur lors de lajustement');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledOnceWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledOnceWith(
       'UPDATE  OPERATION SET BALANCE = BALANCE + ? WHERE id > ? and ID_ACCOUNT = ?',
       [522, 0, 4]
     );
@@ -681,20 +675,20 @@ describe('OperationDataBase', () => {
   });
 
   it('OperationDataBase deleteById', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.resolve());
 
     await operationBd.deleteById([0]);
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'DELETE FROM OPERATION WHERE  ID IN (0)'
     );
   });
 
-  it('OperationDataBase deleteById executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase deleteById query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(
         Promise.reject({ rows: { length: 0 }, rowsAffected: 0 })
       );
@@ -705,7 +699,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual('erreur lors de la suppression');
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'DELETE FROM OPERATION WHERE  ID IN (0)'
     );
   });
@@ -723,7 +717,7 @@ describe('OperationDataBase', () => {
     let operations: Operation[] = performOperations();
 
     await operationBd.createList(operations, true);
-    /* expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    /* expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       `INSERT INTO OPERATION (ID,NUM_TRANS,TIME,DESCRIPTION,STATUT,CREDIT,DEBIT,BALANCE,ID_ACCOUNT,TRANSFER) 
         VALUES ( 0, '', 'Tue Mar 21 2023 23:10:38 GMT-0400 (Eastern Daylight Time)', '', '' ,0, 0, 0, 0, ''),( 4, 'erwerwre', 'Tue Mar 21 2023 23:10:38 GMT-0400 (Eastern Daylight Time)', '', 'r' ,555, 0, 0, 0, '');`,
       []
@@ -742,9 +736,9 @@ describe('OperationDataBase', () => {
     }
   });
 
-  it('OperationDataBase createList sqLiteObject.executeSql reject code 6', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase createList sqLiteObject.query reject code 6', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject({ code: 6 }));
 
     let operations: Operation[] = performOperations();
@@ -756,9 +750,9 @@ describe('OperationDataBase', () => {
     }
   });
 
-  it('OperationDataBase createList sqLiteObject.executeSql reject other 6', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase createList sqLiteObject.query reject other 6', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject({}));
 
     let operations: Operation[] = performOperations();
@@ -773,41 +767,39 @@ describe('OperationDataBase', () => {
   it('OperationDataBase selectOperationByNumTrans all good', async () => {
     let operations: Operation[] = performOperations();
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 2,
-            item: (i: number) => {
-              return {
-                ID: operations[i].id,
-                NUM_TRANS: operations[i].numTrans,
-                TIME: operations[i].time.toISOString(),
-                BALANCE: operations[i].balance,
-                DESCRIPTION: operations[i].description,
-                STATUT: operations[i].statut,
-                CREDIT: operations[i].credit,
-                DEBIT: operations[i].debit,
-                ID_ACCOUNT: operations[i].idAccount,
-                TRANSFER: operations[i].transfer,
-              };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 2,
+          item: (i: number) => {
+            return {
+              ID: operations[i].id,
+              NUM_TRANS: operations[i].numTrans,
+              TIME: operations[i].time.toISOString(),
+              BALANCE: operations[i].balance,
+              DESCRIPTION: operations[i].description,
+              STATUT: operations[i].statut,
+              CREDIT: operations[i].credit,
+              DEBIT: operations[i].debit,
+              ID_ACCOUNT: operations[i].idAccount,
+              TRANSFER: operations[i].transfer,
+            };
           },
-        })
-      );
+        },
+      })
+    );
 
     let result = await operationBd.selectOperationByNumTrans('num');
     expect(result).toEqual(operations);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  *  FROM OPERATION  WHERE NUM_TRANS = ?',
       ['num']
     );
   });
 
-  it('OperationDataBase selectOperationByNumTrans executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase selectOperationByNumTrans query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.resolve(Promise.reject()));
     try {
       await operationBd.selectOperationByNumTrans('num');
@@ -815,7 +807,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual("error dans l'excecusion de la requette");
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  *  FROM OPERATION  WHERE NUM_TRANS = ?',
       ['num']
     );
@@ -833,44 +825,42 @@ describe('OperationDataBase', () => {
   it('OperationDataBase selectOperationJoinAccountByNumTrans all godd', async () => {
     let operations: Operation[] = performOperationsAccountType();
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 2,
-            item: (i: number) => {
-              return {
-                ID: operations[i].id,
-                NUM_TRANS: operations[i].numTrans,
-                TIME: operations[i].time.toISOString(),
-                BALANCE: operations[i].balance,
-                DESCRIPTION: operations[i].description,
-                STATUT: operations[i].statut,
-                CREDIT: operations[i].credit,
-                DEBIT: operations[i].debit,
-                ID_ACCOUNT: operations[i].idAccount,
-                TYPE: operations[i].accountType,
-                TRANSFER: operations[i].transfer,
-              };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 2,
+          item: (i: number) => {
+            return {
+              ID: operations[i].id,
+              NUM_TRANS: operations[i].numTrans,
+              TIME: operations[i].time.toISOString(),
+              BALANCE: operations[i].balance,
+              DESCRIPTION: operations[i].description,
+              STATUT: operations[i].statut,
+              CREDIT: operations[i].credit,
+              DEBIT: operations[i].debit,
+              ID_ACCOUNT: operations[i].idAccount,
+              TYPE: operations[i].accountType,
+              TRANSFER: operations[i].transfer,
+            };
           },
-        })
-      );
+        },
+      })
+    );
 
     let result = await operationBd.selectOperationJoinAccountByNumTrans('num');
     expect(result).toEqual(operations);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.NUM_TRANS = ?;',
       ['num']
     );
   });
 
-  it('OperationDataBase selectOperationJoinAccountByNumTrans executeSql reject', async () => {
+  it('OperationDataBase selectOperationJoinAccountByNumTrans query reject', async () => {
     let operations: Operation[] = performOperationsAccountType();
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject('error'));
 
     try {
@@ -879,7 +869,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual("erreur lors de l'excecusion de la requette");
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.NUM_TRANS = ?;',
       ['num']
     );
@@ -900,34 +890,32 @@ describe('OperationDataBase', () => {
   it('OperationDataBase selectOperationJoinAccountById all godd', async () => {
     let operations: Operation[] = performOperationsAccountType();
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 2,
-            item: (i: number) => {
-              return {
-                ID: operations[i].id,
-                NUM_TRANS: operations[i].numTrans,
-                TIME: operations[i].time.toISOString(),
-                BALANCE: operations[i].balance,
-                DESCRIPTION: operations[i].description,
-                STATUT: operations[i].statut,
-                CREDIT: operations[i].credit,
-                DEBIT: operations[i].debit,
-                ID_ACCOUNT: operations[i].idAccount,
-                TYPE: operations[i].accountType,
-                TRANSFER: operations[i].transfer,
-              };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 2,
+          item: (i: number) => {
+            return {
+              ID: operations[i].id,
+              NUM_TRANS: operations[i].numTrans,
+              TIME: operations[i].time.toISOString(),
+              BALANCE: operations[i].balance,
+              DESCRIPTION: operations[i].description,
+              STATUT: operations[i].statut,
+              CREDIT: operations[i].credit,
+              DEBIT: operations[i].debit,
+              ID_ACCOUNT: operations[i].idAccount,
+              TYPE: operations[i].accountType,
+              TRANSFER: operations[i].transfer,
+            };
           },
-        })
-      );
+        },
+      })
+    );
 
     let result = await operationBd.selectOperationJoinAccountById(0);
     expect(result).toEqual(operations[0]);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.ID = ?;',
       [0]
     );
@@ -936,27 +924,25 @@ describe('OperationDataBase', () => {
   it('OperationDataBase selectOperationJoinAccountById no row found', async () => {
     let operations: Operation[] = performOperationsAccountType();
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 0,
-          },
-        })
-      );
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 0,
+        },
+      })
+    );
 
     let result = await operationBd.selectOperationJoinAccountById(0);
     expect(result.id).toBeFalsy();
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.ID = ?;',
       [0]
     );
   });
 
-  it('OperationDataBase selectOperationJoinAccountById executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase selectOperationJoinAccountById query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject('error'));
 
     try {
@@ -965,7 +951,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual("erreur lors de l'excecusion de la requette");
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.ID = ?;',
       [0]
     );
@@ -984,34 +970,32 @@ describe('OperationDataBase', () => {
   it('OperationDataBase findOperationTransferTo all godd', async () => {
     let operations: Operation[] = performOperationsAccountType();
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 2,
-            item: (i: number) => {
-              return {
-                ID: operations[i].id,
-                NUM_TRANS: operations[i].numTrans,
-                TIME: operations[i].time.toISOString(),
-                BALANCE: operations[i].balance,
-                DESCRIPTION: operations[i].description,
-                STATUT: operations[i].statut,
-                CREDIT: operations[i].credit,
-                DEBIT: operations[i].debit,
-                ID_ACCOUNT: operations[i].idAccount,
-                TYPE: operations[i].accountType,
-                TRANSFER: operations[i].transfer,
-              };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 2,
+          item: (i: number) => {
+            return {
+              ID: operations[i].id,
+              NUM_TRANS: operations[i].numTrans,
+              TIME: operations[i].time.toISOString(),
+              BALANCE: operations[i].balance,
+              DESCRIPTION: operations[i].description,
+              STATUT: operations[i].statut,
+              CREDIT: operations[i].credit,
+              DEBIT: operations[i].debit,
+              ID_ACCOUNT: operations[i].idAccount,
+              TYPE: operations[i].accountType,
+              TRANSFER: operations[i].transfer,
+            };
           },
-        })
-      );
+        },
+      })
+    );
 
     let result = await operationBd.findOperationTransferTo('num', 0);
     expect(result).toEqual(operations[0]);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.NUM_TRANS = ? and op.ID_ACCOUNT <> ?',
       ['num', 0]
     );
@@ -1020,15 +1004,13 @@ describe('OperationDataBase', () => {
   it('OperationDataBase findOperationTransferTo not found', async () => {
     let operations: Operation[] = performOperationsAccountType();
 
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 0,
-          },
-        })
-      );
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 0,
+        },
+      })
+    );
 
     try {
       await operationBd.findOperationTransferTo('num', 0);
@@ -1036,15 +1018,15 @@ describe('OperationDataBase', () => {
       expect(error).toEqual("erreur lors de l'excecusion de la requette");
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.NUM_TRANS = ? and op.ID_ACCOUNT <> ?',
       ['num', 0]
     );
   });
 
-  it('OperationDataBase findOperationTransferTo executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase findOperationTransferTo query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject());
 
     try {
@@ -1053,7 +1035,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual("erreur lors de l'excecusion de la requette");
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  op.*, acc.type  FROM OPERATION op left join ACCOUNT acc on op.id_account = acc.id WHERE op.NUM_TRANS = ? and op.ID_ACCOUNT <> ?',
       ['num', 0]
     );
@@ -1070,83 +1052,77 @@ describe('OperationDataBase', () => {
   });
 
   it('OperationDataBase findOperationTransferTo all good', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 1,
-            item: (i: number) => {
-              return { BALANCE: 8000 };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 1,
+          item: (i: number) => {
+            return { BALANCE: 8000 };
           },
-        })
-      );
+        },
+      })
+    );
 
     let givenDate = new Date();
     let result = await operationBd.getBalanceBeforeDate(givenDate, 0);
 
     expect(8000).toEqual(result);
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT BALANCE FROM OPERATION WHERE TIME < ? AND  ID_ACCOUNT  = ? ORDER BY TIME DESC LIMIT 2',
       [givenDate, 0]
     );
   });
 
   it('OperationDataBase getBalanceBeforeDate all good ', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 1,
-            item: (i: number) => {
-              return { BALANCE: 8000 };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 1,
+          item: (i: number) => {
+            return { BALANCE: 8000 };
           },
-        })
-      );
+        },
+      })
+    );
 
     let givenDate = new Date();
     let result = await operationBd.getBalanceBeforeDate(givenDate, 0);
 
     expect(8000).toEqual(result);
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT BALANCE FROM OPERATION WHERE TIME < ? AND  ID_ACCOUNT  = ? ORDER BY TIME DESC LIMIT 2',
       [givenDate, 0]
     );
   });
 
   it('OperationDataBase getBalanceBeforeDate no result ', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
-      .and.returnValue(
-        Promise.resolve({
-          rows: {
-            length: 0,
-            item: (i: number) => {
-              return { BALANCE: 8000 };
-            },
+    operationBd.sqLiteObject.query = jasmine.createSpy('query').and.returnValue(
+      Promise.resolve({
+        rows: {
+          length: 0,
+          item: (i: number) => {
+            return { BALANCE: 8000 };
           },
-        })
-      );
+        },
+      })
+    );
 
     let givenDate = new Date();
     let result = await operationBd.getBalanceBeforeDate(givenDate, 0);
 
     expect(0).toEqual(result);
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT BALANCE FROM OPERATION WHERE TIME < ? AND  ID_ACCOUNT  = ? ORDER BY TIME DESC LIMIT 2',
       [givenDate, 0]
     );
   });
 
-  it('OperationDataBase getBalanceBeforeDate  executeSql reject', async () => {
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+  it('OperationDataBase getBalanceBeforeDate  query reject', async () => {
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject('error'));
 
     let givenDate = new Date();
@@ -1156,7 +1132,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual("erreur lors de l'excecusion de la requette");
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT BALANCE FROM OPERATION WHERE TIME < ? AND  ID_ACCOUNT  = ? ORDER BY TIME DESC LIMIT 2',
       [givenDate, 0]
     );
@@ -1177,16 +1153,16 @@ describe('OperationDataBase', () => {
     let givenDate = new Date();
 
     await operationBd.adjusteAfterOperationByDate(givenDate, 0, 8000);
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE  OPERATION SET BALANCE = BALANCE + ? WHERE TIME > ? and ID_ACCOUNT = ?',
       [8000, givenDate, 0]
     );
   });
 
-  it('OperationDataBase adjusteAfterOperationByDate executeSql reject ', async () => {
+  it('OperationDataBase adjusteAfterOperationByDate query reject ', async () => {
     let givenDate = new Date();
-    operationBd.sqLiteObject.executeSql = jasmine
-      .createSpy('executeSql')
+    operationBd.sqLiteObject.query = jasmine
+      .createSpy('query')
       .and.returnValue(Promise.reject());
 
     try {
@@ -1195,7 +1171,7 @@ describe('OperationDataBase', () => {
       expect(error).toEqual("erreur lors de l'excecusion de la requette");
     }
 
-    expect(operationBd.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(operationBd.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE  OPERATION SET BALANCE = BALANCE + ? WHERE TIME > ? and ID_ACCOUNT = ?',
       [8000, givenDate, 0]
     );

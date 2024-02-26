@@ -1,0 +1,56 @@
+.detail {
+    width: 100%;
+    padding: .8em;
+}
+
+.detail-path {
+    width: 100%;
+    padding: .8em;
+    font-style: italic;
+}
+
+.fill-height {
+    height: calc(100vh - 55px);
+    overflow-y: hidden;
+}
+
+ion-button {
+    margin-right: 15px;
+}
+
+ion-input.custom {
+    text-align: right;
+
+    label {
+        text-align: left;
+    }
+}
+
+.label-text {
+    text-align: left;
+}
+
+.message {
+    border-radius: 5px;
+    padding: .8em;
+    background-color: #b3c4ff;
+    color: rgb(54, 54, 54);
+    font-weight: bold;
+    font-style: italic;
+}
+
+ion-select {
+    color: #fcfcff;
+}
+
+ion-textarea {
+    color: #fcfcff;
+}
+
+ion-input {
+    color: #fcfcff;
+}
+
+ion-toggle {
+    color: #fcfcff;
+}

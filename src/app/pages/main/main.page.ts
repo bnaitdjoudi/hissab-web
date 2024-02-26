@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { Period } from '../../model/balance.model';
 import { getLabelPeriode } from './../../tools/period.label';
 import { RouteParamsStore } from 'src/app/store/route.params.store';
+import { AlertLimit } from 'src/app/model/alert.limit.model';
 
 @Component({
   selector: 'main-page',
@@ -16,12 +17,14 @@ export class MainPage implements OnInit, OnDestroy {
   balanceSuscription: Subscription;
   flagSuscription: Subscription;
   isModalOpenActif = false;
+  alertSuscription: Subscription | undefined;
 
   mainAccounts$ = this.mainStore.mainAccounts$;
   balanceAccount: Account;
   globalBalance: number;
   period$: Observable<Period> = this.mainStore.period$;
 
+  alertLimits: AlertLimit[] = [];
   constructor(
     private readonly mainStore: MainStore,
     private readonly router: Router,
@@ -38,7 +41,12 @@ export class MainPage implements OnInit, OnDestroy {
     );
 
     this.mainStore.setPeriod('month');
-    this.routeParamStore.goto
+    this.routeParamStore.goto;
+
+    this.alertSuscription = this.mainStore.alertLimits$.subscribe((limits) => {
+      console.log('app:::', JSON.stringify(limits));
+      this.alertLimits = limits;
+    });
   }
 
   accountClass(currentAccount: Account): string {

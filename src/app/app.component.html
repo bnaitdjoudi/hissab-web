@@ -6,4 +6,55 @@
       <ion-icon name="notifications-outline" class="icon-button inner-center-btn"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+  <ion-modal [isOpen]="isAlertOpen" [initialBreakpoint]=".5" [breakpoints]="[0, 1]">
+    <ng-template>
+      <ion-content class="ion-padding">
+        <div class="ion-margin-top">
+          <ion-list>
+            <ion-item *ngFor="let item of alertLimits">
+              <ion-card>
+                <ion-card-header>
+                  <div>
+                    <div class="title"> <ion-icon name="alert-circle-outline" color="danger"
+                        size="large"></ion-icon><ion-label>{{item.account.acountName}}</ion-label></div>
+                    <ion-label class="period-title">{{'period.'+item.accountLimit.period| traduction}}</ion-label>
+                  </div>
+                </ion-card-header>
+                <ion-card-content>
+                  <div class="item-content">
+                    <div class="limit" *ngIf="item.accountLimit.max">
+                      <div class="bull">
+                        <div class="text"><ion-label>Maximum</ion-label></div>
+                        <div class="value">
+                          <ion-label>{{ item.accountLimit.max ? transformValue(item.accountLimit.max): '-'}}</ion-label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="limit" *ngIf="item.accountLimit.min">
+                      <div class="bull">
+                        <div class="text"><ion-label>Minimum</ion-label></div>
+                        <div class="value">
+                          <ion-label>{{item.accountLimit.min ? transformValue(item.accountLimit.min) : '-'}}</ion-label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="limit" *ngIf="item.account.totalAccount">
+                      <div class="current">
+                        <div class="text"><ion-label>Current</ion-label></div>
+                        <div class="value">
+                          <ion-label>{{item.account.totalAccount ? totalAccount(item.account.totalAccount, item.account.type) : '-'}}</ion-label>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-app>

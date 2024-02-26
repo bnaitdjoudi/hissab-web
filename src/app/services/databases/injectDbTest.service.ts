@@ -29,7 +29,7 @@ export class InjectDbTestService {
     }
   }
   initAccounts(sqLiteObject: any) {
-    sqLiteObject.executeSql(`INSERT INTO ${tables.account.name} (
+    sqLiteObject.query(`INSERT INTO ${tables.account.name} (
             ${tables.account.columns[0].name},
             ${tables.account.columns[1].name},
             ${tables.account.columns[2].name}, 
@@ -48,7 +48,7 @@ export class InjectDbTestService {
   deleteAllOperation(sqLiteObject: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       sqLiteObject
-        .executeSql('DELETE FROM OPERATION WHERE 1 = 1', [])
+        .query('DELETE FROM OPERATION WHERE 1 = 1', [])
         .then(() => resolve())
         .catch((err: any) => reject(err));
     });
@@ -56,7 +56,7 @@ export class InjectDbTestService {
   resetBalanceAccount(sqLiteObject: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       sqLiteObject
-        .executeSql('UPDATE ACCOUNT SET BALANCE = 0', [])
+        .query('UPDATE ACCOUNT SET BALANCE = 0', [])
         .then(() => resolve())
         .catch((err: any) => reject(err));
     });
@@ -65,7 +65,7 @@ export class InjectDbTestService {
   async deleteNonMainAccount(sqLiteObject: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       sqLiteObject
-        .executeSql('DELETE FROM ACCOUNT WHERE IS_MAIN = ?', [0])
+        .query('DELETE FROM ACCOUNT WHERE IS_MAIN = ?', [0])
         .then(() => resolve())
         .catch((err: any) => reject(err));
     });

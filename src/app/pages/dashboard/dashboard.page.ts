@@ -5,6 +5,7 @@ import { MainStore } from './../../store/main.store';
 import { Router } from '@angular/router';
 import { Period } from '../../model/balance.model';
 import { getLabelPeriode } from './../../tools/period.label';
+import { AdminStore } from '../admin/admin.store';
 
 @Component({
   selector: 'dashboard-page',
@@ -14,6 +15,7 @@ import { getLabelPeriode } from './../../tools/period.label';
 export class DashboardPage implements OnInit, OnDestroy {
   balanceSuscription: Subscription;
   mainAccountsSuscription: Subscription;
+  langSubscription: Subscription;
   isModalOpenActif = false;
 
   mainAccounts: Account[] = [];
@@ -26,8 +28,10 @@ export class DashboardPage implements OnInit, OnDestroy {
     subHeader: 'Select your favorite topping';
     class: 'custom-alert';
   };
+  side: string = 'start';
   constructor(
     private readonly mainStore: MainStore,
+    private readonly adminStore: AdminStore,
     private readonly router: Router
   ) {}
 
@@ -35,6 +39,7 @@ export class DashboardPage implements OnInit, OnDestroy {
     console.log('DashboardPage::ngOnDestroy');
     this.balanceSuscription?.unsubscribe();
     this.mainAccountsSuscription?.unsubscribe();
+    this.langSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -50,7 +55,13 @@ export class DashboardPage implements OnInit, OnDestroy {
         this.mainAccounts = result;
       }
     );
-
+    this.langSubscription = this.adminStore.lang$.subscribe((val) => {
+      if (val === 'ar') {
+        this.side = 'end';
+      } else {
+        this.side = 'start';
+      }
+    });
     this.mainStore.setPeriod('month');
   }
 

@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
-import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
 
+import {
+  CapacitorSQLite,
+  SQLiteConnection,
+  SQLiteDBConnection,
+} from '@capacitor-community/sqlite';
 import { Platform } from '@ionic/angular';
 import { browserDBInstance } from './browser';
 import {
@@ -22,7 +26,7 @@ import { InjectDbTestService } from './injectDbTest.service';
 import { BehaviorSubject } from 'rxjs';
 import { printError } from '../../tools/errorTools';
 import { InitService } from '../init.service';
-import { PatchQuery } from 'src/app/model/patch.model';
+import { Patchquery } from 'src/app/model/patch.model';
 
 declare var window: any;
 
@@ -37,9 +41,8 @@ export class DataBaseService {
   DATABASE_V: string = '1.1';
   DDD: string = 'yes';
   isInserting: boolean = false;
-
+  sqliteCapacitor: SQLiteConnection = new SQLiteConnection(CapacitorSQLite);
   constructor(
-    private readonly sqlite: SQLite,
     private readonly platform: Platform,
     private readonly sqliteporter: SQLitePorter,
     private readonly initService: InitService
@@ -48,6 +51,7 @@ export class DataBaseService {
   }
 
   private createDataBase() {
+    console.log('createDataBase', new Date());
     if (this.platform.is('capacitor')) {
       this.createDataBaseSqlite();
     } else {
@@ -82,19 +86,19 @@ export class DataBaseService {
   }
   async initInitNotification() {
     console.info('CREATE NOTIFICATION TABLE');
-    await this.sqLiteObject.executeSql(CREATE_NOTIFICATION_TABLE, []);
+    await this.sqLiteObject.query(CREATE_NOTIFICATION_TABLE, []);
     console.info('NOTIFICATION CREATED');
   }
   async initInitRappel() {
     console.info('CREATE RAPPEL TABLE');
-    await this.sqLiteObject.executeSql(CREATE_RAPPEL_TABLE, []);
+    await this.sqLiteObject.query(CREATE_RAPPEL_TABLE, []);
     console.info('RAPPEL CREATED');
   }
 
   async initPatchData() {
     console.info('CREATE PATCH TABLE');
     this.sqLiteObject
-      .executeSql(CREATE_PATCH_TABLE, [])
+      .query(CREATE_PATCH_TABLE, [])
       .then((res: any) => {
         console.info('PATCH TABLE CREATED');
       })
@@ -102,13 +106,13 @@ export class DataBaseService {
   }
   initAuthTable() {
     console.info('CREATE PROFILES TABLE');
-    this.sqLiteObject.executeSql(CREATE_AUTH_TABLE, []).then((res: any) => {
+    this.sqLiteObject.query(CREATE_AUTH_TABLE, []).then((res: any) => {
       console.info('AUTH TABLE CREATED');
     });
   }
   initProfilesTable() {
     console.info('CREATE PROFILES TABLE');
-    this.sqLiteObject.executeSql(CREATE_PROFILES_TABLE, []).then((res: any) => {
+    this.sqLiteObject.query(CREATE_PROFILES_TABLE, []).then((res: any) => {
       console.info('PROFILES TABLE CREATED');
     });
   }
@@ -116,9 +120,10 @@ export class DataBaseService {
   private async initInitFlag() {
     return new Promise<void>((resolve, reject) => {
       console.info('INSERT FLAGS');
+
       this.sqLiteObject
-        .executeSql(
-          'INSERT INTO FLAGS (FLAG_NAME, IS_FLAG_SETTED) values (?, ?)',
+        .query(
+          'INSERT INTO FLAGS (FLAG_NAME, IS_FLAG_SETTED) values (?, ?), (?,?)',
           ['DATA_ACCOUNT_SETTED', 1]
         )
         .then(() => {
@@ -130,18 +135,18 @@ export class DataBaseService {
     });
   }
   private async createFlagsTables(): Promise<boolean> {
-    console.log('CONSTRUC FLAG');
+    console.log('CONSTRUCt FLAG');
     return new Promise<boolean>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(CREATE_FLAGS, [])
+        .execute(CREATE_FLAGS)
         .then((res: any) => {
           this.sqLiteObject
-            .executeSql(
+            .query(
               'SELECT * FROM FLAGS WHERE FLAG_NAME = ? AND IS_FLAG_SETTED = ?',
               ['DATA_ACCOUNT_SETTED', 1]
             )
             .then(async (res: any) => {
-              resolve(res.rows.length === 0);
+              resolve(res.values.length === 0);
             })
             .catch((err: any) => {
               printError('error dans SELECT FLAGS:', reject, err);
@@ -157,14 +162,12 @@ export class DataBaseService {
    */
   private createDataBaseSqlite() {
     console.info('CREATE SQLITE DATABASE');
-    this.sqlite
-      .create({
-        name: this.DATABASE,
-        location: 'default',
-      })
-      .then((db: SQLiteObject) => {
+    this.openDatabase(this.DATABASE, false, 'no-encryption', 1.1, false)
+      .then(async (db: SQLiteDBConnection) => {
         this.sqLiteObject = db;
         DataBaseService.sqlStaticValue = db;
+        await this.sqLiteObject.open();
+
         this.initAll();
       })
       .catch((e: any) => console.error(e));
@@ -175,7 +178,7 @@ export class DataBaseService {
 
     return new Promise<void>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(CREATE_ACCOUNT_TABLE, [])
+        .query(CREATE_ACCOUNT_TABLE, [])
         .then(async () => {
           try {
             await this.createInitialAccounts(undefined);
@@ -197,7 +200,7 @@ export class DataBaseService {
     console.log('creation table OPERATION');
     return new Promise<void>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(CREATE_TRANSACTION_TABLE, [])
+        .query(CREATE_TRANSACTION_TABLE, [])
         .then(() => {
           resolve();
         })
@@ -210,7 +213,7 @@ export class DataBaseService {
 
     return new Promise<void>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(CREATE_TRANSACTION_VIEW, [])
+        .query(CREATE_TRANSACTION_VIEW, [])
         .then(() => {
           console.log('OPERATION_VIEW created');
           resolve();
@@ -233,7 +236,7 @@ export class DataBaseService {
           .catch((err) => reject(err));
       } else {
         this.sqLiteObject
-          .executeSql(INSERT_INITIAL_ACCOUNT_DATA, [])
+          .query(INSERT_INITIAL_ACCOUNT_DATA, [])
           .then((res: any) => {
             resolve(res);
           })
@@ -248,11 +251,11 @@ export class DataBaseService {
     console.log('check inital data');
     new Promise<void>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql('SELECT * FROM ACCOUNT WHERE ACCOUNT_NAME = ?', [
+        .query('SELECT * FROM ACCOUNT WHERE ACCOUNT_NAME = ?', [
           INITIAL_ACCOUNT_DATA[0].acountName,
         ])
         .then((data: any) => {
-          if (data.rows.length === 0 && !this.isInserting) {
+          if (data.values.length === 0 && !this.isInserting) {
             this.isInserting = true;
             this.insertFromSQL()
               .then((res) => {
@@ -277,13 +280,30 @@ export class DataBaseService {
   }
 
   async openSQLObject(): Promise<any> {
-    if (this.sqLiteObject) {
-      return new Promise<any>((resolve, reject) => {
-        console.log('ddddd');
+    return new Promise<any>(async (resolve, reject) => {
+      if (this.sqLiteObject) {
         resolve(this.sqLiteObject);
-      });
-    }
-    console.info('OPEN SQLITE DATABASEfdgsdffg');
+      } else {
+        if (DataBaseService.sqlStaticValue) {
+          this.sqLiteObject = DataBaseService.sqlStaticValue;
+        } else {
+          console.log('ddddd');
+
+          this.sqLiteObject = await this.openDatabase(
+            this.DATABASE,
+            false,
+            'no-encryption',
+            1.1,
+            false
+          );
+        }
+
+        resolve(this.sqLiteObject);
+      }
+    });
+  }
+
+  /*console.info('OPEN SQLITE DATABASEfdgsdffg');
     if (this.platform.is('capacitor')) {
       console.info('OPEN SQLITE DATABASE');
 
@@ -294,20 +314,20 @@ export class DataBaseService {
         resolve(this.sqLiteObject);
       });
     }
-  }
+  }*/
 
-  async runPatchQuery(query: PatchQuery): Promise<boolean> {
+  async runPatchquery(query: Patchquery): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
-        const res = await this.runSqlQuery(
+        const res = await this.runSqlquery(
           `SELECT * FROM PATCH_SQL WHERE ${tables.patchquery.columns[0].name} = '${query.codePatch}';`
         );
-        if (res.rows.length > 0) {
+        if (res.values.length > 0) {
           console.log('NOT RUN :' + query.codePatch);
           resolve(false);
         } else {
           console.log('RUN :' + query.codePatch);
-          await this.runSqlQuery(query.query);
+          await this.runSqlquery(query.query);
           resolve(true);
         }
       } catch (error) {
@@ -318,10 +338,10 @@ export class DataBaseService {
     });
   }
 
-  async runSqlQuery(query: string): Promise<any> {
+  async runSqlquery(query: string): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       if (this.sqLiteObject) {
-        this.runSqlQuerySecure(query)
+        this.runSqlquerySecure(query)
           .then((res) => {
             resolve(res);
           })
@@ -332,7 +352,7 @@ export class DataBaseService {
       } else {
         this.openSQLObject().then((val: any) => {
           this.sqLiteObject = val;
-          this.runSqlQuerySecure(query)
+          this.runSqlquerySecure(query)
             .then((res) => {
               resolve(res);
             })
@@ -344,12 +364,46 @@ export class DataBaseService {
       }
     });
   }
-  runSqlQuerySecure(query: string): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      this.sqLiteObject
-        .executeSql(query, [])
-        .then((res: any) => resolve(res))
-        .catch((error: any) => reject(error));
+  runSqlquerySecure(query: string): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      const queries = query.split(';');
+      try {
+        for (let q in queries) {
+          console.log('run sql:', q);
+          await this.sqLiteObject.query(q, []);
+        }
+
+        resolve('done!');
+      } catch (error) {
+        reject(error);
+      }
     });
+  }
+
+  async openDatabase(
+    dbName: string,
+    encrypted: boolean,
+    mode: string,
+    version: number,
+    readonly: boolean
+  ): Promise<SQLiteDBConnection> {
+    let db: SQLiteDBConnection;
+    const retCC = (await this.sqliteCapacitor.checkConnectionsConsistency())
+      .result;
+    let isConn = (await this.sqliteCapacitor.isConnection(dbName, readonly))
+      .result;
+    if (retCC && isConn) {
+      db = await this.sqliteCapacitor.retrieveConnection(dbName, readonly);
+    } else {
+      db = await this.sqliteCapacitor.createConnection(
+        dbName,
+        encrypted,
+        mode,
+        version,
+        readonly
+      );
+    }
+    await db.open();
+    return db;
   }
 }

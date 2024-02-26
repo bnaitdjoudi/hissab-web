@@ -18,7 +18,7 @@ export class FlagsDataBase
     return new Promise<any>(async (resolve, reject) => {
       if (this.sqLiteObject) {
         try {
-          await this.sqLiteObject.executeSql(
+          await this.sqLiteObject.query(
             `INSERT INTO ${tables.flags.name} (${tables.flags.columns.map(
               (el) => el.name
             )}) VALUES (?,?)`,
@@ -56,7 +56,7 @@ export class FlagsDataBase
 
   private privateFindAll(resolve: any, reject: any) {
     this.sqLiteObject
-      .executeSql(`SELECT * FROM ${tables.flags.name} `, [])
+      .query(`SELECT * FROM ${tables.flags.name} `, [])
       .then((res: any) => {
         resolve(this.constructGlagArray(res));
       })
@@ -72,7 +72,7 @@ export class FlagsDataBase
   private constructGlagArray(data: any): Flag[] {
     let flags: Flag[] = [];
 
-    for (let i = 0; i < data.rows.length; i++) {
+    for (let i = 0; i < data.values.length; i++) {
       flags.push(this.performOperationsRowIndex(data, i));
     }
 
@@ -81,8 +81,8 @@ export class FlagsDataBase
 
   private performOperationsRowIndex(data: any, i: number): Flag {
     return {
-      flagName: data.rows.item(i).FLAG_NAME,
-      flagSetted: data.rows.item(i).IS_FLAG_SETTED === 1,
+      flagName: data.values[i].FLAG_NAME,
+      flagSetted: data.values[i].IS_FLAG_SETTED === 1,
     };
   }
 }

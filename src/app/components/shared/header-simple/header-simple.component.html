@@ -6,6 +6,9 @@
                 <ion-icon name="arrow-back-sharp" size="large"></ion-icon>
             </ion-button>
         </ion-buttons>
+        <ion-title *ngIf="!!title">
+            {{title}}
+        </ion-title>
 
         <ion-buttons slot="end">
             <ion-button fill="clear" slot="end" id="menu-button" (click)="period()">

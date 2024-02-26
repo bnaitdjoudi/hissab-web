@@ -17,11 +17,19 @@ import { far } from '@fortawesome/free-regular-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { GuardsModule } from './guards/guards.module';
 import { IonicStorageModule } from '@ionic/storage-angular';
-import { SQLite } from '@awesome-cordova-plugins/sqlite/ngx';
+
 import { SQLitePorter } from '@awesome-cordova-plugins/sqlite-porter/ngx';
+import { StoreModule } from './store/store.module';
+import { PipeModule } from './pipes/pipes.moule';
 
 @NgModule({
   declarations: [AppComponent],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+
+    SQLitePorter,
+  ],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -31,13 +39,9 @@ import { SQLitePorter } from '@awesome-cordova-plugins/sqlite-porter/ngx';
     FontAwesomeModule,
     GuardsModule,
     IonicStorageModule.forRoot(),
+    StoreModule,
+    PipeModule,
   ],
-  providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    SQLite,
-    SQLitePorter,
-  ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {
   constructor(library: FaIconLibrary) {

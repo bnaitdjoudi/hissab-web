@@ -14,6 +14,9 @@ import { AccountPageViewComponent } from './view/account-page.component';
 import { AccountPageRoutingModule } from './account-routing.module';
 import { AccountNewPage } from './new/account-new.page';
 import { AccountSearchPage } from './search/account-search.page';
+import { AccountLimitPageViewComponent } from './limites/view/account-limit-page.component';
+import { AccountLimitNewPage } from './limites/new/account-limit-new.page';
+import { MaskitoModule } from '@maskito/angular';
 
 @NgModule({
   imports: [
@@ -28,7 +31,14 @@ import { AccountSearchPage } from './search/account-search.page';
     FontAwesomeModule,
     MaterialModule,
     AccountPageRoutingModule,
+    MaskitoModule,
   ],
-  declarations: [AccountPageViewComponent, AccountNewPage, AccountSearchPage],
+  declarations: [
+    AccountPageViewComponent,
+    AccountNewPage,
+    AccountSearchPage,
+    AccountLimitPageViewComponent,
+    AccountLimitNewPage,
+  ],
 })
 export class AccountPageModule {}

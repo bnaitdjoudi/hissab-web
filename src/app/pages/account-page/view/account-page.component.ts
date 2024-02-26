@@ -118,7 +118,7 @@ export class AccountPageViewComponent implements OnInit {
   }
 
   async presentActionSheet() {
-    let actions: string[] = ['cancel'];
+    let actions: string[] = ['cancel', 'limit'];
     if (this.currentAccount.isLeaf && this.accountsData.data.length === 0) {
       actions = ['createOp', ...actions];
     }
@@ -150,8 +150,15 @@ export class AccountPageViewComponent implements OnInit {
           this.presentAlertPeriod();
           break;
         }
+        case 'limit': {
+          this.gotoLimit();
+          break;
+        }
       }
     });
+  }
+  gotoLimit() {
+    this.router.navigate(['/account/' + this.currentAccount.id + '/limit'], {});
   }
 
   createOperation() {

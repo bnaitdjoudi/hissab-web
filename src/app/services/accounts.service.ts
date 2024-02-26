@@ -8,6 +8,7 @@ import { AccountDataBase } from './databases/account.db';
 import { AccountResume } from '../model/account.resume.model';
 import { printError } from '../tools/errorTools';
 import { resolve } from 'cypress/types/bluebird';
+import { AccountLimit } from '../model/account-limit.model';
 
 @Injectable({
   providedIn: 'root',
@@ -230,6 +231,7 @@ export class AccountsService {
       }
     });
   }
+
   async deleteAccountById(id: number): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       if (id && id !== null) {
@@ -244,6 +246,53 @@ export class AccountsService {
       }
 
       resolve();
+    });
+  }
+
+  async getAccountLimits(idAccount: number): Promise<AccountLimit[]> {
+    return new Promise<AccountLimit[]>(async (resolve, reject) => {
+      if (idAccount) {
+        console.log('getAccountLimits:', idAccount);
+        const result: AccountLimit[] = await this.accountDb.getAccountLimits(
+          idAccount
+        );
+        resolve(result);
+      }
+    });
+  }
+
+  async createAccountLimit(model: AccountLimit): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      if (model) {
+        try {
+          await this.accountDb.createAccountLimit(model);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      }
+    });
+  }
+
+  async deleteAccountLimitById(id: number): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.accountDb.deleteAccountLimitById(id);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async findAllLeafChildAccounst(accountId: number): Promise<Account[]> {
+    return new Promise<Account[]>(async (resolve, reject) => {
+      try {
+        const account = await this.getAccountById(accountId);
+        const accounts: Account[] =
+          await this.accountDb.findAllLeafChildAccounst(account.path);
+        resolve(accounts);
+      } catch (error) {}
     });
   }
 }

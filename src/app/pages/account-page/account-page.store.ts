@@ -14,6 +14,7 @@ import random from 'random-string-alphanumeric-generator';
 import { printError } from '../../tools/errorTools';
 import { MainStore } from '../../store/main.store';
 import { getDatesByPeriodValue } from '../../tools/date.tools';
+import { AccountLimit } from 'src/app/model/account-limit.model';
 
 @Injectable({
   providedIn: 'root',
@@ -253,6 +254,7 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
   }
 
   private loadAccount(id: number) {
+    console.log('load account:', id);
     if (id > 0) {
       const [startDate, endDate] = getDatesByPeriodValue(
         this.mainStore.state.period
@@ -507,6 +509,48 @@ export class AccountPageStore extends Store<AccountPageStoreModel> {
       } catch (error) {
         console.error(error);
         reject('erreur durant la creation');
+      }
+    });
+  }
+
+  async updateLimits(
+    id: number,
+    limitMax: number | undefined,
+    limitMin: number | undefined
+  ) {
+    this.state.currentAccount.limitMax = limitMax;
+    this.state.currentAccount.limitMin = limitMin;
+
+    const account = await this.accountService.updateAccount(
+      { ...this.state.currentAccount, limitMax: limitMax, limitMin: limitMin },
+      id
+    );
+    this.setCurrentAccount(account);
+  }
+
+  async createLimits(limit: AccountLimit) {
+    try {
+      await this.accountService.createAccountLimit(limit);
+    } catch (error) {}
+  }
+
+  async getLimitsByAccountId(id: number): Promise<AccountLimit[]> {
+    return new Promise<AccountLimit[]>(async (resolve, reject) => {
+      try {
+        resolve(await this.accountService.getAccountLimits(id));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async deleteLimitById(id: number): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.accountService.deleteAccountLimitById(id);
+        resolve();
+      } catch (error) {
+        reject(error);
       }
     });
   }

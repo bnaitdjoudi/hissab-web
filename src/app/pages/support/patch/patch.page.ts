@@ -35,7 +35,7 @@ export class PatchPage implements OnInit {
     try {
       await this.supportPageStore.applyFile();
     } catch (error: any) {
-      console.log(JSON.stringify(error));
+      console.log('error runng patch', JSON.stringify(error));
     }
   }
 }

@@ -24,7 +24,7 @@ export class RappelDataBase
       this.checkDataBaseOpened();
 
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `INSERT INTO ${tables.rappel.name} (${tables.rappel.columns
             .filter((el) => {
               return el.name !== 'ID';
@@ -42,12 +42,12 @@ export class RappelDataBase
           ]
         );
 
-        let data = await this.sqLiteObject.executeSql(
+        let data = await this.sqLiteObject.query(
           `SELECT * FROM ${tables.rappel.name} WHERE ID=(SELECT MAX(ID) from ${tables.rappel.name});`,
           []
         );
 
-        if (data.rows.length >= 1) {
+        if (data.values.length >= 1) {
           resolve(this.constructRappelArray(data)[0]);
         } else {
           resolve({});
@@ -62,7 +62,7 @@ export class RappelDataBase
     await this.checkDataBaseOpened();
     return new Promise<Rappel>(async (resolve, reject) => {
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `UPDATE  ${tables.rappel.name} SET ${tables.rappel.columns
             .filter((el) => el.name !== 'ID')
             .map((el) => el.name + ' = ?')} WHERE ${
@@ -92,11 +92,8 @@ export class RappelDataBase
     await this.checkDataBaseOpened();
     return new Promise<Rappel[]>(async (resolve, reject) => {
       try {
-        let data = await this.sqLiteObject.executeSql(
-          'SELECT * FROM RAPPEL',
-          []
-        );
-        if (data.rows.length > 0) {
+        let data = await this.sqLiteObject.query('SELECT * FROM RAPPEL', []);
+        if (data.values.length > 0) {
           resolve(this.constructRappelArray(data));
         }
 
@@ -112,16 +109,16 @@ export class RappelDataBase
     await this.checkDataBaseOpened();
     return new Promise<PagingData<Rappel>>(async (resolve, reject) => {
       try {
-        let dateCount = await this.sqLiteObject.executeSql(
+        let dateCount = await this.sqLiteObject.query(
           `SELECT COUNT (*) AS VAL FROM  ${tables.rappel.name}`,
           []
         );
 
-        let totalElements: number = dateCount.rows.item(0).VAL;
+        let totalElements: number = dateCount.values[0].VAL;
         let offset: number = (request.page - 1) * request.limit;
         let totalPage: number = Math.ceil(totalElements / request.limit);
 
-        let data = await this.sqLiteObject.executeSql(
+        let data = await this.sqLiteObject.query(
           `SELECT  rap.*, acc.${tables.account.columns[1].name}  FROM ${tables.rappel.name} rap left join ${tables.account.name} acc on acc.${tables.account.columns[0].name} = 
            rap.${tables.rappel.columns[1].name}   ORDER BY rap.${tables.rappel.columns[0].name}  DESC LIMIT ?  OFFSET ?;`,
           [request.limit, offset]
@@ -143,7 +140,7 @@ export class RappelDataBase
     await this.checkDataBaseOpened();
     return new Promise<void>(async (resolve, reject) => {
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `DELETE FROM  ${tables.rappel.name} WHERE ${
             tables.rappel.columns[0].name
           } IN (${ids.join(',')})`,
@@ -160,7 +157,7 @@ export class RappelDataBase
   private constructRappelArray(data: any): Rappel[] {
     let rappels: Rappel[] = [];
 
-    for (let i = 0; i < data.rows.length; i++) {
+    for (let i = 0; i < data.values.length; i++) {
       rappels.push(this.performRappelsRowIndex(data, i));
     }
 
@@ -169,15 +166,15 @@ export class RappelDataBase
 
   private performRappelsRowIndex(data: any, i: number): Rappel {
     return {
-      id: data.rows.item(i).ID,
-      accountId: data.rows.item(i).ACCOUNT_ID,
-      description: data.rows.item(i).DESCRIPTION,
-      eventDate: parseISO(data.rows.item(i).EVENT_DATE),
-      notifyDate: parseISO(data.rows.item(i).NOTIFY_DATE),
-      periode: data.rows.item(i).PERIODE,
-      isActive: data.rows.item(i).IS_ACTIVE === 1,
-      isPeriode: data.rows.item(i).IS_PERIODE === 1,
-      accountName: data.rows.item(i).ACCOUNT_NAME,
+      id: data.values[i].ID,
+      accountId: data.values[i].ACCOUNT_ID,
+      description: data.values[i].DESCRIPTION,
+      eventDate: parseISO(data.values[i].EVENT_DATE),
+      notifyDate: parseISO(data.values[i].NOTIFY_DATE),
+      periode: data.values[i].PERIODE,
+      isActive: data.values[i].IS_ACTIVE === 1,
+      isPeriode: data.values[i].IS_PERIODE === 1,
+      accountName: data.values[i].ACCOUNT_NAME,
     };
   }
 }

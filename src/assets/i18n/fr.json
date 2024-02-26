@@ -1,31 +1,157 @@
 {
-  "accounttype": {
-    "actifs": "actifs",
-    "passifs": "passifs",
-    "despense": "depense",
-    "incone": "entrées"
-  },
-  "actions": {
-    "create": "Créer",
-    "cancel": "Annuler",
-    "period": "Periode"
-  },
+  "menu": {
+    "dashbord": "tableau de bord",
 
-  "forms": {
+    "account": {
+      "text": "Compte",
+      "new": "Nouveau compte",
+      "search": "rechercher compte"
+    },
+
     "operation": {
-      "title": "Ajouter operation",
-      "cancel": "Annuler",
-      "attachment": "attachment",
-      "actifs": {
-        "debit": "Dépos",
-        "credit": "Retrait"
-      },
-      "depense": {
-        "debit": "bonus",
-        "credit": "charge"
-      }
+      "text": "operations",
+      "new": "nouvelle operation",
+      "search": "rechercher operation"
+    },
+
+    "magaging": {
+      "text": "Moderation",
+      "rapport": "rapports",
+      "remind": "rappel",
+      "alert": "alert"
+    },
+
+    "admin": {
+      "text": "admin",
+      "profiles": "profiles & personnes",
+      "subscription": "subscription",
+      "langues": "langages",
+      "support": "support"
     }
   },
+
+  "period": {
+    "global": "global",
+    "gl": "globale",
+    "an": "Annuele",
+    "dl": "Par jour",
+    "ml": "Par mois",
+    "wl": "Par semaine"
+  },
+  "month": {
+    "January": "Janvier",
+    "February": "fevrier",
+    "March": "mars",
+    "April": "avril",
+    "May": "mai",
+    "June": "juin",
+    "July": "juillet",
+    "August": "aount",
+    "September": "septembre",
+    "October": "octobre",
+    "November": "novembre",
+    "December": "decembre"
+  },
+  "accounttype": {
+    "actifs": "assets",
+    "passifs": "liabilities",
+    "depense": "expenses",
+    "income": "incomes"
+  },
+  "actions": {
+    "createOp": "creation operation",
+    "createAcc": "creation compte",
+    "cancel": "annuler",
+    "period": "Periode",
+    "limit": "nouvelle limitation"
+  },
+  "forms": {
+    "operation": {
+      "title": "nouvelle operation",
+      "cancel": "annuler",
+      "transferTo": "vers le compte",
+      "description": "description",
+      "attachment": "pieces jointes",
+      "numTrans": "numero transaction",
+
+      "actif": {
+        "debit": "depôt",
+        "credit": "retrait"
+      },
+
+      "passif": {
+        "debit": "paiement",
+        "credit": "charge"
+      },
+
+      "income": {
+        "debit": "entrée",
+        "credit": "charge"
+      },
+
+      "depense": {
+        "debit": "remboursement",
+        "credit": "charge"
+      },
+
+      "case1": {
+        "credit": "retraits"
+      },
+      "case2": {
+        "credit": "prêts"
+      },
+      "case3": {
+        "credit": "remboursement"
+      },
+      "case4": {
+        "debit": "entrée"
+      },
+      "case5": {
+        "credit": "paiement"
+      },
+      "case6": {
+        "debit": "tranferer"
+      },
+      "case7": {
+        "debit": "remboursement"
+      },
+      "case8": {
+        "debit": "paiement"
+      },
+      "case9": {
+        "credit": "charge"
+      },
+      "case10": {
+        "credit": "charge"
+      },
+
+      "case11": {
+        "debit": "transferer"
+      },
+      "case12": {
+        "debit": "charge"
+      },
+      "case13": {
+        "credit": "remboursement"
+      },
+      "case14": {
+        "credit": "transferer"
+      },
+      "case15": {
+        "debit": "remboursement"
+      }
+    },
+    "account": {
+      "title": "nouveaux compte",
+      "parent": "compte parent",
+      "name": "nom du compte",
+      "name_message": "Veuillez entrer un  nom valide!",
+      "path": "chemin",
+      "reset": "réinitialiser",
+      "submit": "soumettre"
+    }
+  },
+
   "divers": "diverse",
   "actifs": "assets",
   "passifs": "liabilities",
@@ -35,11 +161,21 @@
   "pages": {
     "main": {
       "balance": {
+        "balance": "balance",
         "global": "global"
       }
+    },
+
+    "lang": {
+      "apply": "appliquer",
+      "cancel": "annuler"
     }
   },
+
   "operations": {
-    "s": "En attente"
+    "s": "waiting"
+  },
+  "titles": {
+    "lang": "langages"
   }
 }

@@ -16,6 +16,7 @@ import { PagingData } from 'src/app/model/paging-data';
 import { MainStore } from 'src/app/store/main.store';
 import { ProfileService } from 'src/app/services/profile.service';
 import { ProfileModel } from 'src/app/model/profil.model';
+import { SupportPageStore } from '../support/support-page.store';
 
 let initialStore: OperationPageStoreModel = {};
 
@@ -47,7 +48,8 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
     private readonly routeParamsStore: RouteParamsStore,
     readonly accountStore: AccountPageStore,
     readonly mainStore: MainStore,
-    readonly profileService: ProfileService
+    readonly profileService: ProfileService,
+    readonly supportStore: SupportPageStore
   ) {
     super(initialStore);
 
@@ -157,20 +159,24 @@ export class OperationPageStore extends Store<OperationPageStoreModel> {
   }
 
   async createNewOperation(operation: Operation): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
+    return new Promise<number>(async (resolve, reject) => {
       operation.numTrans = random.randomAlphanumeric(16, 'uppercase');
       operation.profile = this.mainStore.state.currentProfile?.mail;
-      this.operationService
-        .businessCreationOperationDate(operation)
-        .then((operation) => {
-          this.setOperation(operation);
 
-          resolve(operation.id);
-        })
-        .catch((err) => {
-          console.error(err);
-          reject('erreur dans les service');
-        });
+      try {
+        this.setOperation(
+          await this.operationService.businessCreationOperationDate(operation)
+        );
+        //await this.supportStore.processToMaintaine();
+        await this.mainStore.checkLimitsAccount(
+          operation.idAccount,
+          operation.transfer
+        );
+        resolve(this.state.currentOperation?.id || 0);
+      } catch (error) {
+        console.error(error);
+        reject('erreur dans les service');
+      }
     });
   }
 

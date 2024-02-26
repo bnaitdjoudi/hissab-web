@@ -23,7 +23,7 @@ import { ServicesModule } from 'src/app/services/services.module';
     FormsModule,
     MainPageRoutingModule,
     ComponentsModule,
-    StoreModule,
+
     RouterModule,
     NgxTranslateModule,
     PipeModule,

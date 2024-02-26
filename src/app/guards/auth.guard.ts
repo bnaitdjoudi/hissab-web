@@ -33,6 +33,7 @@ export class PermissionsService {
     | UrlTree {
     return new Promise<boolean | UrlTree>(async (resolve, reject) => {
       let can = await this.sessionStore.checkIsSignedIn();
+      
       console.log('callllllllllllllllllllllllllllll' + can);
       if (!can) {
         this.router.navigate(['signup-page']);

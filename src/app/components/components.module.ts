@@ -74,8 +74,7 @@ registerLocaleData(localeFr, 'fr-FR');
     SearchAccountComponent,
     ProfileListTypeheadComponent,
     RappelFormComponent,
-    AttachmentComponent
-
+    AttachmentComponent,
   ],
   providers: [],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

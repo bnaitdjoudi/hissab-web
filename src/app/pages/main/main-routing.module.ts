@@ -64,6 +64,12 @@ const routes: Routes = [
         (m) => m.NotificationPageModule
       ),
   },
+
+  {
+    path: 'admin',
+    loadChildren: () =>
+      import('./../admin/admin.module').then((m) => m.AdminPageModule),
+  },
 ];
 
 @NgModule({

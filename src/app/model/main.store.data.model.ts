@@ -1,4 +1,5 @@
 import { Account } from './account.model';
+import { AlertLimit } from './alert.limit.model';
 import { Period } from './balance.model';
 import { Flag } from './flags.model';
 import { ProfileModel } from './profil.model';
@@ -14,4 +15,5 @@ export interface MainStoreData {
   flags: Map<string, Flag>;
   iSignedin: boolean;
   currentProfile?: ProfileModel;
+  alertLimits: AlertLimit[];
 }

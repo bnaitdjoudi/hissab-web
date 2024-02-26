@@ -72,6 +72,7 @@ export class RouteParamsStore extends Store<RouteParams> {
   }
 
   setIdCount(id: number) {
+    console.log('account id:', id);
     this.setState({
       ...this.state,
       accountParams: { ...this.state.accountParams, id: id },

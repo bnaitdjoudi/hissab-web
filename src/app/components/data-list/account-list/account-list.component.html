@@ -11,18 +11,16 @@
                                     :'CAD':'symbol-narrow':'1.2-2'
                                     }}</h1>
 
-
-
       </div>
       <div class="mcat">
         <div>
-          <ion-label class="labeltrans">{{'forms.operation.'+account.type+'.debit' | translate}}</ion-label>
+          <ion-label class="labeltrans">{{'forms.operation.'+account.type+'.debit' | traduction}}</ion-label>
           <ion-label class="numberd">{{(account? (account.debit ? account.debit : 0) * multiply(account.type):1) | currency
                                           :'CAD':'symbol-narrow':'1.2-2'
                                           }}</ion-label>
         </div>
         <div>
-          <ion-label class="labeltrans">{{'forms.operation.'+account.type+'.credit' | translate}}</ion-label>
+          <ion-label class="labeltrans">{{'forms.operation.'+account.type+'.credit' | traduction}}</ion-label>
           <ion-label class="numberd">{{(account? (account.credit ? account.credit : 0) * multiply(account.type):1) | currency
                                                     :'CAD':'symbol-narrow':'1.2-2'
                                                     }}</ion-label>
@@ -40,8 +38,8 @@
             </ion-icon></ion-item-option>
         </ion-item-options>
         <ion-item detail="true" button>
-          <ion-label class="capitelize">{{ item.acountName | translate }} </ion-label>
-          <ion-label [class]="accountClass(item)" slot="end">{{(item? ((item.rbalance? item.rbalance:0) * multiply(item.type)):0) | currency
+          <ion-label slot="start" class="capitelize">{{ item.acountName | traduction }} </ion-label>
+          <ion-label slot="end" [class]="accountClass(item)" slot="end">{{(item? ((item.rbalance? item.rbalance:0) * multiply(item.type)):0) | currency
                           :'CAD':'symbol-narrow':'1.2-2'
                           }}</ion-label>
 

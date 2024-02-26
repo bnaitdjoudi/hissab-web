@@ -2,8 +2,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'hissab-web',
+  appId: 'dev.edroos.money',
+  appName: 'Edroos Money',
   webDir: 'www',
   bundledWebRuntime: false,
   plugins: {

@@ -18,7 +18,7 @@ export class ProfileDataBase
     return new Promise<any>(async (resolve, reject) => {
       if (this.sqLiteObject) {
         try {
-          await this.sqLiteObject.executeSql(
+          await this.sqLiteObject.query(
             `INSERT INTO ${tables.profiles.name} (${tables.profiles.columns.map(
               (el) => el.name
             )}) VALUES (?,?,?,?, ?)`,
@@ -44,7 +44,7 @@ export class ProfileDataBase
     return new Promise<ProfileModel>(async (resolve, reject) => {
       if (this.sqLiteObject) {
         try {
-          await this.sqLiteObject.executeSql(
+          await this.sqLiteObject.query(
             'UPDATE PROFIL SET FIRST_NAME = ? , LAST_NAME = ?, PHONE = ? WHERE mail = ?',
             [model.firstName, model.lastName, model.phone, id]
           );
@@ -61,15 +61,15 @@ export class ProfileDataBase
     await this.checkDataBaseOpened();
     return new Promise<ProfileModel>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql('SELECT * FROM PROFIL WHERE MAIL = ?', [id])
+        .query('SELECT * FROM PROFIL WHERE MAIL = ?', [id])
         .then((data: any) => {
-          if (data.rows.length > 0) {
+          if (data.values.length > 0) {
             resolve({
-              mail: data.rows.item(0).mail,
-              firstName: data.rows.item(0).FIRST_NAME,
-              lastName: data.rows.item(0).LAST_NAME,
-              phone: data.rows.item(0).PHONE,
-              isAdmin: data.rows.item(0).IS_ADMIN,
+              mail: data.values[0].mail,
+              firstName: data.values[0].FIRST_NAME,
+              lastName: data.values[0].LAST_NAME,
+              phone: data.values[0].PHONE,
+              isAdmin: data.values[0].IS_ADMIN,
             });
           } else {
             reject('profile not found');
@@ -86,19 +86,19 @@ export class ProfileDataBase
     return new Promise<ProfileModel[]>(async (resolve, reject) => {
       if (this.sqLiteObject) {
         try {
-          const data = await this.sqLiteObject.executeSql(
+          const data = await this.sqLiteObject.query(
             'SELECT * FROM PROFIL',
             []
           );
           const profiles: ProfileModel[] = [];
-          if (data.rows.length > 0) {
-            for (let i = 0; i < data.rows.length; i++) {
+          if (data.values.length > 0) {
+            for (let i = 0; i < data.values.length; i++) {
               profiles.push({
-                mail: data.rows.item(i).mail,
-                firstName: data.rows.item(i).FIRST_NAME,
-                lastName: data.rows.item(i).LAST_NAME,
-                phone: data.rows.item(i).PHONE,
-                isAdmin: data.rows.item(i).IS_ADMIN,
+                mail: data.values[i].mail,
+                firstName: data.values[i].FIRST_NAME,
+                lastName: data.values[i].LAST_NAME,
+                phone: data.values[i].PHONE,
+                isAdmin: data.values[i].IS_ADMIN,
               });
             }
           }

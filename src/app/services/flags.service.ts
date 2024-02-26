@@ -15,4 +15,5 @@ export class FlagsService {
   async createFlag(flag: Flag): Promise<any> {
     return this.flagsDb.create(flag);
   }
+
 }

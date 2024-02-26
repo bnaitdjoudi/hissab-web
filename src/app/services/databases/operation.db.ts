@@ -45,10 +45,12 @@ export class OperationDataBase
   private async privateCreate(model: Operation): Promise<number> {
     return new Promise<any>((resolve, reject) =>
       this.sqLiteObject
-        .executeSql(
+        .query(
           `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
             .filter((el) => el.name !== 'ID')
-            .map((el) => el.name)}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?, ?, ?); `,
+            .map(
+              (el) => el.name
+            )}) VALUES ( ?, ?, ?, ? , ?, ?, ?, ?, ?, ?, ?); `,
           [
             model.numTrans,
             format(model.time, 'yyyy-MM-dd HH:mm:ss'),
@@ -65,13 +67,13 @@ export class OperationDataBase
         )
         .then(async () => {
           try {
-            let res = await this.sqLiteObject.executeSql(
+            let res = await this.sqLiteObject.query(
               `SELECT max(id) as seq from operation where transfer = ?;`,
               [model.transfer]
             );
 
-            if (res.rows.length > 0) {
-              resolve(res.rows.item(0).seq);
+            if (res.values.length > 0) {
+              resolve(res.values[0].seq);
             } else {
               resolve(0);
             }
@@ -113,7 +115,7 @@ export class OperationDataBase
   ): Promise<Operation> {
     return new Promise<Operation>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `UPDATE  ${tables.transaction.name} SET ${tables.transaction.columns
             .filter((el) => el.name !== 'ID')
             .map((el) => el.name + ' = ?')} WHERE ID = ? `,
@@ -167,12 +169,12 @@ export class OperationDataBase
   private async privateFindById(id: number): Promise<Operation> {
     return new Promise<Operation>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT * FROM ${tables.transaction.name} WHERE ${tables.transaction.columns[0].name} = ${id};`,
           []
         )
         .then((data: any) => {
-          if (data.rows.length >= 1) {
+          if (data.values.length >= 1) {
             resolve(this.performOperationsRowIndex(data, 0));
           } else {
             reject('no operation found');
@@ -206,7 +208,7 @@ export class OperationDataBase
   private async privateFindByIdAccount(id: number): Promise<Operation[]> {
     return new Promise<Operation[]>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT * FROM ${tables.transaction.name} WHERE ${tables.transaction.columns[8].name} = ? ORDER BY ${tables.transaction.columns[2].name} DESC;`,
           [id]
         )
@@ -276,17 +278,17 @@ export class OperationDataBase
   ): Promise<PagingData<Operation>> {
     return new Promise<PagingData<Operation>>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT COUNT (*) AS VAL FROM ${tables.transaction.name}  WHERE  ${tables.transaction.columns[8].name} = ?`,
           [id]
         )
         .then((res: any) => {
-          let totalElements: number = res.rows.item(0).VAL;
+          let totalElements: number = res.values[0].VAL;
           let offset: number = (paging.page - 1) * paging.limit;
           let totalPage: number = Math.ceil(totalElements / paging.limit);
 
           this.sqLiteObject
-            .executeSql(
+            .query(
               `SELECT  *  FROM ${tables.transaction.name}  WHERE ${tables.transaction.columns[8].name} = ? ORDER BY ${tables.transaction.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
               [id, paging.limit, offset]
             )
@@ -315,7 +317,7 @@ export class OperationDataBase
   ): Promise<PagingData<Operation>> {
     return new Promise<PagingData<Operation>>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT COUNT (*) AS VAL FROM ${tables.transaction.name}  WHERE  
           ${tables.transaction.columns[8].name} = ?  AND 
           ${tables.transaction.columns[2].name} >= ? AND 
@@ -323,12 +325,12 @@ export class OperationDataBase
           [id, startDate, endDate]
         )
         .then((res: any) => {
-          let totalElements: number = res.rows.item(0).VAL;
+          let totalElements: number = res.values[0].VAL;
           let offset: number = (paging.page - 1) * paging.limit;
           let totalPage: number = Math.ceil(totalElements / paging.limit);
 
           this.sqLiteObject
-            .executeSql(
+            .query(
               `SELECT  *  FROM ${tables.transaction.name}  WHERE ${tables.transaction.columns[8].name} = ? 
               AND ${tables.transaction.columns[2].name} >= ? 
               AND ${tables.transaction.columns[2].name} <= ? ORDER BY ${tables.transaction.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
@@ -380,7 +382,7 @@ export class OperationDataBase
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `UPDATE  ${tables.transaction.name} SET ${tables.transaction.columns[7].name} = ${tables.transaction.columns[7].name} + ? WHERE id > ? and ${tables.transaction.columns[8].name} = ?`,
           [diff, id, countId]
         )
@@ -397,18 +399,18 @@ export class OperationDataBase
   private constructOperationArray(data: any): Operation[] {
     let operations: Operation[] = [];
 
-    for (let i = 0; i < data.rows.length; i++) {
+    for (let i = 0; i < data.values.length; i++) {
       operations.push({
-        id: data.rows.item(i).ID,
-        numTrans: data.rows.item(i).NUM_TRANS,
-        time: parseISO(data.rows.item(i).TIME),
-        balance: data.rows.item(i).BALANCE,
-        description: data.rows.item(i).DESCRIPTION,
-        statut: data.rows.item(i).STATUT,
-        credit: data.rows.item(i).CREDIT,
-        debit: data.rows.item(i).DEBIT,
-        idAccount: data.rows.item(i).ID_ACCOUNT,
-        transfer: data.rows.item(i).TRANSFER,
+        id: data.values[i].ID,
+        numTrans: data.values[i].NUM_TRANS,
+        time: parseISO(data.values[i].TIME),
+        balance: data.values[i].BALANCE,
+        description: data.values[i].DESCRIPTION,
+        statut: data.values[i].STATUT,
+        credit: data.values[i].CREDIT,
+        debit: data.values[i].DEBIT,
+        idAccount: data.values[i].ID_ACCOUNT,
+        transfer: data.values[i].TRANSFER,
       } as Operation);
     }
 
@@ -433,7 +435,7 @@ export class OperationDataBase
   private async privateDeleteById(ids: number[]): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `DELETE FROM ${tables.transaction.name} WHERE  ${
             tables.transaction.columns[0].name
           } IN (${ids.join(',')})`
@@ -448,7 +450,7 @@ export class OperationDataBase
           resolve();
         })
         .catch((err: any) => {
-          if (err.rows.length === 0 && err.rowsAffected >= 0) {
+          if (err.values.length === 0 && err.rowsAffected >= 0) {
             resolve();
           } else {
             printError("erreur dans l'excecusion de le requete", reject, err);
@@ -478,7 +480,7 @@ export class OperationDataBase
   ): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `INSERT INTO ${tables.transaction.name} (${tables.transaction.columns
             .filter((el) => {
               if (withId) {
@@ -556,7 +558,7 @@ export class OperationDataBase
   ): Promise<Operation[]> {
     return new Promise<Operation[]>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT  *  FROM ${tables.transaction.name}  WHERE ${tables.transaction.columns[1].name} = ?`,
           [numTrans]
         )
@@ -595,13 +597,13 @@ export class OperationDataBase
   ): Promise<Operation[]> {
     return new Promise<Operation[]>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[1].name} = ?;`,
           [numTrans]
         )
         .then((data: any) => {
           let operations: Operation[] = [];
-          if (data.rows.length >= 1) {
+          if (data.values.length >= 1) {
             operations = this.constructAccountArray(data);
           }
           resolve(operations);
@@ -636,12 +638,12 @@ export class OperationDataBase
   ): Promise<Operation> {
     return new Promise<Operation>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[0].name} = ?;`,
           [id]
         )
         .then((data: any) => {
-          if (data.rows.length >= 1) {
+          if (data.values.length >= 1) {
             resolve(this.performOperationsRowIndex(data, 0));
           } else {
             resolve({} as Operation);
@@ -680,12 +682,12 @@ export class OperationDataBase
   ): Promise<Operation> {
     return new Promise<Operation>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[1].name} = ? and op.${tables.transaction.columns[8].name} <> ?`,
           [numTrans, countId]
         )
         .then((res: any) => {
-          if (res.rows.length > 0) {
+          if (res.values.length > 0) {
             resolve(this.performOperationsRowIndex(res, 0));
           } else {
             reject(404);
@@ -725,12 +727,12 @@ export class OperationDataBase
   ): Promise<Operation> {
     return new Promise<Operation>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT  op.*, acc.type  FROM ${tables.transaction.name} op left join ${tables.account.name} acc on op.id_account = acc.id WHERE op.${tables.transaction.columns[1].name} = ? and op.${tables.transaction.columns[8].name} = ?`,
           [numTrans, countId]
         )
         .then((res: any) => {
-          if (res.rows.length > 0) {
+          if (res.values.length > 0) {
             resolve(this.performOperationsRowIndex(res, 0));
           } else {
             reject(404);
@@ -766,13 +768,13 @@ export class OperationDataBase
   ): Promise<number> {
     return new Promise<number>((resolve, rejects) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT ${tables.transaction.columns[7].name} FROM ${tables.transaction.name} WHERE ${tables.transaction.columns[2].name} < ? AND  ${tables.transaction.columns[8].name}  = ? ORDER BY TIME DESC LIMIT 2`,
           [format(date, 'yyyy-MM-dd HH:mm:ss'), accountId]
         )
         .then((res: any) => {
-          if (res.rows.length > 0) {
-            let balance: number = res.rows.item(0).BALANCE;
+          if (res.values.length > 0) {
+            let balance: number = res.values[0].BALANCE;
             resolve(balance);
           } else {
             resolve(0);
@@ -813,7 +815,7 @@ export class OperationDataBase
   ): Promise<void> {
     return new Promise<void>((resolve, rejects) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `UPDATE  ${tables.transaction.name} SET ${tables.transaction.columns[7].name} = ${tables.transaction.columns[7].name} + ? WHERE ${tables.transaction.columns[2].name} > ? and ${tables.transaction.columns[8].name} = ?`,
           [diff, format(date, 'yyyy-MM-dd HH:mm:ss'), countId]
         )
@@ -852,13 +854,13 @@ export class OperationDataBase
     return new Promise<number>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(
+          .query(
             `select actif - passif as balance from (select sum(op.debit) as actif, sum(op.credit) as passif from operation op left join account acc on op.id_account = acc.id where acc.type like 'actif' or acc.type like 'passif');`,
             []
           )
           .then((res: any) => {
-            if (res.rows.length > 0) {
-              resolve(res.rows.item(0).balance);
+            if (res.values.length > 0) {
+              resolve(res.values[0].balance);
             } else {
               reject(' no result');
             }
@@ -901,7 +903,7 @@ export class OperationDataBase
   ): Promise<number> {
     return new Promise<number>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `select actif - passif as balance from ( select sum(op.debit) as actif, sum(op.credit) as passif from operation op left join account acc on op.id_account = acc.id where (op.time  <= ? and op.time >= ? ) and ( acc.type like 'actif' or acc.type like 'passif'));`,
           [
             format(endDate, 'yyyy-MM-dd HH:mm:ss'),
@@ -909,8 +911,8 @@ export class OperationDataBase
           ]
         )
         .then((res: any) => {
-          if (res.rows.length > 0) {
-            resolve(res.rows.item(0).balance);
+          if (res.values.length > 0) {
+            resolve(res.values[0].balance);
           } else {
             reject('no result');
           }
@@ -930,7 +932,7 @@ export class OperationDataBase
     return new Promise<number>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(
+          .query(
             `select debit - credit as balance from (select sum(op.credit) as credit, sum(op.debit) as debit, acc.type from account acc left join operation op on acc.id = op.id_account where op.time  <= ? and op.time >= ?   group by acc.type) where type = ? ;`,
             [
               format(endDate, 'yyyy-MM-dd HH:mm:ss'),
@@ -939,8 +941,8 @@ export class OperationDataBase
             ]
           )
           .then((res: any) => {
-            if (res.rows.length > 0) {
-              resolve(res.rows.item(0).balance);
+            if (res.values.length > 0) {
+              resolve(res.values[0].balance);
             } else {
               reject('no result');
             }
@@ -963,7 +965,7 @@ export class OperationDataBase
     return new Promise<AccountBalance[]>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(
+          .query(
             `select id, name, debit - credit as balance from (select acc.id as id, acc.account_name as name, sum(op.credit) as credit, sum(op.debit) as debit from account acc left outer join operation op on acc.id = op.id_account and op.time <= ? and op.time >= ? where  acc.type = ? and acc.is_leaf = 1 group by acc.id, acc.account_name);`,
             [
               format(endDate, 'yyyy-MM-dd HH:mm:ss'),
@@ -972,13 +974,13 @@ export class OperationDataBase
             ]
           )
           .then((res: any) => {
-            if (res.rows.length > 0) {
+            if (res.values.length > 0) {
               const accountBalances: AccountBalance[] = [];
-              for (let i = 0; i < res.rows.length; i++) {
+              for (let i = 0; i < res.values.length; i++) {
                 accountBalances.push({
-                  accountId: res.rows.item(i).id,
-                  accountName: res.rows.item(i).name,
-                  balance: res.rows.item(i).balance,
+                  accountId: res.values[i].id,
+                  accountName: res.values[i].name,
+                  balance: res.values[i].balance,
                 });
               }
               resolve(accountBalances);
@@ -1018,12 +1020,12 @@ export class OperationDataBase
           : ' 1 = 1';
         const clause = `${clauseDescription} and ${clauseStartDate} and  ${clauseEndDate} and ${clauseAccountId}`;
         this.sqLiteObject
-          .executeSql(
+          .query(
             `SELECT COUNT (*) AS VAL FROM ${tables.transaction.name} WHERE ${clause};`,
             []
           )
           .then((res: any) => {
-            let totalElements: number = res.rows.item(0).VAL;
+            let totalElements: number = res.values[0].VAL;
             let offset: number =
               (operationSearchData.page - 1) * operationSearchData.limit;
             let totalPage: number = Math.ceil(
@@ -1031,7 +1033,7 @@ export class OperationDataBase
             );
 
             this.sqLiteObject
-              .executeSql(
+              .query(
                 `SELECT op.*, acc.${tables.account.columns[1].name} FROM ${tables.transaction.name} op left join ${tables.account.name} acc on acc.${tables.account.columns[0].name} = ${tables.transaction.columns[8].name}   WHERE ${clause} ORDER BY ${tables.transaction.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
                 [operationSearchData.limit, offset]
               )
@@ -1064,7 +1066,7 @@ export class OperationDataBase
     return new Promise<Operation>(async (resolve, reject) => {
       if (this.sqLiteObject) {
         try {
-          const res = await this.sqLiteObject.executeSql(
+          const res = await this.sqLiteObject.query(
             `select sum(op.debit) as actif, sum(op.credit) as passif from operation op left join account acc on op.id_account = acc.id where (op.time  <= ? and op.time >= ? ) and ( acc.type like ?);`,
             [
               format(date, 'yyyy-MM-dd HH:mm:ss'),
@@ -1077,10 +1079,10 @@ export class OperationDataBase
             ]
           );
 
-          if (res.rows.length > 0) {
+          if (res.values.length > 0) {
             const result: Operation = {
-              debit: res.rows.item(0).actif,
-              credit: res.rows.item(0).passif,
+              debit: res.values[0].actif,
+              credit: res.values[0].passif,
             } as unknown as Operation;
 
             resolve({
@@ -1096,6 +1098,34 @@ export class OperationDataBase
     });
   }
 
+  async getAccountBalanceBetweenDates(
+    startDate: Date,
+    endDate: Date,
+    accountdIds: number[]
+  ): Promise<number> {
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        const data = await this.sqLiteObject.query(
+          `SELECT debit - credit as balance FROM (SELECT SUM(DEBIT) as debit,SUM(CREDIT) as credit  FROM ${tables.transaction.name}
+           WHERE ${tables.transaction.columns[8].name} IN (?) 
+            and ${tables.transaction.columns[2].name} >= ? and ${tables.transaction.columns[2].name} <= ? )`,
+          [
+            accountdIds,
+            format(endDate, 'yyyy-MM-dd HH:mm:ss'),
+            format(startDate, 'yyyy-MM-dd HH:mm:ss'),
+          ]
+        );
+        if (data.values.length > 0) {
+          resolve(data.values[0].balance);
+        } else {
+          resolve(0);
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   async getAllOperationAfterDate(
     idAccount: number,
     date: Date
@@ -1104,7 +1134,7 @@ export class OperationDataBase
 
     return new Promise<Operation[]>(async (resolve, reject) => {
       try {
-        let data = await this.sqLiteObject.executeSql(
+        let data = await this.sqLiteObject.query(
           `SELECT * FROM  ${tables.transaction.name} WHERE ${tables.transaction.columns[2].name} >= ?  
           and ${tables.transaction.columns[8].name}  = ? order by ${tables.transaction.columns[2].name} ;`,
           [format(date, 'yyyy-MM-dd HH:mm:ss'), idAccount]
@@ -1121,7 +1151,7 @@ export class OperationDataBase
   private constructAccountArray(data: any): Operation[] {
     let operations: Operation[] = [];
 
-    for (let i = 0; i < data.rows.length; i++) {
+    for (let i = 0; i < data.values.length; i++) {
       operations.push(this.performOperationsRowIndex(data, i));
     }
 
@@ -1130,20 +1160,20 @@ export class OperationDataBase
 
   private performOperationsRowIndex(data: any, i: number): Operation {
     return {
-      id: data.rows.item(i).ID,
-      numTrans: data.rows.item(i).NUM_TRANS,
-      time: parseISO(data.rows.item(i).TIME),
-      balance: data.rows.item(i).BALANCE,
-      description: data.rows.item(i).DESCRIPTION,
-      statut: data.rows.item(i).STATUT,
-      credit: data.rows.item(i).CREDIT,
-      debit: data.rows.item(i).DEBIT,
-      idAccount: data.rows.item(i).ID_ACCOUNT,
-      accountType: data.rows.item(i).TYPE,
-      transfer: data.rows.item(i).TRANSFER,
-      accountName: data.rows.item(i).ACCOUNT_NAME,
-      profile: data.rows.item(i).PROFILE,
-      attachment: data.rows.item(i).ATTACHMENT,
+      id: data.values[i].ID,
+      numTrans: data.values[i].NUM_TRANS,
+      time: parseISO(data.values[i].TIME),
+      balance: data.values[i].BALANCE,
+      description: data.values[i].DESCRIPTION,
+      statut: data.values[i].STATUT,
+      credit: data.values[i].CREDIT,
+      debit: data.values[i].DEBIT,
+      idAccount: data.values[i].ID_ACCOUNT,
+      accountType: data.values[i].TYPE,
+      transfer: data.values[i].TRANSFER,
+      accountName: data.values[i].ACCOUNT_NAME,
+      profile: data.values[i].PROFILE,
+      attachment: data.values[i].ATTACHMENT,
     };
   }
 }

@@ -380,7 +380,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
 
   onTransferChange(event: any) {
     if (event.detail.value !== undefined) {
-      if (this.modalTitle === 'Transfer from') {
+      if (this.modalTitle === 'Account source') {
         this.defaultTransferFrom = this.leafsAccountTotal.find((el) => {
           return el.id == event.detail.value;
         });
@@ -403,7 +403,7 @@ export class OperationFormComponent implements OnInit, OnDestroy {
         this.classeValideTransferFrom = 'card-account-valide';
       }
 
-      if (this.modalTitle === 'Transfer to') {
+      if (this.modalTitle === 'To account') {
         this.defaultTransferTo = this.leafsAccountTotal.find((el) => {
           return el.id == event.detail.value;
         });
@@ -458,14 +458,14 @@ export class OperationFormComponent implements OnInit, OnDestroy {
     console.log('open modal:' + JSON.stringify(this.account));
     switch (mode) {
       case 'from': {
-        this.modalTitle = 'Transfer from';
+        this.modalTitle = 'Account source';
         this.loadDataLeaf();
         this.isModalOpen = true;
         break;
       }
 
       case 'to': {
-        this.modalTitle = 'Transfer to';
+        this.modalTitle = 'To account';
         this.loadDataLeaf();
         this.isModalOpen = true;
         break;
@@ -546,8 +546,10 @@ export class OperationFormComponent implements OnInit, OnDestroy {
   private loadDataLeaf() {
     this.progressShown = true;
 
+    console.log(this.defaultTransferFrom?.id);
+
     this.onLoadLeafAccount.emit(
-      this.modalTitle === 'Transfer to'
+      this.modalTitle === 'To account'
         ? this.defaultTransferFrom?.id
         : undefined
     );
@@ -645,6 +647,26 @@ export class OperationFormComponent implements OnInit, OnDestroy {
       this.tranferCase === 'case12' ||
       this.tranferCase === 'case15'
     );
+  }
+
+  get valueLeafSelected() {
+    console.log(
+      'value selected',
+      this.modalTitle === 'To account'
+        ? this.defaultTransferTo
+          ? this.defaultTransferTo.id
+          : -5
+        : this.defaultTransferFrom
+        ? this.defaultTransferFrom.id
+        : -5
+    );
+    return this.modalTitle === 'To account'
+      ? this.defaultTransferTo
+        ? this.defaultTransferTo.id
+        : -5
+      : this.defaultTransferFrom
+      ? this.defaultTransferFrom.id
+      : -5;
   }
 
   showCredit(): boolean {

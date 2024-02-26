@@ -15,13 +15,18 @@ import { OperationPageStore } from '../operation-page.store';
 import { Account } from 'src/app/model/account.model';
 import { Router } from '@angular/router';
 import { ProfileModel } from 'src/app/model/profil.model';
-import { FileOpener } from '@awesome-cordova-plugins/file-opener';
+import { LoadingController } from '@ionic/angular';
+import { AbstractPage } from '../../abstract-page';
+
 @Component({
   selector: 'app-operation-page-new',
   templateUrl: './operation-page-new.page.html',
   styleUrls: ['./operation-page-new.page.scss'],
 })
-export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
+export class OperationPageNewPage
+  extends AbstractPage
+  implements OnInit, OnDestroy, AfterViewInit
+{
   currentOperation: Operation;
   subscription: Subscription;
   subscriptionLeaf: Subscription;
@@ -36,8 +41,11 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     readonly operationStore: OperationPageStore,
-    readonly router: Router
-  ) {}
+    readonly router: Router,
+    loadingCtrl: LoadingController
+  ) {
+    super(loadingCtrl);
+  }
   ngAfterViewInit(): void {
     this.operationStore.getCurrentProfile().then((profile) => {
       this.currentProfile = profile;
@@ -71,6 +79,7 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
   async submit() {
     if (this.operationFormComponent.isValidData()) {
       try {
+        await this.showLoading();
         let id = await this.operationStore.createNewOperation(
           avoidOperationNumberConfusion(
             this.operationFormComponent.currentOperation
@@ -80,6 +89,8 @@ export class OperationPageNewPage implements OnInit, OnDestroy, AfterViewInit {
         await this.operationFormComponent.validateAttachment();
         await this.operationFormComponent.reset();
         this.router.navigate(['operation/' + id]);
+
+        this.dismissLoading();
       } catch (error) {
         console.error(error);
       }

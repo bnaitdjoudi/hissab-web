@@ -25,7 +25,7 @@ export class NotificationDataBase
       this.checkDataBaseOpened();
 
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `INSERT INTO ${
             tables.notification.name
           } (${tables.notification.columns
@@ -42,7 +42,7 @@ export class NotificationDataBase
           ]
         );
 
-        let data = await this.sqLiteObject.executeSql(
+        let data = await this.sqLiteObject.query(
           `SELECT * FROM  ${tables.notification.name}  WHERE ${tables.notification.columns[3].name} = ? 
           and ${tables.notification.columns[2].name} = ? and ${tables.notification.columns[1].name} = ?;`,
           [
@@ -52,7 +52,7 @@ export class NotificationDataBase
           ]
         );
 
-        if (data.rows.length >= 1) {
+        if (data.values.length >= 1) {
           resolve(this.constructNotArray(data)[0]);
         } else {
           resolve({} as Notify);
@@ -73,11 +73,11 @@ export class NotificationDataBase
     await this.checkDataBaseOpened();
     return new Promise<Notify[]>(async (resolve, reject) => {
       try {
-        let data = await this.sqLiteObject.executeSql(
+        let data = await this.sqLiteObject.query(
           'SELECT * FROM NOTIFICATION',
           []
         );
-        if (data.rows.length > 0) {
+        if (data.values.legth > 0) {
           resolve(this.constructNotArray(data));
         }
 
@@ -92,7 +92,7 @@ export class NotificationDataBase
     this.checkDataBaseOpened();
     return new Promise<void>(async (resolve, reject) => {
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `DELETE FROM ${tables.notification.name} WHERE ${tables.notification.columns[0].name} IN (?);`,
           [ids]
         );
@@ -108,7 +108,7 @@ export class NotificationDataBase
     this.checkDataBaseOpened();
     return new Promise<void>(async (resolve, reject) => {
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `DELETE FROM ${tables.notification.name} WHERE ${tables.notification.columns[2].name} = ? `,
           [rappelId]
         );
@@ -124,7 +124,7 @@ export class NotificationDataBase
     this.checkDataBaseOpened();
     return new Promise<Notify[]>(async (resolve, reject) => {
       try {
-        const data = await this.sqLiteObject.executeSql(
+        const data = await this.sqLiteObject.query(
           `SELECT * FROM ${tables.notification.name} WHERE ${tables.notification.columns[2].name} = ? `,
           [rappelId]
         );
@@ -144,7 +144,7 @@ export class NotificationDataBase
         let offset: number = (request.page - 1) * request.limit;
         let totalPage: number = Math.ceil(totalElements / request.limit);
 
-        let data = await this.sqLiteObject.executeSql(
+        let data = await this.sqLiteObject.query(
           `SELECT  noti.*, acc.${tables.account.columns[1].name}, rap.${tables.rappel.columns[6].name}  FROM ${tables.notification.name} noti left join ${tables.account.name} acc on acc.${tables.account.columns[0].name} = noti.${tables.notification.columns[1].name} left join ${tables.rappel.name} rap on rap.${tables.rappel.columns[0].name} = ${tables.notification.columns[2].name} 
           WHERE noti.${tables.notification.columns[3].name} <= ? ORDER BY noti.${tables.notification.columns[3].name}  DESC LIMIT ?  OFFSET ?;`,
           [format(new Date(), 'yyyy-MM-dd HH:mm:ss'), request.limit, offset]
@@ -166,11 +166,11 @@ export class NotificationDataBase
     await this.checkDataBaseOpened();
     return new Promise<number>(async (resolve, reject) => {
       try {
-        let dateCount = await this.sqLiteObject.executeSql(
+        let dateCount = await this.sqLiteObject.query(
           `SELECT COUNT (*) AS VAL FROM  ${tables.notification.name}  WHERE ${tables.notification.columns[3].name} <= ?`,
           [format(new Date(), 'yyyy-MM-dd HH:mm:ss')]
         );
-        let totalElements: number = dateCount.rows.item(0).VAL;
+        let totalElements: number = dateCount.values[0].VAL;
 
         resolve(totalElements);
       } catch (error) {
@@ -184,7 +184,7 @@ export class NotificationDataBase
     await this.checkDataBaseOpened();
     return new Promise<void>(async (resolve, reject) => {
       try {
-        this.sqLiteObject.executeSql(
+        this.sqLiteObject.query(
           `UPDATE  ${tables.notification.name} SET ${tables.notification.columns[4].name} = ?
            WHERE ${tables.notification.columns[0].name} = ?`,
           [isOpen ? 1 : 0, id]
@@ -200,7 +200,7 @@ export class NotificationDataBase
   private constructNotArray(data: any): Notify[] {
     let rappels: Notify[] = [];
 
-    for (let i = 0; i < data.rows.length; i++) {
+    for (let i = 0; i < data.values.legth; i++) {
       rappels.push(this.performNotificationsRowIndex(data, i));
     }
 
@@ -209,14 +209,14 @@ export class NotificationDataBase
 
   private performNotificationsRowIndex(data: any, i: number): Notify {
     return {
-      id: data.rows.item(i).ID,
-      accountId: data.rows.item(i).ACCOUNT_ID,
-      rappelId: data.rows.item(i).RAPPEL_ID,
-      notifyDateBegin: parseISO(data.rows.item(i).NOTIFY_DATE_BEGIN),
-      eventDate: parseISO(data.rows.item(i).EVENT_DATE),
-      isOpen: data.rows.item(i).IS_OPEN === 1,
-      description: data.rows.item(i).DESCRIPTION,
-      accountName: data.rows.item(i).ACCOUNT_NAME,
+      id: data.values[i].ID,
+      accountId: data.values[i].ACCOUNT_ID,
+      rappelId: data.values[i].RAPPEL_ID,
+      notifyDateBegin: parseISO(data.values[i].NOTIFY_DATE_BEGIN),
+      eventDate: parseISO(data.values[i].EVENT_DATE),
+      isOpen: data.values[i].IS_OPEN === 1,
+      description: data.values[i].DESCRIPTION,
+      accountName: data.values[i].ACCOUNT_NAME,
     };
   }
 }

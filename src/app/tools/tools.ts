@@ -49,3 +49,20 @@ export const showDebitField = (from: string, to: string): boolean => {
     from === 'income'
   );
 };
+
+export const codeLangToNumber = (code: string): number => {
+  switch (code) {
+    case 'fr': {
+      return 0;
+    }
+    case 'en': {
+      return 1;
+    }
+    case 'ar': {
+      return 2;
+    }
+    default: {
+      return 1;
+    }
+  }
+};

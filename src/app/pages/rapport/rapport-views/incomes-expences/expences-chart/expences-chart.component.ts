@@ -44,8 +44,14 @@ export class ExpencesChartComponent
     this.options = {
       title: {
         text: 'Expences',
-        subtext: 'Pie Chart',
+
         left: 'center',
+        subtextStyle: {
+          color: '#f1f1f2',
+        },
+        textStyle: {
+          color: '#f1f1f2',
+        },
       },
       tooltip: {
         trigger: 'item',

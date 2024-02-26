@@ -19,7 +19,7 @@ export class AuthDataBase
     return new Promise<any>(async (resolve, reject) => {
       if (this.sqLiteObject) {
         try {
-          await this.sqLiteObject.executeSql(
+          await this.sqLiteObject.query(
             `INSERT INTO ${
               tables.authentication.name
             } (${tables.authentication.columns.map(
@@ -55,19 +55,19 @@ export class AuthDataBase
     return new Promise<any>(async (resolve, reject) => {
       if (this.sqLiteObject) {
         try {
-          const res = await this.sqLiteObject.executeSql(
+          const res = await this.sqLiteObject.query(
             `SELECT * FROM ${tables.authentication.name} WHERE ${tables.authentication.columns[0].name} = ?
              AND ${tables.authentication.columns[1].name} = ? `,
             [model.email, model.password]
           );
-          if (res.rows.length > 0) {
-            let l = res.rows.length;
+          if (res.values.length > 0) {
+            let l = res.values.length;
             const auths: AuthModel[] = [];
 
             for (let i = 0; i < l; i++) {
               auths.push({
-                email: res.rows.item(i).mail,
-                password: res.rows.item(i).password,
+                email: res.values[i].mail,
+                password: res.values[i].password,
                 hashed: true,
               });
             }

@@ -13,4 +13,6 @@ export interface Account {
   debit?: number;
   credit?: number;
   rbalance?: number;
+  limitMax?: number;
+  limitMin?: number;
 }

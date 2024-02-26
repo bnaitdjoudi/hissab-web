@@ -1,0 +1,68 @@
+<header-simple [title]="' create limite'" (onReturnClick)="backNavigation()" (onPeriodClick)="showPeriodOption()"
+  [periodLabel]="''"></header-simple>
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-textarea labelPlacement="stacked" value="{{account.acountName}}">
+        <div class="account-label" slot="label">{{'forms.account.name' | traduction }}: </div>
+      </ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-textarea labelPlacement="stacked" value="{{account.path}}">
+        <div class="account-label" slot="label">{{'forms.account.path' | traduction }}: </div>
+      </ion-textarea>
+    </ion-item>
+  </ion-list>
+  <ion-list>
+    <ion-item>
+      <ion-select [value]="period" label="Period" placeholder="Choose period" [(ngModel)]="period"
+        (ionChange)="periodChange($event)">
+        <ion-select-option *ngIf="isNotCreated('gl')" value="gl">{{'period.gl' | traduction }}</ion-select-option>
+        <ion-select-option *ngIf="isNotCreated('an')" value="an">{{'period.an' | traduction }}</ion-select-option>
+        <ion-select-option *ngIf="isNotCreated('ml')" value="ml">{{'period.ml' | traduction }}</ion-select-option>
+        <ion-select-option *ngIf="isNotCreated('wl')" value="wl">{{'period.wl' | traduction }}</ion-select-option>
+        <ion-select-option *ngIf="isNotCreated('dl')" value="dl">{{'period.dl' | traduction }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item *ngIf="displayMax">
+      <ion-toggle [disabled]="!period" [checked]="activeMax" (click)="activateMax($event)"
+        [(ngModel)]="activeMax">Maximum
+        limitation:</ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="displayMax">
+      <ion-input [disabled]="!activeMax" class="custom" labelPlacement="fixed" placeholder="Maximum"
+        (ionInput)="changeMax($event)" [maskito]="maskitoMaxOptions" [value]="max" [maskitoElement]="predicate"
+        [(ngModel)]="max">
+        <div class="account-label" slot="label">Maximum: </div>
+      </ion-input>
+    </ion-item>
+    <ion-item *ngIf="displayMin">
+      <ion-toggle [disabled]="!period" [checked]="activeMin" (click)="activateMin($event)"
+        [(ngModel)]="activeMin">Minimum
+        limitation:</ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="displayMin">
+      <ion-input (ionInput)="changeMin($event)" [disabled]="!activeMin" class="custom" labelPlacement="fixed"
+        placeholder="Minimum" [maskito]="maskitoMinOptions" [value]="min" [maskitoElement]="predicate"
+        [(ngModel)]="min">
+        <div class="account-label" slot="label">Minimum: </div>
+      </ion-input>
+    </ion-item>
+  </ion-list>
+  <ion-toast color="danger" [isOpen]="mumToast" message="You should define one of the two limits"
+    icon="alert-circle-outline" translucent="true" position="middle" [buttons]="toastButtons"></ion-toast>
+  <ion-toast color="danger" [isOpen]="periodToast" message="You should Choose Period!" icon="alert-circle-outline"
+    translucent="true" position="middle" [buttons]="toastButtons"></ion-toast>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" slot="start" (click)="goToHome()" id="menu-button">
+        <fa-icon icon="house"></fa-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <button mat-raised-button color="primary" (click)="submit()" style="float: right;">{{ 'SUBMIT'}}</button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

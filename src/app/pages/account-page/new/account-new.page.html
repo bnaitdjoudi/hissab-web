@@ -7,7 +7,7 @@
         <ion-icon name="arrow-back-sharp" size="large"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Create new Account</ion-title>
+    <ion-title>{{ 'forms.account.title' | translate}}</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -17,28 +17,29 @@
       <!-- <ng-template matStepLabel>Name</ng-template> -->
       <div class="example-form">
         <mat-form-field class="example-full-width">
-          <mat-label>Parent account name</mat-label>
+          <mat-label>{{ 'forms.account.parent' | translate}}</mat-label>
           <input matInput type="text" readonly formControlName="accountName">
           <button id="open-leaf" mat-mini-fab matSuffix aria-label="Search" (click)="openMode()">
             <mat-icon color="primary">search</mat-icon>
           </button>
           <mat-error *ngIf="accountForm.get('accountName')?.hasError('required')">
-            Enter a valid first account tranfer!
+            {{ 'forms.account.name_message' | translate}}
           </mat-error>
         </mat-form-field>
 
 
         <mat-form-field class="example-full-width">
-          <mat-label>Account path</mat-label>
-          <textarea matInput placeholder="Account path" readonly formControlName="path" [disabled]="true"></textarea>
+          <mat-label>{{ 'forms.account.path' | translate}}</mat-label>
+          <textarea matInput placeholder="{{ 'forms.account.path' | translate}}" readonly formControlName="path"
+            [disabled]="true"></textarea>
           <input type="hidden" readonly formControlName="idAccount">
         </mat-form-field>
         <br>
         <mat-form-field class="example-full-width">
-          <mat-label>New account name</mat-label>
-          <input matInput placeholder="New account name " formControlName="newAccountName" />
+          <mat-label>{{ 'forms.account.name' | translate}}</mat-label>
+          <input matInput placeholder="{{ 'forms.account.name' | translate}}" formControlName="newAccountName" />
           <mat-error *ngIf="accountForm.get('newAccountName')?.hasError('required')">
-            Enter a valid second account tranfer!
+            {{ 'forms.account.name_message' | translate}}
           </mat-error>
         </mat-form-field>
 
@@ -46,9 +47,10 @@
 
     </form>
     <div class="ion-padding form-tool">
-      <button mat-raised-button color="primary" style="float: right;" (click)="submit()">{{ 'SUBMIT'}}</button>
+      <button mat-raised-button color="primary" style="float: right;"
+        (click)="submit()">{{ 'forms.account.submit' | translate}}</button>
       <button (click)="accountForm.reset(); accountForm.markAsPristine()" mat-raised-button color="accent"
-        style="float: right;">RESET</button>
+        style="float: right;">{{ 'forms.account.reset' | translate}}</button>
 
     </div>
   </ion-content>

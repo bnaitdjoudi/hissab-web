@@ -13,8 +13,8 @@ import { tables } from './tables';
 import { AccountResume } from '../../model/account.resume.model';
 import { queriesAccount } from './queries';
 import { format } from 'date-fns';
-import { number } from 'echarts';
-import { resolve } from 'cypress/types/bluebird';
+
+import { AccountLimit } from 'src/app/model/account-limit.model';
 
 @Injectable({
   providedIn: 'root',
@@ -38,27 +38,27 @@ export class AccountDataBase
         }
       }
       this.sqLiteObject
-        .executeSql(queriesAccount.view, [
+        .query(queriesAccount.view, [
           format(startDate, 'yyyy-MM-dd HH:mm:ss'),
           format(endDate, 'yyyy-MM-dd HH:mm:ss'),
           id,
         ])
         .then((data: any) => {
-          if (data.rows.length > 0) {
+          if (data.values.length > 0) {
             let i = 0;
             resolve({
-              id: data.rows.item(i).ID,
-              acountName: data.rows.item(i).ACCOUNT_NAME,
-              totalAccount: data.rows.item(i)[tables.account.columns[2].name],
-              isMain: data.rows.item(i).IS_MAIN > 0,
-              type: data.rows.item(i).TYPE,
-              parentId: data.rows.item(i).PARENT_ID,
-              path: data.rows.item(i).PATH,
-              isLeaf: data.rows.item(i).IS_LEAF > 0,
+              id: data.values[i].ID,
+              acountName: data.values[i].ACCOUNT_NAME,
+              totalAccount: data.values[i][tables.account.columns[2].name],
+              isMain: data.values[i].IS_MAIN > 0,
+              type: data.values[i].TYPE,
+              parentId: data.values[i].PARENT_ID,
+              path: data.values[i].PATH,
+              isLeaf: data.values[i].IS_LEAF > 0,
               resume: { debit: 0, credit: 0, sons: 0 },
-              debit: data.rows.item(i).debit,
-              credit: data.rows.item(i).credit,
-              rbalance: data.rows.item(i).rbalance,
+              debit: data.values[i].debit,
+              credit: data.values[i].credit,
+              rbalance: data.values[i].rbalance,
             });
           }
         });
@@ -103,7 +103,7 @@ export class AccountDataBase
     await this.checkDataBaseOpened();
     return new Promise<Account>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `UPDATE ${tables.account.name} SET ${tables.account.columns
             .filter((el) => el.name !== 'ID')
             .map((el) => el.name + ' = ?')} WHERE id = ?;`,
@@ -115,6 +115,8 @@ export class AccountDataBase
             model.parentId,
             model.path,
             model.isLeaf ? 1 : 0,
+            model.limitMax,
+            model.limitMin,
             id,
           ]
         )
@@ -140,7 +142,7 @@ export class AccountDataBase
     return new Promise<Account[]>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(`SELECT * FROM ${tables.account.name};`, [])
+          .query(`SELECT * FROM ${tables.account.name};`, [])
           .then((res: any) => resolve(this.constructAccountArray(res)))
           .catch((err: any) => {
             printError(
@@ -157,12 +159,12 @@ export class AccountDataBase
     return new Promise((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(
+          .query(
             `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[0].name} = ${id};`,
             []
           )
           .then((data: any) => {
-            if (data.rows.length >= 1) {
+            if (data.values.length >= 1) {
               resolve(this.performeAccountRowIndex(data, 0));
             } else {
               reject('NOT FOUND');
@@ -179,12 +181,12 @@ export class AccountDataBase
     await this.checkDataBaseOpened();
     return new Promise<Account>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[1].name} = ?;`,
           [name]
         )
         .then((res: any) => {
-          if (res.rows.length > 0) {
+          if (res.values.length > 0) {
             resolve(this.performeAccountRowIndex(res, 0));
           } else {
             reject('NOT FOUND');
@@ -200,7 +202,7 @@ export class AccountDataBase
     await this.checkDataBaseOpened();
     return new Promise((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `INSERT INTO ${tables.account.name} (
             ${tables.account.columns[1].name},
             ${tables.account.columns[2].name}, 
@@ -232,17 +234,42 @@ export class AccountDataBase
     });
   }
 
+  async createAccountLimit(model: AccountLimit): Promise<void> {
+    await this.checkDataBaseOpened();
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.sqLiteObject.query(
+          `INSERT INTO ${tables.limites.name} (
+            ${tables.limites.columns[1].name},
+            ${tables.limites.columns[2].name}, 
+            ${tables.limites.columns[3].name},
+            ${tables.limites.columns[4].name})
+              VALUES( ?, ?, ?,? );`,
+          [
+            model.accountId,
+            model.max !== undefined && model.max !== null ? model.max : null,
+            model.min !== undefined && model.min !== null ? model.min : null,
+            model.period,
+          ]
+        );
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   async getAccountsByType(arg0: string): Promise<Account[]> {
     await this.checkDataBaseOpened();
     return new Promise<Account[]>((resolve, reject) => {
       if (this.sqLiteObject !== undefined || this.sqLiteObject !== null) {
         this.sqLiteObject
-          .executeSql(
+          .query(
             `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[4].name} = ?;`,
             [arg0]
           )
-          .then((data: { rows: string | any[] }) => {
-            if (data.rows.length >= 1) {
+          .then((data: any) => {
+            if (data.values.length >= 1) {
               resolve(this.constructAccountArray(data));
             } else {
               resolve([]);
@@ -261,12 +288,12 @@ export class AccountDataBase
     await this.checkDataBaseOpened();
     return new Promise<Account[]>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[3].name} = ?;`,
           [1]
         )
-        .then((data: { rows: string | any[] }) => {
-          if (data.rows.length >= 1) {
+        .then((data: any) => {
+          if (data.values.length >= 1) {
             resolve(this.constructAccountArray(data));
           } else {
             resolve([]);
@@ -299,17 +326,17 @@ export class AccountDataBase
   ): Promise<PagingData<Account>> {
     return new Promise<PagingData<Account>>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT COUNT (*) AS VAL FROM ${tables.account.name}  WHERE  ${tables.account.columns[5].name} = ?`,
           [id]
         )
         .then((res: any) => {
-          let totalElements: number = res.rows.item(0).VAL;
+          let totalElements: number = res.values[0].VAL;
           let offset: number = (paging.page - 1) * paging.limit;
           let totalPage: number = Math.ceil(totalElements / paging.limit);
 
           this.sqLiteObject
-            .executeSql(
+            .query(
               `SELECT  *  FROM ${tables.account.name}  WHERE ${tables.account.columns[5].name} = ? ORDER BY ${tables.account.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
               [id, paging.limit, offset]
             )
@@ -330,7 +357,7 @@ export class AccountDataBase
     return new Promise<void>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(
+          .query(
             `DELETE FROM ${tables.account.name} WHERE  ${
               tables.account.columns[0].name
             } IN (${ids.join(',')})`
@@ -345,7 +372,7 @@ export class AccountDataBase
             resolve();
           })
           .catch((err: any) => {
-            if (err.rows.length === 0 && err.rowsAffected >= 0) {
+            if (err.values.length === 0 && err.rowsAffected >= 0) {
               resolve();
             } else {
               printError("erreur dans l'excecusion de le requete", reject, err);
@@ -375,7 +402,7 @@ export class AccountDataBase
     await this.checkDataBaseOpened();
     return new Promise<any>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `UPDATE ${tables.account.name} SET ${
             tables.account.columns[2].name
           } = ${tables.account.columns[2].name} + ? WHERE ${
@@ -404,44 +431,28 @@ export class AccountDataBase
   ): Promise<LeafAccount[]> {
     return new Promise<LeafAccount[]>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF , TYPE, BALANCE FROM ACCOUNT  WHERE IS_LEAF = 1 AND TYPE NOT IN (${types
             .map((el) => `'${el}'`)
             .join(',')});`,
           []
         )
-        .then(
-          (data: {
-            rows: {
-              length: number;
-              item: (arg0: number) => {
-                (): any;
-                new (): any;
-                ID: any;
-                ACCOUNT_NAME: any;
-                PATH: any;
-                IS_LEAF: number;
-                TYPE: string;
-                BALANCE: number;
-              };
-            };
-          }) => {
-            let leafAccounts: LeafAccount[] = [];
-            if (data.rows.length > 0) {
-              for (let i = 0; i < data.rows.length; i++) {
-                leafAccounts.push({
-                  id: data.rows.item(i).ID,
-                  acountName: data.rows.item(i).ACCOUNT_NAME,
-                  path: data.rows.item(i).PATH,
-                  isLeaf: data.rows.item(i).IS_LEAF > 0,
-                  type: data.rows.item(i).TYPE,
-                  balance: data.rows.item(i).BALANCE,
-                });
-              }
+        .then((data: any) => {
+          let leafAccounts: LeafAccount[] = [];
+          if (data.values.length > 0) {
+            for (let i = 0; i < data.values.length; i++) {
+              leafAccounts.push({
+                id: data.values[i].ID,
+                acountName: data.values[i].ACCOUNT_NAME,
+                path: data.values[i].PATH,
+                isLeaf: data.values[i].IS_LEAF > 0,
+                type: data.values[i].TYPE,
+                balance: data.values[i].BALANCE,
+              });
             }
-            resolve(leafAccounts);
           }
-        )
+          resolve(leafAccounts);
+        })
         .catch((err: any) => {
           printError("erreur dans l'appel a la base de données", reject, err);
         });
@@ -462,44 +473,28 @@ export class AccountDataBase
   async privateFindAllLeafExeptOneByIds(ids: number[]): Promise<LeafAccount[]> {
     return new Promise<LeafAccount[]>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF, TYPE, BALANCE FROM ACCOUNT  WHERE IS_LEAF = 1 AND ID NOT IN (${ids
             .map((el) => `'${el}'`)
             .join(',')});`,
           []
         )
-        .then(
-          (data: {
-            rows: {
-              length: number;
-              item: (arg0: number) => {
-                (): any;
-                new (): any;
-                ID: any;
-                ACCOUNT_NAME: any;
-                PATH: any;
-                IS_LEAF: number;
-                TYPE: string;
-                BALANCE: number;
-              };
-            };
-          }) => {
-            let leafAccounts: LeafAccount[] = [];
-            if (data.rows.length > 0) {
-              for (let i = 0; i < data.rows.length; i++) {
-                leafAccounts.push({
-                  id: data.rows.item(i).ID,
-                  acountName: data.rows.item(i).ACCOUNT_NAME,
-                  path: data.rows.item(i).PATH,
-                  isLeaf: data.rows.item(i).IS_LEAF > 0,
-                  type: data.rows.item(i).TYPE,
-                  balance: data.rows.item(i).BALANCE,
-                });
-              }
+        .then((data: any) => {
+          let leafAccounts: LeafAccount[] = [];
+          if (data.values.length > 0) {
+            for (let i = 0; i < data.values.length; i++) {
+              leafAccounts.push({
+                id: data.values[i].ID,
+                acountName: data.values[i].ACCOUNT_NAME,
+                path: data.values[i].PATH,
+                isLeaf: data.values[i].IS_LEAF > 0,
+                type: data.values[i].TYPE,
+                balance: data.values[i].BALANCE,
+              });
             }
-            resolve(leafAccounts);
           }
-        )
+          resolve(leafAccounts);
+        })
         .catch((err: any) => {
           reject("erreur dans l'appel a la base de données");
           console.error(err);
@@ -518,22 +513,21 @@ export class AccountDataBase
     });
   }
   private async privateFinByPath(transfer: string): Promise<Account> {
-    return new Promise<Account>((resolve, reject) => {
-      this.sqLiteObject
-        .executeSql(
+    return new Promise<Account>(async (resolve, reject) => {
+      try {
+        const data = await this.sqLiteObject.query(
           `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[6].name} LIKE ?`,
           [transfer]
-        )
-        .then((data: { rows: string | any[] }) => {
-          if (data.rows.length > 0) {
-            resolve(this.performeAccountRowIndex(data, 0));
-          } else {
-            reject('no record found!!!');
-          }
-        })
-        .catch((err: any) => {
-          reject(err);
-        });
+        );
+        console.log('privateFinByPath::', JSON.stringify(data));
+        if (data.values.length > 0) {
+          resolve(this.performeAccountRowIndex(data, 0));
+        } else {
+          reject('no record found!!!');
+        }
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
@@ -545,17 +539,17 @@ export class AccountDataBase
   ): Promise<PagingData<Account>> {
     return new Promise<PagingData<Account>>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT COUNT (*) AS VAL FROM ${tables.account.name}  WHERE  ${tables.account.columns[5].name} = ?`,
           [id]
         )
         .then((res: any) => {
-          let totalElements: number = res.rows.item(0).VAL;
+          let totalElements: number = res.values[0].VAL;
           let offset: number = (paging.page - 1) * paging.limit;
           let totalPage: number = Math.ceil(totalElements / paging.limit);
 
           this.sqLiteObject
-            .executeSql(
+            .query(
               `select acc.*, sum(opv.debit) as debit, sum(opv.credit) as credit, sum(opv.debit) - sum(opv.credit)   as rbalance from 
               account acc left outer join operation_view opv on opv.${tables.account.columns[6].name} like acc.${tables.account.columns[6].name} || '%' and opv.${tables.transaction.columns[2].name} >= ? and opv.${tables.transaction.columns[2].name} <= ?
               where acc.${tables.account.columns[5].name} = ?  group by (acc.${tables.account.columns[0].name}) 
@@ -584,14 +578,14 @@ export class AccountDataBase
   async getResumeOfAccountById(id: number): Promise<AccountResume> {
     return new Promise<AccountResume>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `select count(op.id) as sons from operation op where op.id_account = ?`,
           [id]
         )
         .then((res: any) => {
-          if (res.rows.length >= 1) {
+          if (res.values.length >= 1) {
             resolve({
-              sons: res.rows.item(0).sons ? res.rows.item(0).sons : 0,
+              sons: res.values[0].sons ? res.values[0].sons : 0,
             });
           } else {
             resolve({ sons: 0 });
@@ -611,7 +605,7 @@ export class AccountDataBase
     return new Promise<Account[]>((resolve, reject) => {
       if (this.sqLiteObject) {
         this.sqLiteObject
-          .executeSql(
+          .query(
             `select acc.*, count(op.id)  from ${
               tables.account.name
             } acc left join operation op on op.id_account = acc.id  where  UPPER(${
@@ -624,7 +618,7 @@ export class AccountDataBase
             [text, text]
           )
           .then((res: any) => {
-            if (res.rows.length > 0) {
+            if (res.values.length > 0) {
               resolve(this.constructAccountArray(res));
             } else {
               resolve([]);
@@ -646,17 +640,17 @@ export class AccountDataBase
   ): Promise<PagingData<Account>> {
     return new Promise<PagingData<Account>>((resolve, reject) => {
       this.sqLiteObject
-        .executeSql(
+        .query(
           `SELECT COUNT (*) AS VAL FROM ${tables.account.name}  WHERE  ${tables.account.columns[1].name} like ? or ${tables.account.columns[6].name} like ?`,
           [`%${val}%`, `%${val}%`]
         )
         .then((res: any) => {
-          let totalElements: number = res.rows.item(0).VAL;
+          let totalElements: number = res.values[0].VAL;
           let offset: number = (paging.page - 1) * paging.limit;
           let totalPage: number = Math.ceil(totalElements / paging.limit);
 
           this.sqLiteObject
-            .executeSql(
+            .query(
               `SELECT *  FROM ${tables.account.name}  WHERE  ${tables.account.columns[1].name} like ? or ${tables.account.columns[6].name} like ? 
               ORDER BY ${tables.account.columns[2].name} DESC LIMIT ?  OFFSET ?;`,
               [`%${val}%`, `%${val}%`, paging.limit, offset]
@@ -678,7 +672,7 @@ export class AccountDataBase
     await this.checkDataBaseOpened();
     return new Promise<void>(async (resolve, reject) => {
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `UPDATE  ${tables.account.name} SET 
           ${tables.account.columns[2].name} = ? WHERE ${tables.account.columns[0].name} = ?`,
           [balance, accountId]
@@ -696,7 +690,7 @@ export class AccountDataBase
 
     return new Promise<void>(async (resolve, reject) => {
       try {
-        await this.sqLiteObject.executeSql(
+        await this.sqLiteObject.query(
           `UPDATE ${tables.account.name}  SET ${tables.account.columns[2].name} = ?`,
           [balance]
         );
@@ -708,10 +702,68 @@ export class AccountDataBase
     });
   }
 
+  async getAccountLimits(idAccount: number): Promise<AccountLimit[]> {
+    await this.checkDataBaseOpened();
+    return new Promise<AccountLimit[]>(async (resolve, reject) => {
+      try {
+        const data = await this.sqLiteObject.query(
+          `SELECT * FROM ${tables.limites.name} WHERE ${tables.limites.columns[1].name} =  ? ORDER BY ${tables.limites.columns[0].name} DESC ;`,
+          [idAccount]
+        );
+        const limits: AccountLimit[] = [];
+        if (data.values.length >= 1) {
+          for (let i = 0; i < data.values.length; i++) {
+            let accountLimit: AccountLimit = {
+              id: data.values[i].ID,
+              accountId: data.values[i].ACCOUNT_ID,
+              max: data.values[i].MAX,
+              min: data.values[i].MIN,
+              period: data.values[i].PERIOD,
+            };
+            limits.push(accountLimit);
+          }
+        }
+        resolve(limits);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async findAllLeafChildAccounst(path: string): Promise<Account[]> {
+    await this.checkDataBaseOpened();
+    return new Promise<Account[]>(async (resolve, reject) => {
+      try {
+        const data = await this.sqLiteObject.query(
+          `SELECT * FROM ${tables.account.name} WHERE ${tables.account.columns[6].name} LIKE ? AND ${tables.account.columns[6].name}  = 1`,
+          ['%' + path + '%']
+        );
+
+        resolve(this.constructAccountArray(data));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  async deleteAccountLimitById(id: number): Promise<void> {
+    new Promise<void>(async (resolve, reject) => {
+      try {
+        await this.sqLiteObject.query(
+          `DELETE FROM ${tables.limites.name} WHERE  ${tables.account.columns[0].name} =  ?`,
+          [id]
+        );
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   private constructAccountArray(data: any): Account[] {
     let accounts: Account[] = [];
 
-    for (let i = 0; i < data.rows.length; i++) {
+    for (let i = 0; i < data.values.length; i++) {
       accounts.push(this.performeAccountRowIndex(data, i));
     }
 
@@ -720,18 +772,18 @@ export class AccountDataBase
 
   private performeAccountRowIndex(data: any, i: number): Account {
     return {
-      id: data.rows.item(i).ID,
-      acountName: data.rows.item(i).ACCOUNT_NAME,
-      totalAccount: data.rows.item(i)[tables.account.columns[2].name],
-      isMain: data.rows.item(i).IS_MAIN > 0,
-      type: data.rows.item(i).TYPE,
-      parentId: data.rows.item(i).PARENT_ID,
-      path: data.rows.item(i).PATH,
-      isLeaf: data.rows.item(i).IS_LEAF > 0,
+      id: data.values[i].ID,
+      acountName: data.values[i].ACCOUNT_NAME,
+      totalAccount: data.values[i].BALANCE,
+      isMain: data.values[i].IS_MAIN > 0,
+      type: data.values[i].TYPE,
+      parentId: data.values[i].PARENT_ID,
+      path: data.values[i].PATH,
+      isLeaf: data.values[i].IS_LEAF > 0,
       resume: { debit: 0, credit: 0, sons: 0 },
-      debit: data.rows.item(i).debit,
-      credit: data.rows.item(i).credit,
-      rbalance: data.rows.item(i).rbalance,
+      debit: data.values[i].debit,
+      credit: data.values[i].credit,
+      rbalance: data.values[i].rbalance,
     };
   }
 }

@@ -1,7 +1,7 @@
-<ion-menu contentId="main-content">
+<ion-menu [side]="side" contentId="main-content">
   <ion-header>
     <ion-toolbar>
-      <ion-avatar>
+      <ion-avatar [slot]="side">
         <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
       </ion-avatar>
     </ion-toolbar>
@@ -18,7 +18,7 @@
     <ion-list>
       <ion-item>
 
-        <ion-select label="Period" label-placement="fixed" [value]="period$ | async "
+        <ion-select label="{{'actions.period' | traduction}}" label-placement="fixed" [value]="period$ | async "
           (ionChange)="onPeriodChange($event)" [interfaceOptions]="alertOptions" interface="alert">
           <ion-select-option value="month">Current month</ion-select-option>
           <ion-select-option value="cyear">Current year</ion-select-option>
@@ -32,11 +32,11 @@
     <ion-card [class]=" globalBalance >=  0 ? 'positif':'negatif'">
       <ion-card-header>
         <ion-card-title>
-          {{'pages.main.balance.balance' | translate}}
+          {{'pages.main.balance.balance' | traduction}}
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-label class="uppercase-text" slot="start">{{getMonth() | translate}}</ion-label>
+        <ion-label class="uppercase-text" slot="start">{{getMonth() | traduction}}</ion-label>
         <ion-label slot="end" style="float: right;" class="uppercase-text">{{globalBalance| currency
       :'CAD':'symbol-narrow':'1.2-2'}}</ion-label>
       </ion-card-content>
@@ -48,7 +48,7 @@
         <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[0]? mainAccounts[0].id:1)">
             <mat-card-header>
               <mat-card-title-group>
-                <mat-card-title>{{mainAccounts[0]? mainAccounts[0].acountName:'' | translate}}</mat-card-title>
+                <mat-card-title>{{mainAccounts[0]? mainAccounts[0].acountName:'' | traduction}}</mat-card-title>
 
 
               </mat-card-title-group>
@@ -62,7 +62,7 @@
         <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[1]? mainAccounts[1].id:1)">
             <mat-card-header>
               <mat-card-title-group>
-                <mat-card-title>{{mainAccounts[1]? mainAccounts[1].acountName:''| translate}}</mat-card-title>
+                <mat-card-title>{{mainAccounts[1]? mainAccounts[1].acountName:''| traduction}}</mat-card-title>
 
 
               </mat-card-title-group>
@@ -78,7 +78,7 @@
         <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[2]? mainAccounts[2].id:1)">
             <mat-card-header>
               <mat-card-title-group>
-                <mat-card-title>{{mainAccounts[2]? mainAccounts[2].acountName:'' | translate}}</mat-card-title>
+                <mat-card-title>{{mainAccounts[2]? mainAccounts[2].acountName:'' | traduction}}</mat-card-title>
 
 
               </mat-card-title-group>
@@ -92,7 +92,7 @@
         <ion-col><mat-card class="dash-card" matRipple (click)="routeToAccount(mainAccounts[3]? mainAccounts[3].id:1)">
             <mat-card-header>
               <mat-card-title-group>
-                <mat-card-title>{{mainAccounts[3]? mainAccounts[3].acountName:'' | translate}}</mat-card-title>
+                <mat-card-title>{{mainAccounts[3]? mainAccounts[3].acountName:'' | traduction}}</mat-card-title>
 
 
               </mat-card-title-group>
@@ -105,15 +105,12 @@
           </mat-card></ion-col>
       </ion-row>
     </ion-grid>
-
-
-
   </ion-content>
   <ion-footer>
     <ion-toolbar>
       <ion-buttons>
         <ion-button>
-          fwefwe
+          fwefweoo
         </ion-button>
       </ion-buttons>
     </ion-toolbar>

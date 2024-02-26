@@ -1,0 +1,83 @@
+<header-simple [title]="'limites'" (onReturnClick)="backNavigation()" (onPeriodClick)="showPeriodOption()"
+  [periodLabel]="''"></header-simple>
+
+
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-textarea labelPlacement="stacked" value="{{account.acountName}}">
+        <div class="account-label" slot="label">{{'forms.account.name' | traduction }} </div>
+      </ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-textarea labelPlacement="stacked" value="{{account.path}}">
+        <div class="account-label" slot="label">{{'forms.account.path' | traduction }} </div>
+      </ion-textarea>
+    </ion-item>
+  </ion-list>
+  <ion-list>
+    <ion-item *ngFor="let item of limits" inset="true" lines="none">
+      <ion-card button="true">
+        <ion-card-header>
+          <div style="display: flex; justify-content: space-between;">
+            <h5 class="title">{{'period.'+item.period | traduction}}</h5>
+            <ion-icon (click)="deleteItem(item.id)" name="trash-outline" color="danger"></ion-icon>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+
+          <div class="item-content">
+
+            <div class="limit">
+              <div class="bull">
+                <div class="text"><ion-label>Maximum</ion-label></div>
+                <div class="value"><ion-label>{{ item.max ? transformValue(item.max): '-'}}</ion-label></div>
+              </div>
+
+            </div>
+
+            <div class="limit">
+              <div class="bull">
+                <div class="text"><ion-label>Minimum</ion-label></div>
+                <div class="value"><ion-label>{{item.min ? transformValue(item.min) : '-'}}</ion-label></div>
+              </div>
+
+            </div>
+          </div>
+
+        </ion-card-content>
+      </ion-card>
+
+    </ion-item>
+
+  </ion-list>
+</ion-content>
+
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab-button (click)="newLimit()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ion-footer>
+  <!--<ion-toolbar>
+
+    <ion-buttons slot="start">
+
+      <ion-button fill="clear" slot="start" (click)="goToHome()" id="menu-button">
+
+        <fa-icon icon="house"></fa-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+
+      <button mat-raised-button color="primary" (click)="submit()" style="float: right;">{{ 'SUBMIT'}}</button>
+
+    </ion-buttons>
+
+  </ion-toolbar>-->
+</ion-footer>

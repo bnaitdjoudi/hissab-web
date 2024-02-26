@@ -11,9 +11,7 @@ describe('AccountDataBase', () => {
 
   beforeEach(() => {
     let sqLiteObjectSpy: any = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.resolve()),
+      query: jasmine.createSpy('query').and.returnValue(Promise.resolve()),
     };
 
     let dataBaseSpy: any = {
@@ -55,7 +53,7 @@ describe('AccountDataBase', () => {
 
     let result = await accountDb.update(account, 0);
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE ACCOUNT SET ACCOUNT_NAME = ?,BALANCE = ?,IS_MAIN = ?,TYPE = ?,PARENT_ID = ?,PATH = ?,IS_LEAF = ? WHERE id = ?;',
       ['', 0, 0, '', 0, '', 0, 0]
     );
@@ -83,16 +81,16 @@ describe('AccountDataBase', () => {
       expect(error).toEqual("erreur l'ors de l'execussion d ela requette");
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE ACCOUNT SET ACCOUNT_NAME = ?,BALANCE = ?,IS_MAIN = ?,TYPE = ?,PARENT_ID = ?,PATH = ?,IS_LEAF = ? WHERE id = ?;',
       ['', 0, 0, '', 0, '', 0, 0]
     );
   });
 
-  it('AccountDataBase update findById executeSql reject', async () => {
+  it('AccountDataBase update findById query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.returnValue(Promise.reject('error')),
     };
 
@@ -120,7 +118,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual("erreur l'ors de l'execussion d ela requette");
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'UPDATE ACCOUNT SET ACCOUNT_NAME = ?,BALANCE = ?,IS_MAIN = ?,TYPE = ?,PARENT_ID = ?,PATH = ?,IS_LEAF = ? WHERE id = ?;',
       ['', 0, 0, '', 0, '', 0, 0]
     );
@@ -156,7 +154,7 @@ describe('AccountDataBase', () => {
     let accounts = [account1, account2];
 
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 2,
@@ -184,16 +182,14 @@ describe('AccountDataBase', () => {
     let result = await accountDb.findAll();
 
     expect(accounts).toEqual(result);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT;'
     );
   });
 
-  it('AccountDataBase  findByAll executeSql reject', async () => {
+  it('AccountDataBase  findByAll query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject()),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject()),
     };
 
     dataBase.openSQLObject = jasmine
@@ -204,7 +200,7 @@ describe('AccountDataBase', () => {
       await accountDb.findAll();
     } catch (error) {}
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT;'
     );
   });
@@ -225,7 +221,7 @@ describe('AccountDataBase', () => {
     let accounts = [account1];
 
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 1,
@@ -253,7 +249,7 @@ describe('AccountDataBase', () => {
     let result = await accountDb.findById(0);
 
     expect(accounts[0]).toEqual(result);
-    expect(sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE ID = 0;',
       []
     );
@@ -261,7 +257,7 @@ describe('AccountDataBase', () => {
 
   it('AccountDataBase  findById not found', async () => {
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 0,
@@ -280,17 +276,15 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('NOT FOUND');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE ID = 0;',
       []
     );
   });
 
-  it('AccountDataBase  findById executeSql reject', async () => {
+  it('AccountDataBase  findById query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject()),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject()),
     };
 
     dataBase.openSQLObject = jasmine
@@ -303,7 +297,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('erreur lors de la requette');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE ID = 0;',
       []
     );
@@ -325,7 +319,7 @@ describe('AccountDataBase', () => {
     let accounts = [account1];
 
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 1,
@@ -353,7 +347,7 @@ describe('AccountDataBase', () => {
     let result = await accountDb.findByName('name');
 
     expect(accounts[0]).toEqual(result);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE ACCOUNT_NAME = ?;',
       ['name']
     );
@@ -361,7 +355,7 @@ describe('AccountDataBase', () => {
 
   it('AccountDataBase  findByName not found', async () => {
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 0,
@@ -380,17 +374,15 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('NOT FOUND');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE ACCOUNT_NAME = ?;',
       ['name']
     );
   });
 
-  it('AccountDataBase  findByName executeSql reject', async () => {
+  it('AccountDataBase  findByName query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject()),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject()),
     };
 
     dataBase.openSQLObject = jasmine
@@ -403,7 +395,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('erreur lors de la requette');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE ACCOUNT_NAME = ?;',
       ['name']
     );
@@ -425,7 +417,7 @@ describe('AccountDataBase', () => {
     let accounts = [account];
 
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 1,
@@ -453,7 +445,7 @@ describe('AccountDataBase', () => {
     let result = await accountDb.create(account);
 
     expect('succes!').toEqual(result);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'INSERT INTO ACCOUNT (\n            ACCOUNT_NAME,\n            BALANCE, \n            IS_MAIN,\n            TYPE, \n            PARENT_ID,\n            PATH,\n            IS_LEAF) VALUES ( ?, ?, ?,?, ?, ?, ? );',
       ['', 0, 0, '', 0, '', 0]
     );
@@ -473,8 +465,8 @@ describe('AccountDataBase', () => {
     };
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.returnValue(Promise.reject({ code: 6 })),
     };
 
@@ -488,13 +480,13 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('account already exist');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'INSERT INTO ACCOUNT (\n            ACCOUNT_NAME,\n            BALANCE, \n            IS_MAIN,\n            TYPE, \n            PARENT_ID,\n            PATH,\n            IS_LEAF) VALUES ( ?, ?, ?,?, ?, ?, ? );',
       ['', 0, 0, '', 0, '', 0]
     );
   });
 
-  it('AccountDataBase  create executeSql reject ', async () => {
+  it('AccountDataBase  create query reject ', async () => {
     let account: Account = {
       id: 0,
       acountName: '',
@@ -508,9 +500,7 @@ describe('AccountDataBase', () => {
     };
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject('')),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject('')),
     };
 
     dataBase.openSQLObject = jasmine
@@ -523,7 +513,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on creating account:');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'INSERT INTO ACCOUNT (\n            ACCOUNT_NAME,\n            BALANCE, \n            IS_MAIN,\n            TYPE, \n            PARENT_ID,\n            PATH,\n            IS_LEAF) VALUES ( ?, ?, ?,?, ?, ?, ? );',
       ['', 0, 0, '', 0, '', 0]
     );
@@ -545,7 +535,7 @@ describe('AccountDataBase', () => {
     let accounts = [account];
 
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 1,
@@ -574,7 +564,7 @@ describe('AccountDataBase', () => {
 
     expect(result).toEqual(accounts);
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE TYPE = ?;',
       ['actif']
     );
@@ -582,7 +572,7 @@ describe('AccountDataBase', () => {
 
   it('AccountDataBase  getAccountsByType return nothing', async () => {
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 0,
@@ -599,17 +589,15 @@ describe('AccountDataBase', () => {
 
     expect(result).toEqual([]);
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE TYPE = ?;',
       ['actif']
     );
   });
 
-  it('AccountDataBase  getAccountsByType executeSql reject', async () => {
+  it('AccountDataBase  getAccountsByType query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject('')),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject('')),
     };
 
     dataBase.openSQLObject = jasmine
@@ -622,7 +610,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on runnin query account');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE TYPE = ?;',
       ['actif']
     );
@@ -644,7 +632,7 @@ describe('AccountDataBase', () => {
     let accounts = [account];
 
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 1,
@@ -672,7 +660,7 @@ describe('AccountDataBase', () => {
     let result = await accountDb.getMainAccounts();
 
     expect(result).toEqual(accounts);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE IS_MAIN = ?;',
       [1]
     );
@@ -694,7 +682,7 @@ describe('AccountDataBase', () => {
     let accounts = [account];
 
     let sqLiteObject = {
-      executeSql: jasmine.createSpy('executeSql').and.returnValue(
+      query: jasmine.createSpy('query').and.returnValue(
         Promise.resolve({
           rows: {
             length: 0,
@@ -722,16 +710,16 @@ describe('AccountDataBase', () => {
     let result = await accountDb.getMainAccounts();
 
     expect(result).toEqual([]);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE IS_MAIN = ?;',
       [1]
     );
   });
 
-  it('AccountDataBase  getMainAccounts executeSql reject', async () => {
+  it('AccountDataBase  getMainAccounts query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.returnValue(Promise.reject('error')),
     };
 
@@ -744,7 +732,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on running query account');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE IS_MAIN = ?;',
       [1]
     );
@@ -778,8 +766,8 @@ describe('AccountDataBase', () => {
     let accounts = [account1, account2];
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           if (query.includes('SELECT COUNT')) {
             return Promise.resolve({
@@ -824,12 +812,12 @@ describe('AccountDataBase', () => {
     let result = await accountDb.findByIdAccountAndPaging(pagingRequest, 0);
 
     expect(result.data).toEqual(accounts);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT COUNT (*) AS VAL FROM ACCOUNT  WHERE  PARENT_ID = ?',
       [0]
     );
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  *  FROM ACCOUNT  WHERE PARENT_ID = ? ORDER BY ID DESC LIMIT ?  OFFSET ?;',
       [0, 10, 10]
     );
@@ -863,8 +851,8 @@ describe('AccountDataBase', () => {
     let accounts = [account1, account2];
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           if (query.includes('SELECT COUNT')) {
             return Promise.reject('erreur val count!');
@@ -905,7 +893,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('erreur durant la construction des données');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT COUNT (*) AS VAL FROM ACCOUNT  WHERE  PARENT_ID = ?',
       [0]
     );
@@ -913,8 +901,8 @@ describe('AccountDataBase', () => {
 
   it('AccountDataBase findByIdAccountAndPaging get data reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           if (query.includes('SELECT COUNT')) {
             return Promise.resolve({
@@ -946,12 +934,12 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('erreur durant la construction des données');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT COUNT (*) AS VAL FROM ACCOUNT  WHERE  PARENT_ID = ?',
       [0]
     );
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT  *  FROM ACCOUNT  WHERE PARENT_ID = ? ORDER BY ID DESC LIMIT ?  OFFSET ?;',
       [0, 10, 10]
     );
@@ -962,19 +950,17 @@ describe('AccountDataBase', () => {
 
     await accountDb.ajusteDiffByPath(paths, 880);
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       "UPDATE ACCOUNT SET BALANCE = BALANCE + ? WHERE PATH IN ('1/2/3','1/2','1')",
       [880]
     );
   });
 
-  it('AccountDataBase ajusteDiffByPath executeSql reject', async () => {
+  it('AccountDataBase ajusteDiffByPath query reject', async () => {
     let paths: string[] = ['1/2/3', '1/2', '1'];
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject()),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject()),
     };
 
     dataBase.openSQLObject = jasmine
@@ -987,7 +973,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on running query');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       "UPDATE ACCOUNT SET BALANCE = BALANCE + ? WHERE PATH IN ('1/2/3','1/2','1')",
       [880]
     );
@@ -1011,8 +997,8 @@ describe('AccountDataBase', () => {
     let leafs = [leafAccount1, leafAccount2];
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           if (query.includes('SELECT COUNT')) {
             return Promise.reject('erreur val count!');
@@ -1040,17 +1026,15 @@ describe('AccountDataBase', () => {
 
     let result = await accountDb.findAllLeafExeptType(['actif']);
     expect(result).toEqual(leafs);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       "SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF FROM ACCOUNT  WHERE IS_LEAF = 1 AND TYPE NOT IN ('actif');",
       []
     );
   });
 
-  it('AccountDataBase findAllLeafExeptType executeSql reject', async () => {
+  it('AccountDataBase findAllLeafExeptType query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject()),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject()),
     };
 
     dataBase.openSQLObject = jasmine
@@ -1063,7 +1047,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on running query');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       "SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF FROM ACCOUNT  WHERE IS_LEAF = 1 AND TYPE NOT IN ('actif');",
       []
     );
@@ -1087,8 +1071,8 @@ describe('AccountDataBase', () => {
     let leafs = [leafAccount1, leafAccount2];
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           if (query.includes('SELECT COUNT')) {
             return Promise.reject('erreur val count!');
@@ -1116,13 +1100,13 @@ describe('AccountDataBase', () => {
 
     let result = await accountDb.findAllLeafExeptOneByIds([4]);
     expect(result).toEqual(leafs);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       "SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF FROM ACCOUNT  WHERE IS_LEAF = 1 AND ID NOT IN ('4');",
       []
     );
   });
 
-  it('AccountDataBase findAllLeafExeptOneByIds executeSql reject', async () => {
+  it('AccountDataBase findAllLeafExeptOneByIds query reject', async () => {
     let leafAccount1: LeafAccount = {
       id: 4,
       acountName: 'count1',
@@ -1140,9 +1124,7 @@ describe('AccountDataBase', () => {
     let leafs = [leafAccount1, leafAccount2];
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
-        .and.returnValue(Promise.reject()),
+      query: jasmine.createSpy('query').and.returnValue(Promise.reject()),
     };
 
     dataBase.openSQLObject = jasmine
@@ -1154,7 +1136,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on running query');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       "SELECT ID, ACCOUNT_NAME, PATH, IS_LEAF FROM ACCOUNT  WHERE IS_LEAF = 1 AND ID NOT IN ('3');",
       []
     );
@@ -1175,8 +1157,8 @@ describe('AccountDataBase', () => {
     let accounts = [account];
 
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           return Promise.resolve({
             rows: {
@@ -1204,7 +1186,7 @@ describe('AccountDataBase', () => {
 
     let result = await accountDb.finByPath('path');
     expect(result).toEqual(account);
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE PATH LIKE ?',
       ['path']
     );
@@ -1212,8 +1194,8 @@ describe('AccountDataBase', () => {
 
   it('AccountDataBase finByPath return empty', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           return Promise.resolve({
             rows: {
@@ -1233,16 +1215,16 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on running query');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE PATH LIKE ?',
       ['path']
     );
   });
 
-  it('AccountDataBase finByPath executeSql reject', async () => {
+  it('AccountDataBase finByPath query reject', async () => {
     let sqLiteObject = {
-      executeSql: jasmine
-        .createSpy('executeSql')
+      query: jasmine
+        .createSpy('query')
         .and.callFake((query: string, args: any[]) => {
           return Promise.reject('reject!');
         }),
@@ -1258,7 +1240,7 @@ describe('AccountDataBase', () => {
       expect(error).toEqual('error on running query');
     }
 
-    expect(accountDb.sqLiteObject.executeSql).toHaveBeenCalledWith(
+    expect(accountDb.sqLiteObject.query).toHaveBeenCalledWith(
       'SELECT * FROM ACCOUNT WHERE PATH LIKE ?',
       ['path']
     );

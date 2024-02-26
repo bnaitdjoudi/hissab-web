@@ -30,6 +30,7 @@ export class SignUpPageStore extends Store<SignUpModel> {
     super({ isSignedIn: undefined, isSignedUp: undefined });
 
     this.mainStore.flags$.subscribe((flagsMap) => {
+      console.log('flagsMap:', JSON.stringify(flagsMap));
       if (flagsMap.size > 0) {
         this.setState({
           ...this.state,

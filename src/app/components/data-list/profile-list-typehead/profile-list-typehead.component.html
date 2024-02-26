@@ -18,7 +18,7 @@
     <ion-radio-group (ionChange)="radioChange($event)" [value]="value">
         <ion-list id="modal-list" [inset]="true">
             <ion-item *ngFor="let item of filteredItems; trackBy: trackItems">
-                <ion-radio [value]="item.mail">{{ item.lastName +' '+ item.firstName}}</ion-radio>
+                <ion-radio [value]="item.mail" aria-label="{{ item.lastName +' '+ item.firstName}}"></ion-radio>
 
             </ion-item>
         </ion-list>

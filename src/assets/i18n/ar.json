@@ -1,0 +1,178 @@
+{
+  "period": {
+    "global": "شامل",
+    "gl": "شامل",
+    "an": "سنوية",
+    "dl": "يوميًا",
+    "ml": "شهريا",
+    "wl": "أسبوعي"
+  },
+  "menu": {
+    "dashbord": "لوحة القيادة",
+
+    "account": {
+      "text": "حساب",
+      "new": "حساب جديد",
+      "search": "بحث الحساب"
+    },
+
+    "operation": {
+      "text": "عمليات",
+      "new": "عملية جديدة",
+      "search": "بحث عملية"
+    },
+
+    "magaging": {
+      "text": "الاعتدال",
+      "rapport": "التقارير",
+      "remind": "تذكير",
+      "alert": "تنبه"
+    },
+
+    "admin": {
+      "text": "إدارة",
+      "profiles": "تعريفي",
+      "subscription": "الاشتراك",
+      "langues": "اللغات",
+      "support": "دعم"
+    }
+  },
+  "month": {
+    "January": "January",
+    "February": "February",
+    "March": "March",
+    "April": "April",
+    "May": "May",
+    "June": "June",
+    "July": "July",
+    "August": "August",
+    "September": "September",
+    "October": "October",
+    "November": "November",
+    "December": "December"
+  },
+  "accounttype": {
+    "actifs": "assets",
+    "passifs": "liabilities",
+    "depense": "expenses",
+    "income": "incomes"
+  },
+  "actions": {
+    "createOp": "Create Operation",
+    "createAcc": "Create Account",
+    "cancel": "Cancel",
+    "period": "فترة"
+  },
+  "forms": {
+    "operation": {
+      "title": "New operation",
+      "cancel": "cancel",
+      "transferTo": "Transfer to",
+      "description": "description",
+      "attachment": "attachment",
+      "numTrans": "transaction number",
+
+      "actif": {
+        "debit": "deposite",
+        "credit": "withdrawal"
+      },
+
+      "passif": {
+        "debit": "payment",
+        "credit": "تكلف"
+      },
+
+      "income": {
+        "debit": "income",
+        "credit": "تكلف"
+      },
+
+      "depense": {
+        "debit": "استرداد",
+        "credit": "تكلف"
+      },
+
+      "case1": {
+        "credit": "انسحاب"
+      },
+      "case2": {
+        "credit": "قرض"
+      },
+      "case3": {
+        "credit": "استرداد"
+      },
+      "case4": {
+        "debit": "دخل"
+      },
+      "case5": {
+        "credit": "الدفع"
+      },
+      "case6": {
+        "debit": "نقل"
+      },
+      "case7": {
+        "debit": "استرداد"
+      },
+      "case8": {
+        "debit": "الدفع"
+      },
+      "case9": {
+        "credit": "تكلف"
+      },
+      "case10": {
+        "credit": "تكلف"
+      },
+
+      "case11": {
+        "debit": "نقل"
+      },
+      "case12": {
+        "debit": "تكلف"
+      },
+      "case13": {
+        "credit": "استرداد"
+      },
+      "case14": {
+        "credit": "نقل"
+      },
+      "case15": {
+        "debit": "استرداد"
+      }
+    },
+    "account": {
+      "title": "حساب جديد",
+      "parent": "الحساب الاصلي",
+      "name": "إسم الحساب",
+      "name_message": "أدخل اسم حساب صالح",
+      "path": "طريق",
+      "reset": "إعادة ضبط",
+      "submit": "يُقدِّم"
+    }
+  },
+
+  "divers": "diverse",
+  "actifs": "assets",
+  "passifs": "liabilities",
+  "depense": "expenses",
+  "income": "incomes",
+  "transferTo": "transfer to",
+  "pages": {
+    "main": {
+      "balance": {
+        "balance": "balance",
+        "global": "global"
+      }
+    },
+    "lang": {
+      "apply": "طبق",
+      "cancel": "إلغاء"
+    }
+  },
+
+  "operations": {
+    "s": "waiting"
+  },
+  "titles": {
+    "lang": "اللغات"
+  }
+}

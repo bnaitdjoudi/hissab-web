@@ -1,0 +1,57 @@
+<ion-header>
+    <ion-toolbar>
+
+        <ion-buttons slot="start">
+            <ion-button fill="clear" slot="end" id="menu-button" (click)="back()">
+                <ion-icon name="arrow-back-sharp" size="large"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+
+        <ion-title [slot]="slot"><ion-label class="capitelize">
+            </ion-label> {{ 'titles.lang' | traduction}} </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+    <ion-radio-group [value]="lang" (ionChange)="valueChange($event)">
+
+
+        <ion-list>
+            <ion-item>
+                <ion-label slot="start">Arabic/العربية</ion-label>
+                <ion-radio value="ar" slot="end"></ion-radio>
+            </ion-item>
+            <ion-item>
+                <ion-label slot="start">Français</ion-label>
+                <ion-radio value="fr" slot="end"></ion-radio>
+
+            </ion-item>
+            <ion-item>
+                <ion-label slot="start">Englais</ion-label>
+                <ion-radio value="en" slot="end"></ion-radio>
+            </ion-item>
+
+        </ion-list>
+    </ion-radio-group>
+
+
+</ion-content>
+
+<ion-footer>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button fill="clear" slot="start" id="menu-button">
+                <fa-icon icon="house"></fa-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+            <button mat-raised-button (click)="back()"
+                style="float: left;margin-right: 5px;">{{'pages.lang.cancel' | traduction}}</button>
+            <button mat-raised-button color="primary" style="float: right;"
+                (click)="apply()">{{'pages.lang.apply' | traduction}}</button>
+
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-footer>

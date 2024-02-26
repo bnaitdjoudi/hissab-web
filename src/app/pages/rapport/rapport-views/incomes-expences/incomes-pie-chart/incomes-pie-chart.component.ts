@@ -53,6 +53,12 @@ export class IncomesPieChartComponent
         text: 'Incomes',
         subtext: '',
         left: 'center',
+        subtextStyle: {
+          color: '#f1f1f2',
+        },
+        textStyle: {
+          color: '#f1f1f2',
+        },
       },
       tooltip: {
         trigger: 'item',
@@ -60,12 +66,20 @@ export class IncomesPieChartComponent
       legend: {
         orient: 'vertical',
         left: 'left',
+        textStyle: {
+          color: '#f1f1f2',
+          fontWeight: 'bold',
+        },
       },
       series: [
         {
           name: 'Incomes',
           type: 'pie',
           radius: '50%',
+          label: {
+            color: '#f1f1f2',
+          },
+
           data: this.dataComul
             .filter((el) => Math.abs(el.value) > 0)
             .map((el) => {
@@ -76,6 +90,7 @@ export class IncomesPieChartComponent
               shadowBlur: 10,
               shadowOffsetX: 0,
               shadowColor: 'rgba(0, 0, 0, 0.5)',
+              color: '#f1f1f2',
             },
           },
         },
